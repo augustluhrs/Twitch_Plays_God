@@ -10,7 +10,7 @@ let ecosystem;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  ecosystem = new Ecosystem(50);
+  ecosystem = new Ecosystem(100);
 }
 
 function draw() {
