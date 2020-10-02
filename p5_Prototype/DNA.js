@@ -11,5 +11,6 @@ class DNA {
         this.refractoryPeriod = Math.floor(random(30, 100)); //doesn't need floor if using <= but w/e
         this.parentalSacrifice = random();
         this.minLifeToReproduce = random(10,100);
+        this.excretionRate = Math.floor(random(1000, 10000));
     }
 }

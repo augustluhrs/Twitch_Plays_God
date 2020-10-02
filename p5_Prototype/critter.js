@@ -36,11 +36,14 @@ class Critter {
 
 
         this.mateTimer = Math.floor(random(100, 1000));
+        this.excretionTimer = Math.floor(random(0, 500));
+        this.foodScale = 10; //where else can I set this?
     }
 
     run() {
         this.update();
         this.borders();
+        this.excrete();
         this.display();
     }
 
@@ -68,6 +71,31 @@ class Critter {
         this.color.setRed(map(this.lifeForce, 0, 150, 0, 255));
         fill(this.color);
         ellipse(this.position.x, this.position.y, this.r);
+    }
+
+    excrete(){
+        this.excretionTimer += 1;
+        if(this.excretionTimer >= this.DNA.excretionRate){
+            console.log("excretion at: " + this.position);
+            this.lifeForce -= this.foodScale;
+            let newFood;
+            if(this.lifeForce == 0){ //very unlikely it's exactly 0
+                this.die();
+                newFood = this.foodScale;
+            } else if (this.lifeForce < 0){
+                newFood = abs(this.lifeForce); //to make sure it only excretes the amount it had left
+                this.die();
+            } else {
+                newFood = this.foodScale;
+                this.excretionTimer = 0;
+            }
+            let foodPos = {x: this.position.x, y: this.position.y};
+            ecosystem.makeFood(newFood, foodPos); //needs a timer so it doesn't pick it back up
+        }
+    }
+
+    die(){
+        ecosystem.decompose(this);
     }
 
     //TODO find a way to check neighbors without going through whole array
