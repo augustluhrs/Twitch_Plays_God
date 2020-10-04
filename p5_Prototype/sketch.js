@@ -12,7 +12,9 @@ function setup() {
 
   // createCanvas(windowWidth, windowHeight);
   ecosystem = new Ecosystem(25);
+  // ecosystem = Ecosystem(25);
   createCanvas(ecosystem.width,ecosystem.height);
+  ecosystem.name();
 }
 
 function draw() {

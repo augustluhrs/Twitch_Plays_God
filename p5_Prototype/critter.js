@@ -8,46 +8,54 @@ class Critter {
         this.xOff = random(1000); //for perlin noise
         this.yOff = random(1000);
         this.DNA = new DNA(); //will get overwritten if child
-        
+
         if (parentA == null || parentB == null) {
-            // this.position = createVector(random(width), random(height));
-            // console.log(ecosystem.width);
+            // this.position = createVector(random(ecosystem.width), random(ecosystem.height));
             //need a promise or something, not sure why eco.width isn't here
             this.position = createVector(random(100, 800), random(100, 800));
-            // this.DNA = new DNA();
-            // this.lifeForce = random(50, 150); //adjust later
             this.lifeForce = 100;
+            // this.name = ecosystem.critters.length.toString();
+            this.name = "test"; //overwritten soon
         } else {
+            this.name = ecosystem.critters.length.toString();
             this.position = createVector(parentA.position.x, parentB.position.y); //not the best way but w/e for now
-            
             //crossover here now
-            
             //color is a mix
             this.DNA.genes[0] = lerpColor(parentA.DNA.genes[0], parentB.DNA.genes[0], random());
             //for all genes but color, normal lerp
-            for(let i = 1; i < 8; i++){ //hardcoding num genes for now
+            for (let i = 1; i < 8; i++) { //hardcoding num genes for now
                 this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], random());
-                // if(random()<0.5){
-                //     this.DNA.genes[i] = parentA.DNA.genes[i];
-                // } else {
-                //     this.DNA.genes[i] = parentB.DNA.genes[i];
-                // }
             }
-            this.DNA = new DNA(this.DNA); //hmm, this could be better
-            this.lifeForce = inheritance;
 
             //mutation
-            // if(random() < this.DNA.mutationRate){
+            for (let i = 0; i < 8; i++) {
+                if (random() < this.DNA.mutationRate) {
+                    //color mutation
+                    if (i == 0) {
 
-            // }
+                    } else{
+                        // this.DNA.genes[i] += random(-)
+                    }
+
+                }
+            }
+
+
+            this.DNA = new DNA(this.DNA); //hmm, this could be better
+            this.lifeForce = inheritance;
         }
 
-        //redundant TODO
-        this.maxSpeed = this.DNA.maxSpeed;
+        // now adjusting b/c of normalized genes
         this.color = this.DNA.color;
-        this.r = this.DNA.r;
+        this.r = map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
+        this.maxSpeed = map(this.DNA.maxSpeed, 0, 1, 0, 15); //speed between 0-15
+        this.refractoryPeriod = map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
+        this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
+        this.minLifeToReproduce = map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
+        this.excretionRate = map(this.DNA.excretionRate, 0, 1, 10000, 100); //now making size+speed = effort --> excretion
+        // this.mutationRate = this.DNA.mutationRate;
 
-
+        //timers
         this.mateTimer = Math.floor(random(100, 1000));
         this.excretionTimer = Math.floor(random(0, 500));
         this.foodScale = 10; //where else can I set this?
@@ -86,28 +94,32 @@ class Critter {
         ellipse(this.position.x, this.position.y, this.r);
     }
 
-    excrete(){
+    excrete() {
         this.excretionTimer += 1;
-        if(this.excretionTimer >= this.DNA.excretionRate){
+        if (this.excretionTimer >= this.excretionRate) {
             // console.log("excretion at: " + this.position);
             this.lifeForce -= this.foodScale;
             let newFood;
-            if(this.lifeForce == 0){ //very unlikely it's exactly 0
+            if (this.lifeForce == 0) { //very unlikely it's exactly 0
                 this.die();
                 newFood = this.foodScale;
-            } else if (this.lifeForce < 0){
-                newFood = abs(this.lifeForce); //to make sure it only excretes the amount it had left
+            } else if (this.lifeForce < 0) {
+                // newFood = abs(this.lifeForce); //to make sure it only excretes the amount it had left
+                newFood = this.lifeForce + this.foodScale; //amount it had before
                 this.die();
             } else {
                 newFood = this.foodScale;
                 this.excretionTimer = 0;
             }
-            let foodPos = {x: this.position.x, y: this.position.y};
+            let foodPos = {
+                x: this.position.x,
+                y: this.position.y
+            };
             ecosystem.makeFood(newFood, foodPos); //needs a timer so it doesn't pick it back up
         }
     }
 
-    die(){
+    die() {
         ecosystem.decompose(this);
     }
 

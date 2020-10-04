@@ -1,4 +1,5 @@
 class Ecosystem {
+// function Ecosystem(){
   constructor(num) {
     //at start of world
     this.width = windowWidth;
@@ -13,7 +14,12 @@ class Ecosystem {
       // let newDNA = new DNA();
       // this.critters.push(new Critter(newPos, newDNA));
       this.critters.push(new Critter());
-
+    }
+  }
+  name(){
+    //doing this a weird way because classes aren't hoisted and havent figured out different way
+    for (let i = 0; i < this.critters.length; i++) {
+      this.critters[i].name = i.toString();
     }
   }
 
@@ -48,10 +54,14 @@ class Ecosystem {
   decompose(deadCritter) {
     for (let i = 0; i < this.critters.length; i++) { //don't need to go backward because returning after 1?
       if (this.critters[i] == deadCritter) { //if this doesn't work, need to check id/name
-        console.log('dead critter at: ' + this.critters[i].position.x + " " + this.critters[i].position.y);
+        // console.log('dead critter at: ' + this.critters[i].position.x + " " + this.critters[i].position.y);
+        console.log("critter " + this.critters[i] + " is dead");
         //TODO add a dead body
         // let corpseR = //i don't understand pointers/references...
-        let corpsePos = {x: this.critters[i].position.x, y: this.critters[i].position.y };
+        let corpsePos = {
+          x: this.critters[i].position.x,
+          y: this.critters[i].position.y
+        };
         this.corpses.push(new Corpse(corpsePos, this.critters[i].r))
         this.critters.splice(i, 1);
         return;
@@ -82,12 +92,12 @@ class Ecosystem {
 
     // for (let i = matePool.length - 1; i >= 0; i--) { // but forloop here because removing while running?
     for (let i = this.critters.length - 1; i >= 0; i--) {
-      if (this.critters[i].mateTimer <= 0 && this.critters[i].lifeForce >= this.critters[i].DNA.minLifeToReproduce) { //using <= just to be safe
+      if (this.critters[i].mateTimer <= 0 && this.critters[i].lifeForce >= this.critters[i].minLifeToReproduce) { //using <= just to be safe
         // for (let j = matePool.length - 2; j >= 0; j--) {
         // for (let j = this.critters.length - 2; j >= 0; j--) {
         for (let j = 0; j < i; j++) { //really trying to not overlap with self
 
-          if (this.critters[j].mateTimer <= 0 && this.critters[j].lifeForce >= this.critters[j].DNA.minLifeToReproduce) { //if both parents are ready
+          if (this.critters[j].mateTimer <= 0 && this.critters[j].lifeForce >= this.critters[j].minLifeToReproduce) { //if both parents are ready
             if (
               dist(
                 this.critters[i].position.x,
@@ -98,21 +108,21 @@ class Ecosystem {
             ) {
               // console.log("mate found at " + this.critters[i].position.x + " " + this.critters[i].position.y);
               //start refractory period, NEED to do this before sending DNA or else baby will be DTF?
-              this.critters[i].mateTimer += this.critters[i].DNA.refractoryPeriod;
-              this.critters[j].mateTimer += this.critters[j].DNA.refractoryPeriod;
-              // console.log("parentA Life Force: " + this.critters[i].lifeForce + " and minLifeNeeded: " + this.critters[i].DNA.minLifeToReproduce);
-              // console.log("parentB Life Force: " + this.critters[j].lifeForce + " and minLifeNeeded: " + this.critters[j].DNA.minLifeToReproduce);
+              this.critters[i].mateTimer += this.critters[i].refractoryPeriod;
+              this.critters[j].mateTimer += this.critters[j].refractoryPeriod;
+              // console.log("parentA Life Force: " + this.critters[i].lifeForce + " and minLifeNeeded: " + this.critters[i].minLifeToReproduce);
+              // console.log("parentB Life Force: " + this.critters[j].lifeForce + " and minLifeNeeded: " + this.critters[j].minLifeToReproduce);
 
-              let parentSacrificeA = this.critters[i].lifeForce * this.critters[i].DNA.parentalSacrifice;
+              let parentSacrificeA = this.critters[i].lifeForce * this.critters[i].parentalSacrifice;
               this.critters[i].lifeForce -= parentSacrificeA;
-              let parentSacrificeB = this.critters[j].lifeForce * this.critters[j].DNA.parentalSacrifice;
+              let parentSacrificeB = this.critters[j].lifeForce * this.critters[j].parentalSacrifice;
               this.critters[j].lifeForce -= parentSacrificeB;
               let inheritance = parentSacrificeA + parentSacrificeB;
               // console.log("inheritance = " + inheritance);
-              // let newBaby = this.critters[i].reproduce(this.critters[j].DNA);
+              // let newBaby = this.critters[i].reproduce(this.critters[j]);
               let newBaby = new Critter(this.critters[i], this.critters[j], inheritance);
               this.critters.push(newBaby);
-
+              console.log('new baby ' + newBaby.name + '! ' + ' from ' + this.critters[i].name + " and " + this.critters[j].name);
               //don't need to push new baby array at end because if push, goes to end and therefore won't mess with critter indexes?
 
             }
