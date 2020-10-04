@@ -107,7 +107,7 @@ class Critter {
         ellipse(this.position.x, this.position.y, this.r + map(this.lifeForce, 0, 200, 0, this.r / 2));
         //base critter
         fill(this.color);
-        stroke(0);
+        noStroke();
         ellipse(this.position.x, this.position.y, this.r);
         noStroke();
     }
