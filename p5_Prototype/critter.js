@@ -17,7 +17,9 @@ class Critter {
             // this.name = ecosystem.critters.length.toString();
             this.name = "test"; //overwritten soon
         } else {
-            this.name = ecosystem.critters.length.toString();
+            // this.name = ecosystem.critters.length.toString();
+            this.name = ecosystem.critterCount.toString();
+
             this.position = createVector(parentA.position.x, parentB.position.y); //not the best way but w/e for now
             //crossover here now
             //color is a mix
@@ -33,7 +35,7 @@ class Critter {
                     //color mutation
                     if (i == 0) {
 
-                    } else{
+                    } else {
                         // this.DNA.genes[i] += random(-)
                     }
 
@@ -88,10 +90,21 @@ class Critter {
 
     display() {
         ellipseMode(CENTER);
-        noStroke();
+        // noStroke();
         // this.color.setRed(map(this.lifeForce, 0, 150, 0, 255));
+        //faded color showing how much lifeForce
+        let fadedColor = color(this.color.levels[0], this.color.levels[1], this.color.levels[2], 100);
+        fill(fadedColor);
+        noStroke();
+        ellipse(this.position.x, this.position.y, this.r + map(this.lifeForce, 0, 100, 0, this.r / 2));
+        //white circle showing if enough life to mate
+        fill(0, 0);
+        stroke(255);
+        ellipse(this.position.x, this.position.y, this.r + map(this.minLifeToReproduce, 10, 200, 0, this.r / 2));
         fill(this.color);
+        stroke(0);
         ellipse(this.position.x, this.position.y, this.r);
+
     }
 
     excrete() {

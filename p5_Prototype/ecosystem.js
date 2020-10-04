@@ -5,6 +5,7 @@ class Ecosystem {
     this.width = windowWidth;
     this.height = windowHeight;
     this.critters = [];
+    this.critterCount = 0;
     this.corpses = [];
     this.supply = [];
     this.mateDistance = 3; //arbitrary for testing
@@ -20,6 +21,7 @@ class Ecosystem {
     //doing this a weird way because classes aren't hoisted and havent figured out different way
     for (let i = 0; i < this.critters.length; i++) {
       this.critters[i].name = i.toString();
+      this.critterCount++;
     }
   }
 
@@ -55,7 +57,7 @@ class Ecosystem {
     for (let i = 0; i < this.critters.length; i++) { //don't need to go backward because returning after 1?
       if (this.critters[i] == deadCritter) { //if this doesn't work, need to check id/name
         // console.log('dead critter at: ' + this.critters[i].position.x + " " + this.critters[i].position.y);
-        console.log("critter " + this.critters[i] + " is dead");
+        console.log("critter " + this.critters[i].name + " is dead");
         //TODO add a dead body
         // let corpseR = //i don't understand pointers/references...
         let corpsePos = {
@@ -123,6 +125,7 @@ class Ecosystem {
               let newBaby = new Critter(this.critters[i], this.critters[j], inheritance);
               this.critters.push(newBaby);
               console.log('new baby ' + newBaby.name + '! ' + ' from ' + this.critters[i].name + " and " + this.critters[j].name);
+              this.critterCount++;
               //don't need to push new baby array at end because if push, goes to end and therefore won't mess with critter indexes?
 
             }
