@@ -1,6 +1,8 @@
 class Ecosystem {
   constructor(num) {
     //at start of world
+    this.width = windowWidth;
+    this.height = windowHeight;
     this.critters = [];
     this.corpses = [];
     this.supply = [];
@@ -14,14 +16,6 @@ class Ecosystem {
 
     }
   }
-
-  //currently not using this, but good placeholder for adding new agents
-  // birthNewBaby(x, y) {
-  //   //birth a new baby at position x,y
-  //   let babyPos = createVector(x, y);
-  //   let dna = new DNA();
-  //   this.critters.push(new Critter(babyPos, dna));
-  // }
 
   run() {
     for (let i = this.supply.length - 1; i >= 0; i--) {
@@ -41,7 +35,7 @@ class Ecosystem {
       this.corpses[i].display();
       if (absolution) {
         this.corpses.splice(i, 1);
-        console.log('corpse fully decomposed');
+        // console.log('corpse fully decomposed');
       }
     }
   }
@@ -72,7 +66,7 @@ class Ecosystem {
           if (dist(this.critters[i].position.x, this.critters[i].position.y, this.supply[j].position.x, this.supply[j].position.y) < this.critters[i].r) {
             this.critters[i].lifeForce += this.supply[j].amount;
             this.supply.splice(j, 1);
-            console.log(i + " nommed");
+            // console.log(i + " nommed");
           }
         }
       }
@@ -114,7 +108,7 @@ class Ecosystem {
               let parentSacrificeB = this.critters[j].lifeForce * this.critters[j].DNA.parentalSacrifice;
               this.critters[j].lifeForce -= parentSacrificeB;
               let inheritance = parentSacrificeA + parentSacrificeB;
-              console.log("inheritance = " + inheritance);
+              // console.log("inheritance = " + inheritance);
               // let newBaby = this.critters[i].reproduce(this.critters[j].DNA);
               let newBaby = new Critter(this.critters[i], this.critters[j], inheritance);
               this.critters.push(newBaby);

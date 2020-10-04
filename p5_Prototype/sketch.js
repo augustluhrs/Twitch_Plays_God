@@ -9,12 +9,14 @@
 let ecosystem;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  ecosystem = new Ecosystem(100);
+
+  // createCanvas(windowWidth, windowHeight);
+  ecosystem = new Ecosystem(25);
+  createCanvas(ecosystem.width,ecosystem.height);
 }
 
 function draw() {
-  background(120);
+  background(200);
   
   ecosystem.run();
 }

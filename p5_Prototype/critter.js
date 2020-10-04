@@ -7,29 +7,42 @@ class Critter {
         // this.position = pos.copy(); //b/c a vector
         this.xOff = random(1000); //for perlin noise
         this.yOff = random(1000);
+        this.DNA = new DNA(); //will get overwritten if child
+        
         if (parentA == null || parentB == null) {
-            this.position = createVector(random(width), random(height));
-            this.DNA = new DNA();
-            this.lifeForce = random(50, 150); //adjust later
+            // this.position = createVector(random(width), random(height));
+            // console.log(ecosystem.width);
+            //need a promise or something, not sure why eco.width isn't here
+            this.position = createVector(random(100, 800), random(100, 800));
+            // this.DNA = new DNA();
+            // this.lifeForce = random(50, 150); //adjust later
+            this.lifeForce = 100;
         } else {
             this.position = createVector(parentA.position.x, parentB.position.y); //not the best way but w/e for now
+            
             //crossover here now
-            if(random()<0.5){
-                this.DNA = parentA.DNA;
-            } else {
-                this.DNA = parentB.DNA;
+            
+            //color is a mix
+            this.DNA.genes[0] = lerpColor(parentA.DNA.genes[0], parentB.DNA.genes[0], random());
+            //for all genes but color, normal lerp
+            for(let i = 1; i < 8; i++){ //hardcoding num genes for now
+                this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], random());
+                // if(random()<0.5){
+                //     this.DNA.genes[i] = parentA.DNA.genes[i];
+                // } else {
+                //     this.DNA.genes[i] = parentB.DNA.genes[i];
+                // }
             }
-
+            this.DNA = new DNA(this.DNA); //hmm, this could be better
             this.lifeForce = inheritance;
 
             //mutation
+            // if(random() < this.DNA.mutationRate){
 
+            // }
         }
 
-        //   this.dna = new DNA(); //in ecosystem
-        // this.DNA = _DNA;
-
-        //redundant
+        //redundant TODO
         this.maxSpeed = this.DNA.maxSpeed;
         this.color = this.DNA.color;
         this.r = this.DNA.r;
@@ -61,14 +74,14 @@ class Critter {
     borders() {
         if (this.position.x < -this.r) this.position.x = width + this.r;
         if (this.position.y < -this.r) this.position.y = height + this.r;
-        if (this.position.x > this.width + this.r) this.position.x = -r;
-        if (this.position.y > this.height + this.r) this.position.y = -r;
+        if (this.position.x > ecosystem.width + this.r) this.position.x = -this.r;
+        if (this.position.y > ecosystem.height + this.r) this.position.y = -this.r;
     }
 
     display() {
         ellipseMode(CENTER);
         noStroke();
-        this.color.setRed(map(this.lifeForce, 0, 150, 0, 255));
+        // this.color.setRed(map(this.lifeForce, 0, 150, 0, 255));
         fill(this.color);
         ellipse(this.position.x, this.position.y, this.r);
     }
@@ -76,7 +89,7 @@ class Critter {
     excrete(){
         this.excretionTimer += 1;
         if(this.excretionTimer >= this.DNA.excretionRate){
-            console.log("excretion at: " + this.position);
+            // console.log("excretion at: " + this.position);
             this.lifeForce -= this.foodScale;
             let newFood;
             if(this.lifeForce == 0){ //very unlikely it's exactly 0
