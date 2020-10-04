@@ -99,12 +99,12 @@ class Critter {
         ellipse(this.position.x, this.position.y, this.r + map(this.lifeForce, 0, 100, 0, this.r / 2));
         //white circle showing if enough life to mate
         fill(0, 0);
-        stroke(255);
+        stroke(255, map((this.mateTimer / this.refractoryPeriod), 0, 1, 255, 0));
         ellipse(this.position.x, this.position.y, this.r + map(this.minLifeToReproduce, 10, 200, 0, this.r / 2));
         fill(this.color);
         stroke(0);
         ellipse(this.position.x, this.position.y, this.r);
-
+        noStroke();
     }
 
     excrete() {
