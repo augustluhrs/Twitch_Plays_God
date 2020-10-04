@@ -106,7 +106,7 @@ class Ecosystem {
                 this.critters[i].position.y,
                 this.critters[j].position.x,
                 this.critters[j].position.y
-              ) <= this.mateDistance
+              ) <= (this.critters[i].r/2) + (this.critters[j].r/2) //not this.mateDistance anymore
             ) {
               // console.log("mate found at " + this.critters[i].position.x + " " + this.critters[i].position.y);
               //start refractory period, NEED to do this before sending DNA or else baby will be DTF?
