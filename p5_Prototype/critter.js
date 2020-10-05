@@ -16,10 +16,12 @@ class Critter {
             this.lifeForce = 100;
             // this.name = ecosystem.critters.length.toString();
             this.name = "test"; //overwritten soon
+            this.ancestry = {}; //overwritten soon
+            // this.ancestry = {child: this.name, parents:["august"]}; //okay so if user, one parent. assign in creator
         } else {
             // this.name = ecosystem.critters.length.toString();
             this.name = ecosystem.critterCount.toString();
-
+            this.ancestry = {child: this.name, parents:[parentA.ancestry, parentB.ancestry]};
             this.position = createVector(parentA.position.x, parentB.position.y); //not the best way but w/e for now
             //crossover here now
             //color is a mix
@@ -34,11 +36,15 @@ class Critter {
                 if (random() < this.DNA.mutationRate) {
                     //color mutation
                     if (i == 0) {
-
+                        let randColor = color(random(255), random(255), random(255));
+                        this.DNA[0] = lerpColor(this.DNA.genes[0], randColor, random(0,0.4)); //only change a little
+                        console.log(this.name + " mutated color from " + randColor);
                     } else {
-                        // this.DNA.genes[i] += random(-)
+                        let mutationLog = random(-.2, .2);
+                        this.DNA.genes[i] += mutationLog; //arbitrary
+                        this.DNA.genes[i] = constrain(this.DNA.genes[i], 0, 1);
+                        console.log(this.name + " mutated " + i + " from " + (this.DNA.genes[i] + mutationLog) + " to " + this.DNA.genes[i]);
                     }
-
                 }
             }
 

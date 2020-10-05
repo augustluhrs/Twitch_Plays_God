@@ -21,6 +21,8 @@ class Ecosystem {
     //doing this a weird way because classes aren't hoisted and havent figured out different way
     for (let i = 0; i < this.critters.length; i++) {
       this.critters[i].name = i.toString();
+      this.critters[i].ancestry = {child: i.toString(), parents:["august"]}; //okay so if user, one parent. assign in creator
+      // this.critters[i].ancestry["parents"][0] = i.toString();
       this.critterCount++;
     }
   }
