@@ -9,6 +9,13 @@ class Ecosystem {
     this.corpses = [];
     this.supply = [];
     this.mateDistance = 3; //arbitrary for testing
+    this.fundsRaised = {
+      "foundation A": 0,
+      "non-profit B": 0,
+      "org C": 0,
+      "school D": 0,
+      "program E": 0
+    };
 
     for (let i = 0; i < num; i++) {
       // let newPos = createVector(random(width), random(height));

@@ -39,6 +39,7 @@
     - if not on twitch, can click for individual info pop up
     - "PokeDex" of all living critters
         - sortable
+- name/num on critter? or too cluttered? maybe under?
 
 ### Ecosystem
 - World
@@ -55,13 +56,13 @@
 
 ### Critters
 - Implement New Traits
-    - names
-    - ancestry
+    - ~~names~~
+    - ~~ancestry~~
     - mating pause
-    - food outline
-    - excretion rate as effort
+    - ~~food outline~~
+    - ~~excretion rate as effort~~
     - food coma
-    - mutations
+    - ~~mutations~~
     - altruism alleles 
         - primary / secondary donations
         - crossover

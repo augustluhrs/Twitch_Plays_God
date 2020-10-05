@@ -11,6 +11,8 @@ class DNA {
             this.minLifeToReproduce = _DNA.minLifeToReproduce;
             this.excretionRate = _DNA.excretionRate;
             this.mutationRate = _DNA.mutationRate;
+            this.minLifeToDonate = _DNA.minLifeToDonate;
+            this.donationPercentage = _DNA.donationPercentage;
             this.genes = _DNA.genes;
         } else {
             //for brand new DNA
@@ -32,6 +34,8 @@ class DNA {
             // this.excretionRate = Math.floor(random(1000, 10000));
             this.excretionRate = map((this.r + this.maxSpeed), 0, 2, 0, 1);
             this.mutationRate = random() * 0.05;
+            this.minLifeToDonate = random();
+            this.donationPercentage = random();
 
             this.genes = [
                 this.color,
@@ -41,7 +45,9 @@ class DNA {
                 this.parentalSacrifice,
                 this.minLifeToReproduce,
                 this.excretionRate,
-                this.mutationRate
+                this.mutationRate,
+                this.minLifeToDonate,
+                this.donationPercentage
             ]
         }
     }

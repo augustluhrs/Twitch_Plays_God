@@ -17,17 +17,35 @@ class Critter {
             // this.name = ecosystem.critters.length.toString();
             this.name = "test"; //overwritten soon
             this.ancestry = {}; //overwritten soon
+            let placesToDonate = ["foundation A", "non-profit B", "org C", "school D", "program E"];
+            this.altriusm = [random(placesToDonate), random(placesToDonate)];
             // this.ancestry = {child: this.name, parents:["august"]}; //okay so if user, one parent. assign in creator
         } else {
             // this.name = ecosystem.critters.length.toString();
             this.name = ecosystem.critterCount.toString();
             this.ancestry = {child: this.name, parents:[parentA.ancestry, parentB.ancestry]};
             this.position = createVector(parentA.position.x, parentB.position.y); //not the best way but w/e for now
+            let parentAplace, parentBplace;
+            if(random()< 0.75){
+                parentAplace = parentA.altriusm[0];
+            } else {
+                parentAplace = parentA.altriusm[1];
+            }
+            if(random()< 0.75){
+                parentBplace = parentB.altriusm[0];
+            } else {
+                parentBplace = parentB.altriusm[1];
+            }
+            if(random()< 0.5){
+                this.altriusm = [parentAplace, parentBplace];
+            } else {
+                this.altriusm = [parentBplace, parentAplace];
+            }
             //crossover here now
             //color is a mix
             this.DNA.genes[0] = lerpColor(parentA.DNA.genes[0], parentB.DNA.genes[0], random());
             //for all genes but color, normal lerp
-            for (let i = 1; i < 8; i++) { //hardcoding num genes for now
+            for (let i = 1; i < this.DNA.genes.length; i++) { 
                 this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], random());
             }
 
@@ -61,7 +79,9 @@ class Critter {
         this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
         this.minLifeToReproduce = map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
         this.excretionRate = map(this.DNA.excretionRate, 0, 1, 10000, 100); //now making size+speed = effort --> excretion
-        // this.mutationRate = this.DNA.mutationRate;
+        this.mutationRate = this.DNA.mutationRate; //not really necessary but whatever, keep it uniform
+        this.minLifeToDonate = map(this.DNA.minLifeToDonate, 0, 1, 10, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
+        this.donationPercentage = this.DNA.donationPercentage;
 
         //timers
         this.mateTimer = Math.floor(random(100, 1000));
@@ -73,6 +93,7 @@ class Critter {
         this.update();
         this.borders();
         this.excrete();
+        this.donate();
         this.display();
     }
 
@@ -140,6 +161,17 @@ class Critter {
                 y: this.position.y
             };
             ecosystem.makeFood(newFood, foodPos); //needs a timer so it doesn't pick it back up
+        }
+    }
+
+    donate(){
+        if(this.lifeForce >= this.minLifeToDonate){
+            let donation = this.lifeForce * this.donationPercentage;
+            this.lifeForce -= donation;
+            console.log(this.name + " just donated " + donation);
+            let primaryDonation = donation * .75; //doing this really laboriously b/c don't want pennies slipping through
+            ecosystem.fundsRaised[this.altriusm[0]] += primaryDonation;
+            ecosystem.fundsRaised[this.altriusm[1]] += donation - primaryDonation;
         }
     }
 
