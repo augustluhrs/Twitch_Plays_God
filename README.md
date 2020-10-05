@@ -53,6 +53,9 @@
     - terraforming
     - climate change
     - group-controlled predator
+- donation log
+    - ~~basic object in code and fund checker function ~~
+    - some sort of rounding down thing + leftovers go to X
 
 ### Critters
 - Implement New Traits
@@ -63,10 +66,11 @@
     - ~~excretion rate as effort~~
     - food coma
     - ~~mutations~~
-    - altruism alleles 
-        - primary / secondary donations
-        - crossover
-        - rate of donation / conditions
+    - ~~altruism alleles~~
+        - ~~primary / secondary donations~~
+        - ~~crossover~~
+        - ~~rate of donation / conditions~~
+    - donation animation/indicator
     - environment adaptations
         - weather preferences
         - biome traits

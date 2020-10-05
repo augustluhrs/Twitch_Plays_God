@@ -82,10 +82,11 @@ class Critter {
         this.mutationRate = this.DNA.mutationRate; //not really necessary but whatever, keep it uniform
         this.minLifeToDonate = map(this.DNA.minLifeToDonate, 0, 1, 10, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
         this.donationPercentage = this.DNA.donationPercentage;
-
+        this.donationRate = map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
         //timers
         this.mateTimer = Math.floor(random(100, 1000));
         this.excretionTimer = Math.floor(random(0, 500));
+        this.donationTimer = Math.floor(random(0,1000));
         this.foodScale = 10; //where else can I set this?
     }
 
@@ -140,7 +141,7 @@ class Critter {
     }
 
     excrete() {
-        this.excretionTimer += 1;
+        this.excretionTimer++;
         if (this.excretionTimer >= this.excretionRate) {
             // console.log("excretion at: " + this.position);
             this.lifeForce -= this.foodScale;
@@ -165,7 +166,9 @@ class Critter {
     }
 
     donate(){
-        if(this.lifeForce >= this.minLifeToDonate){
+        this.donationTimer++;
+        if(this.lifeForce >= this.minLifeToDonate && this.donationTimer >= this.donationRate){
+            this.donationTimer = 0;
             let donation = this.lifeForce * this.donationPercentage;
             this.lifeForce -= donation;
             console.log(this.name + " just donated " + donation);

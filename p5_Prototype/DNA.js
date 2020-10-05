@@ -13,6 +13,7 @@ class DNA {
             this.mutationRate = _DNA.mutationRate;
             this.minLifeToDonate = _DNA.minLifeToDonate;
             this.donationPercentage = _DNA.donationPercentage;
+            this.donationRate = _DNA.donationRate;
             this.genes = _DNA.genes;
         } else {
             //for brand new DNA
@@ -36,6 +37,7 @@ class DNA {
             this.mutationRate = random() * 0.05;
             this.minLifeToDonate = random();
             this.donationPercentage = random();
+            this.donationRate = random();
 
             this.genes = [
                 this.color,
@@ -47,7 +49,8 @@ class DNA {
                 this.excretionRate,
                 this.mutationRate,
                 this.minLifeToDonate,
-                this.donationPercentage
+                this.donationPercentage,
+                this.donationRate
             ]
         }
     }

@@ -34,6 +34,14 @@ class Ecosystem {
     }
   }
 
+  checkFundsRaised(){
+    let totalRaised = 0;
+    for(let place in this.fundsRaised){
+      totalRaised += this.fundsRaised[place];
+    }
+    console.log('total funds raised = $' + totalRaised/100);
+  }
+
   run() {
     for (let i = this.supply.length - 1; i >= 0; i--) {
       this.supply[i].display();
