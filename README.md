@@ -1,9 +1,92 @@
-# Survival_Machines
-### Twitch Plays God
+# Twitch Plays God
+***A virtual ecosystem guided by an online community where autonomous critters use real-world money to donate to non-profits and orgs.***
+
+## Contributing
+
+Want to help me make this thing? Feel free to add/suggest whatever! Currently looking for people who know about the following areas:
+- reliable long-running programs
+- safe un-hackable programs (esp. with money stuff)
+- money stuff (getting and logging incoming funds and sending them out to the right places)
+- data viz
+- UI/UX
+- twitch overlays
+
+## Reading List
+- *The Selfish Gene* by Richard Dawkins
+
+
+## Current Project TODO
+
+### Short Term Goals
+
+**Server Database Stuff**
+- set up ecosystem on server with exports
+- set up critter db
+- set up world db
+- set up backup db
+- research backup best practices
+
+**Ecosystem Stuff**
+- try out NNs (DIY or ml5)
+- critter generation with sliders
+- new critter generation with genes instead of sliders
+- names and other characterizations
+- features beyond circles? (relevant for world changes)
+- mating pause
+- eggs
+- food coma
+- donation animation/indicator
+- environment adaptations
+    - weather preferences
+    - biome traits
+    - diet
+
+**World Stuff**
+- add terrain
+- add hazards
+- add climate
+
+**Webpage Stuff**
+- Add New Critter overlay
+- world stats overlay
+- family trees
+
+**Community Stuff**
+- consult Mimi Yin
+- Crispr Operation to change individuals DNA
+- hivemind predator
+- terraforming
+- changing global effects
+    - donation minimums
+    - reproduction minimums
+    - excretion minimums (no death?)
+
+**Twitch Stuff**
+- test stream
+- research overlays
+- research TPP
+- research bits
+
+**Money Stuff**
+- research ads
+- research alternative payment sources
+- set up transparent ledger
+
+
+### Long Term Goals
+
+- 3D? Either Unity or three.js
+- Arcade Cabinet
+- more meme evolution?
+- prisoner's dilemma
+
+
+
+
 
 ![the first stable ecosystem, a 13 hour running world of around 60 critters](assets/firstStableEcosystem.png)
 
-## TODO 
+## OLD TODO (Oct 2020)
 
 ### Project Overall
 - Update README with project overview
