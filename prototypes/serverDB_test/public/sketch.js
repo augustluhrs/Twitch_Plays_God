@@ -40,22 +40,26 @@ function draw() {
     });
 
     //draw the critters
-    ecosystem.critters.forEach( (critter) => { //x,y,r,color,life,isReadyToMate
+    ecosystem.critters.forEach( (critter) => { //position,r,color,life,isReadyToMate
+        //radius mapping
+        let mappedR = map(critter.r, 0, 1, 5, 50);
+        
         //for lifeForce aura
-        let fadedColor = color(critter.color[0], critter.color[1], critter.color[2], 100);
+        let fadedColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
         fill(fadedColor);
-        ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 100, 0, critter.r / 2));
+        ellipse(critter.position.x, critter.position.y, mappedR + map(critter.life, 0, 100, 0, mappedR / 2));
         
         //show ring if ready to mate
         noFill();
         if(critter.isReadyToMate){
             stroke(255);
         }
-        ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 200, 0, critter.r / 2));
+        ellipse(critter.position.x, critter.position.y, mappedR + map(critter.life, 0, 200, 0, mappedR / 2));
 
         //base critter
-        fill(critter.color);
+        let critCol = color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
+        fill(critCol);
         noStroke();
-        ellipse(critter.position.x, critter.position.y, critter.r);
+        ellipse(critter.position.x, critter.position.y, mappedR);
     });
 }

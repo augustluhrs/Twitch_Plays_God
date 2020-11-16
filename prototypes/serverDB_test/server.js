@@ -40,7 +40,8 @@ world.on('connection', function(socket){
 });
 
 setInterval( () => {
-    ecosystem.run();
+    let updates = ecosystem.run();
+    world.emit("update", updates);
 }, 10);
 
 
