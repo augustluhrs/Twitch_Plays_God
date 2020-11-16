@@ -13,7 +13,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 
 ## Reading List
 - *The Selfish Gene* by Richard Dawkins
-
+- *Joyful Militancy* by carla bergman and Nick Montgomery
 
 ## Current Project TODO
 
@@ -21,6 +21,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 
 **Server Database Stuff**
 - set up ecosystem on server with exports
+- socket display clientside, everything else on server
 - set up critter db
 - set up world db
 - set up backup db
@@ -60,6 +61,10 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
     - donation minimums
     - reproduction minimums
     - excretion minimums (no death?)
+
+**Unity Stuff**
+- test 3D ecosystem
+- ML-Agents test
 
 **Twitch Stuff**
 - test stream
