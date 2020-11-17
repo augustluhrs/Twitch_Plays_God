@@ -20,7 +20,7 @@ class Ecosystem {
         this.supply = []; //the food that exists in the ecosystem
     
         this.conduit = new Conduit();
-    
+        
         //create initial population -- need "new"?
         for (let i = 0; i < numAgents; i++) {
             this.critters.push(new Critter(this.critterCount, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
@@ -29,6 +29,7 @@ class Ecosystem {
     }
     
     run() {
+        console.log(testGlobal.hi);
         let updates = {
             supply: [],
             critters: [],

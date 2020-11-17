@@ -8,6 +8,8 @@
 
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
+let testGlobal = {hi: "hello"};
+
 let ecosystem = new Ecosystem(8);
 
 //create server
@@ -27,6 +29,7 @@ let io = require('socket.io').listen(server)
 //clients
 var world = io.of('/')
 
+
 //listen for anyone connecting to default namespace
 world.on('connection', function(socket){
     console.log('world: ' + socket.id);
@@ -45,7 +48,5 @@ setInterval( () => {
 }, 10);
 
 
-
-
-
+module.exports = testGlobal;
 

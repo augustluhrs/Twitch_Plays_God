@@ -89,8 +89,8 @@ class Critter {
 
         // now map b/c of normalized genes, display genes not
         this.color = this.DNA.color;
-        // this.r = d.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
-        this.r = this.DNA.r;
+        this.r = d.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
+        // this.r = this.DNA.r;
         this.maxSpeed = d.map(this.DNA.maxSpeed, 0, 1, 0, 15); //speed between 0-15
         this.refractoryPeriod = d.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
         this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
