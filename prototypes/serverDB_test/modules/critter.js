@@ -116,8 +116,7 @@ class Critter {
     //all the non-display updates
     live(critters) { 
         this.update(critters); //eventually need to percept through quadtree for these
-        this.borders();
-
+        // this.borders();
         // have to return upstream so these don't work here?
         // this.excrete();
         // this.donate();
@@ -135,12 +134,15 @@ class Critter {
         this.position.add(velocity);
     }
 
-    borders() {
+    //removing for James' bounds flocking
+    /*
+    borders() { 
         if (this.position.x < -this.r) this.position.x = d.width + this.r;
         if (this.position.y < -this.r) this.position.y = d.height + this.r;
         if (this.position.x > d.width + this.r) this.position.x = -this.r;
         if (this.position.y > d.height + this.r) this.position.y = -this.r;
     }
+    */
 
     excrete() {
         this.excretionTimer++;

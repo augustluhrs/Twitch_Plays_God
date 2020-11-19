@@ -18,14 +18,15 @@ class Boid {
         this.maxForce = critter.maxForce || 0.05;
         this.desiredSeparation = critter.desiredSeparation || 25;
         this.separationBias = critter.separationBias || 1; //go down if ready to mate
-        this.desiredFlockSize = critter.desiredFlockSize || 50; //neighbor distance
-        this.alignmentBias = critter.alignmentBias || .5;
-        this.cohesionBias = critter.cohesionBias || 1;
+        this.desiredFlockSize = critter.desiredFlockSize || 100; //neighbor distance
+        this.alignmentBias = critter.alignmentBias || 1;
+        this.cohesionBias = critter.cohesionBias || 1.5;
     }
 
     run (critters) {
         // console.log("running boid");
         this.flock(critters);
+        this.bounds();
         this.update();
         this.position.add(this.velocity); //forgot i need to update this position too
         return this.velocity;
@@ -40,9 +41,16 @@ class Boid {
         alignment.multiply(new Victor(this.alignmentBias, this.alignmentBias));
         cohesion.multiply(new Victor(this.cohesionBias, this.cohesionBias));
 
-        // this.applyForce(separation);
+        this.applyForce(separation);
         this.applyForce(alignment);
-        // this.applyForce(cohesion);
+        this.applyForce(cohesion);
+    }
+
+    bounds() {
+        if (this.position.x > d.width - 10) {this.applyForce(new Victor(-1, 0))}
+        if (this.position.x < 10) {this.applyForce(new Victor(1, 0))}
+        if (this.position.y > d.height - 10) {this.applyForce(new Victor(0, -1))}
+        if (this.position.y < 10) {this.applyForce(new Victor(0, 1))}
     }
 
     update() {
