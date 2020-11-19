@@ -28,16 +28,17 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - research backup best practices
 
 **Ecosystem Stuff**
-- quadtree!
-- flocking!
+- ~~quadtree!~~
+- ~~flocking!~~
 - try out NNs (DIY or ml5)
-- remove pacman border, make solid
+- ~~remove pacman border, make solid~~
 - critter generation with sliders
 - new critter generation with genes instead of sliders
 - names and other characterizations
 - features beyond circles? (relevant for world changes)
 - mating pause
 - eggs
+- ~~seek food~~
 - food coma
 - donation animation/indicator
 - environment adaptations
@@ -46,6 +47,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
     - diet
 
 **World Stuff**
+- make bigger!!!
 - add terrain
 - add hazards
 - add climate
@@ -54,6 +56,11 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - Add New Critter overlay
 - world stats overlay
 - family trees
+
+**Documentation Stuff**
+- behavior gifs
+    - flies around decomposing food
+    - sexual tension of two ready mates in group with high separation bias
 
 **Community Stuff**
 - consult Mimi Yin

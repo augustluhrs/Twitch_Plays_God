@@ -23,6 +23,7 @@ class Boid {
         this.desiredFlockSize = critter.desiredFlockSize || 100; //neighbor distance
         this.alignmentBias = critter.alignmentBias || 1;
         this.cohesionBias = critter.cohesionBias || 1.5;
+        this.hunger = critter.hunger || 10; //to mult food seeking
     }
 
     // run (critters) {
@@ -87,7 +88,9 @@ class Boid {
             //fine to do this for each b/c food drive is heavier? 
             //will they get stuck between food? maybe should check for biggest food? or depends...
             let foodVec = new Victor(food.position.x, food.position.y);
-            this.applyForce(this.seek(foodVec));
+            let hunger = this.seek(foodVec);
+            hunger.multiply(new Victor(this.hunger, this.hunger));
+            this.applyForce(hunger);
         });
     }
 
