@@ -6,6 +6,7 @@ const lerp = require('lerp');
 const Ecosystem = require("./ecosystem");
 // const Conduit = require("./conduit");
 const Boid = require("./flocking");
+const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
 
 class Critter {
     constructor (id, deets) {
@@ -114,8 +115,16 @@ class Critter {
     }
 
     //all the non-display updates
-    live(critters) { 
-        this.update(critters); //eventually need to percept through quadtree for these
+    // live(critters) { 
+    live(qtree) { 
+        //flock
+        let velocity = this.boid.run(qtree);
+        this.position.add(velocity);
+
+        // let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius)
+        //nvm doing qtree look in flocking b/c that's where perception radius is
+        // this.update(qtree); //getting rid of this because update is just flock now
+        // this.update(critters); //eventually need to percept through quadtree for these
         // this.borders();
         // have to return upstream so these don't work here?
         // this.excrete();
@@ -123,16 +132,15 @@ class Critter {
         // this.display();
     }
     
-    update(critters) {
-        //not noise anymore, eventually NN? we'll see how random works
-        // let vx = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
-        // let vy = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
-        // let velocity = new Victor(vx, vy);
-
+    /*
+    // update(critters) {
+    update(qtree) {
         //flocking
-        let velocity = this.boid.run(critters);
+        // let velocity = this.boid.run(critters);
+        let velocity = this.boid.run(qtree);
         this.position.add(velocity);
     }
+    */
 
     //removing for James' bounds flocking
     /*

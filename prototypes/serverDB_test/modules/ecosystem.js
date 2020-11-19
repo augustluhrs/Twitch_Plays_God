@@ -8,7 +8,8 @@ const Corpse = require("./corpse");
 const D = require("./defaults");
 var d = new D();
 const Conduit = require("./conduit");
-const {Quadtree, Point, Circle, Rectangle} = require("./quadtree");
+const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
+var boundary = new Rectangle(d.width / 2, d.height / 2, d.width / 2, d.height / 2);
 
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
@@ -27,24 +28,43 @@ class Ecosystem {
             this.critters.push(new Critter(this.critterCount, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
             this.critterCount++;
         }
+
+        //not setting up quadtree here because new one every run
     }
 
     run() {
+        //quadtree
+        this.qtree = new QuadTree(boundary, 4); //4 arbitrary capacity, can test later
+
+        //for sockets
         let updates = {
             supply: [],
             critters: [],
             corpses: []
-        }; //trying for client display, hope it won't be too slow
+        };
     
-        //show all the food
+        //show all the food + add to qtree
         this.supply.forEach( (food) => {
+            let point = new Point(food.position.x, food.position.y, food);
+            this.qtree.insert(point);
             updates.supply.push(food.display()); //might want to eventually separate ripe function, but since one line, for now is fine
+        });
+
+        //separating all the critter blocks so they all change before looking at each other
+        this.critters.forEach( (critter) => {
+            //first add to qtree so can send it in .live
+            let point = new Point(critter.position.x, critter.position.y, critter);
+            this.qtree.insert(point);
         });
     
         //update all the critters then check for eating/reproducing
         this.critters.forEach( (critter) => {
             //all serverside critter stuff
-            critter.live(this.critters); //sending list for flock 
+            // critter.live(this.critters); //sending list for flock -- but want to use qtree instead because "snapshot"
+            critter.live(this.qtree);
+        });
+
+        this.critters.forEach( (critter) => {
             //check for donations
             let funds = critter.donate();
             if(funds != null) {
@@ -63,9 +83,11 @@ class Ecosystem {
                     this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
                 }
             }
-            //update positions
+            //update socket display positions
             updates.critters.push(critter.display()); //just the p5side display stuff
         });
+
+        //feed and fuck
         this.checkForFood();
         this.checkForMates();
     
