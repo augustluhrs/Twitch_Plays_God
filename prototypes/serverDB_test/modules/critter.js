@@ -5,12 +5,12 @@ let d = new D();
 const lerp = require('lerp');
 const Ecosystem = require("./ecosystem");
 // const Conduit = require("./conduit");
+const Boid = require("./flocking");
 
 class Critter {
     constructor (id, deets) {
         //better name for deets? opts
-        // this.xOff = Math.random() * 1000;
-        // this.yOff = Math.random() * 1000;
+
         this.DNA = new DNA(); //will get overwritten if child
         let parentA = deets.parentA;
         let parentB = deets.parentB;
@@ -30,6 +30,7 @@ class Critter {
         if (parentA == null || parentB == null) { //new beb
             //trying new victor vector library
             this.position = new Victor(Math.random() * d.width, Math.random() * d.height);
+            // this.boid = new Boid(this.position.x, this.position.y);
             this.lifeForce = 100;
             //user created so first in family tree
             this.ancestry = {child: this.name, parents: [deets.god]};
@@ -37,6 +38,7 @@ class Critter {
             let inheritance = deets.inheritance;
             this.ancestry = {child: this.name, parents:[parentA.ancestry, parentB.ancestry]};
             this.position = new Victor(parentA.position.x, parentB.position.y); //not the best way but w/e for now
+            // this.boid = new Boid(this.position.x, this.position.y);
             //altruism target crossover
             let parentAtarget, parentBtarget;
             if(Math.random()< 0.75){ //b/c primary is "dominant" gene
@@ -91,7 +93,7 @@ class Critter {
         this.color = this.DNA.color;
         this.r = d.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
         // this.r = this.DNA.r;
-        this.maxSpeed = d.map(this.DNA.maxSpeed, 0, 1, 0, 15); //speed between 0-15
+        this.maxSpeed = d.map(this.DNA.maxSpeed, 0, 1, 0, 3); //speed between 0-15
         this.refractoryPeriod = d.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
         this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
         this.minLifeToReproduce = d.map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
@@ -106,25 +108,30 @@ class Critter {
         this.excretionTimer = Math.floor(Math.random() * 500);
         this.donationTimer = Math.floor(Math.random() * 1000);
         this.foodScale = 10; //where else can I set this?
+
+        //at end so flocking has all info
+        this.boid = new Boid(this);
     }
 
     //all the non-display updates
-    live() { 
-        this.update();
+    live(critters) { 
+        this.update(critters); //eventually need to percept through quadtree for these
         this.borders();
+
         // have to return upstream so these don't work here?
         // this.excrete();
         // this.donate();
         // this.display();
     }
     
-    update() {
+    update(critters) {
         //not noise anymore, eventually NN? we'll see how random works
-        let vx = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
-        let vy = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
-        let velocity = new Victor(vx, vy);
-        // this.xOff += 0.01;
-        // this.yOff += 0.01;
+        // let vx = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
+        // let vy = d.map(Math.random(), 0, 1, -this.maxSpeed, this.maxSpeed);
+        // let velocity = new Victor(vx, vy);
+
+        //flocking
+        let velocity = this.boid.run(critters);
         this.position.add(velocity);
     }
 
@@ -187,8 +194,9 @@ class Critter {
         if(this.mateTimer <= 0 && this.lifeForce >= this.minLifeToReproduce){
             isReadyToMate = true;
         }
-
-        return {position: this.position, r: this.r, color: this.color, life: this.lifeForce, isReadyToMate: isReadyToMate};
+        //need to convert from Victor
+        let pos = {x: this.position.x, y: this.position.y};
+        return {position: pos, r: this.r, color: this.color, life: this.lifeForce, isReadyToMate: isReadyToMate};
     }
 
 }

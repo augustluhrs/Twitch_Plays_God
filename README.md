@@ -20,15 +20,18 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 ### Short Term Goals
 
 **Server Database Stuff**
-- set up ecosystem on server with exports
-- socket display clientside, everything else on server
+- ~~set up ecosystem on server with exports~~
+- ~~socket display clientside, everything else on server~~
 - set up critter db
 - set up world db
 - set up backup db
 - research backup best practices
 
 **Ecosystem Stuff**
+- quadtree!
+- flocking!
 - try out NNs (DIY or ml5)
+- remove pacman border, make solid
 - critter generation with sliders
 - new critter generation with genes instead of sliders
 - names and other characterizations

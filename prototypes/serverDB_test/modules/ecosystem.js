@@ -6,8 +6,9 @@ const Critter = require("./critter");
 const Food = require("./food");
 const Corpse = require("./corpse");
 const D = require("./defaults");
-const Conduit = require("./conduit");
 var d = new D();
+const Conduit = require("./conduit");
+const {Quadtree, Point, Circle, Rectangle} = require("./quadtree");
 
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
@@ -27,9 +28,8 @@ class Ecosystem {
             this.critterCount++;
         }
     }
-    
+
     run() {
-        console.log(testGlobal.hi);
         let updates = {
             supply: [],
             critters: [],
@@ -44,7 +44,7 @@ class Ecosystem {
         //update all the critters then check for eating/reproducing
         this.critters.forEach( (critter) => {
             //all serverside critter stuff
-            critter.live(); 
+            critter.live(this.critters); //sending list for flock 
             //check for donations
             let funds = critter.donate();
             if(funds != null) {
@@ -132,6 +132,7 @@ class Ecosystem {
                             this.critters[j].lifeForce -= parentSacrificeB;
                             let inheritance = parentSacrificeA + parentSacrificeB;
                             //make new baby
+                            console.log("new baby from " + this.critters[i].name + " and " + this.critters[j].name);
                             this.critterCount++;
                             let newBaby = new Critter(this.critterCount, {parentA: this.critters[i], parentB: this.critters[j], inheritance: inheritance});
                             this.critters.push(newBaby);

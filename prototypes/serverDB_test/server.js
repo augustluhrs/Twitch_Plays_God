@@ -8,9 +8,7 @@
 
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
-let testGlobal = {hi: "hello"};
-
-let ecosystem = new Ecosystem(8);
+let ecosystem = new Ecosystem(20);
 
 //create server
 let port = process.env.PORT || 8080;
@@ -47,6 +45,4 @@ setInterval( () => {
     world.emit("update", updates);
 }, 10);
 
-
-module.exports = testGlobal;
 
