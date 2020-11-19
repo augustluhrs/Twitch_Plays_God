@@ -2,7 +2,9 @@
 // https://p5js.org/examples/simulate-flocking.html
 
 const Victor = require("victor");
+const Critter = require("./critter");
 const D = require("./defaults");
+const { Circle } = require("./quadtree");
 var d = new D(); //i've gotta be doing something wrong...
 
 //just for calculating the flocking forces, actual position is outside
@@ -17,19 +19,53 @@ class Boid {
         this.maxSpeed = critter.maxSpeed;
         this.maxForce = critter.maxForce || 0.05;
         this.desiredSeparation = critter.desiredSeparation || 25;
-        this.separationBias = critter.separationBias || 1; //go down if ready to mate
+        this.separationBias = critter.separationBias || 5; //go down if ready to mate
         this.desiredFlockSize = critter.desiredFlockSize || 100; //neighbor distance
         this.alignmentBias = critter.alignmentBias || 1;
         this.cohesionBias = critter.cohesionBias || 1.5;
     }
 
-    run (critters) {
-        // console.log("running boid");
-        this.flock(critters);
+    // run (critters) {
+    run (qtree) {
+        let surroundings = this.lookAround(qtree);
+        this.flock(surroundings.neighbors);
+        this.graze(surroundings.foodAround);
         this.bounds();
         this.update();
         this.position.add(this.velocity); //forgot i need to update this position too
         return this.velocity;
+    }
+
+    lookAround (qtree) {
+        let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius);
+        let allAround = qtree.query(perception);
+        let surroundings = {
+            neighbors: [],
+            foodAround: []
+        };
+
+        allAround.forEach( (thing) => {
+            //no diff here between using undefined and null?
+            if (thing.data.DNA != undefined) { //is a critter
+                surroundings.neighbors.push(thing.data);
+            } else if (thing.data.ripeRate != undefined) { //is a food
+                surroundings.foodAround.push(thing.data);
+            } else {
+                console.log("what the hell are you? " + thing.data);
+            }
+
+
+            //can't do this because of circular dependency?
+            // if (thing.data instanceof Critter) {
+            //     surroundings.neighbors.push(thing);
+            // } else if (thing.data instanceof Food) {
+            //     surroundings.foodAround.push(thing);
+            // } else {
+            //     console.log("what the hell are you? " + thing);
+            // }
+        })
+
+        return surroundings; //becomes "critters" for flocking
     }
 
     flock (critters) {
@@ -44,6 +80,15 @@ class Boid {
         this.applyForce(separation);
         this.applyForce(alignment);
         this.applyForce(cohesion);
+    }
+
+    graze (foodAround) {
+        foodAround.forEach( (food) => {
+            //fine to do this for each b/c food drive is heavier? 
+            //will they get stuck between food? maybe should check for biggest food? or depends...
+            let foodVec = new Victor(food.position.x, food.position.y);
+            this.applyForce(this.seek(foodVec));
+        });
     }
 
     bounds() {

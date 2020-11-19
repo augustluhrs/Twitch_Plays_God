@@ -4,7 +4,7 @@ using victor.js for vector instead and DIY map,lerp
 
 ecosystem
 - .run returns updates to send to clients for display info, everything else is serverside
-- changing array for loops to foreach loops
+- changing array for loops to foreach loops (not using for of b/c no indexes, but may not matter. need to keep arrow notation to use "this")
 - .decompose --> .die
 - no console.logs
 

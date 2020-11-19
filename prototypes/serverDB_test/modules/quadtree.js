@@ -380,7 +380,15 @@ class Rectangle {
     }
 }
 
-module.exports = Point;
-module.exports = Rectangle;
-module.exports = Circle;
-module.exports = QuadTree;
+module.exports = {
+    Point: Point,
+    Rectangle: Rectangle,
+    Circle: Circle,
+    QuadTree: QuadTree
+}
+
+// doesn't work, need to export as group
+// module.exports = Point;
+// module.exports = Rectangle;
+// module.exports = Circle;
+// module.exports = QuadTree;
