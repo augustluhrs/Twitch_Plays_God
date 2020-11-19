@@ -26,6 +26,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - set up world db
 - set up backup db
 - research backup best practices
+- manager so if crash, restarts
 
 **Ecosystem Stuff**
 - ~~quadtree!~~
