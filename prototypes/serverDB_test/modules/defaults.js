@@ -4,6 +4,8 @@ class Defaults {
     constructor() {
         this.width = 1920;
         this.height = 1080;
+        // this.width = 3840;
+        // this.height = 2160;
     }
 
     map(n, start1, stop1, start2, stop2) {

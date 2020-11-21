@@ -8,7 +8,7 @@
 
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
-let ecosystem = new Ecosystem(100);
+let ecosystem = new Ecosystem(80);
 
 //create server
 let port = process.env.PORT || 8080;
@@ -31,7 +31,7 @@ var world = io.of('/')
 //listen for anyone connecting to default namespace
 world.on('connection', function(socket){
     console.log('world: ' + socket.id);
-
+    world.emit('fundsUpdate', ecosystem.conduit.fundsRaised);
     //new event listeners
     
     //listen for this client to disconnect
@@ -40,9 +40,16 @@ world.on('connection', function(socket){
     });
 });
 
+//main run
 setInterval( () => {
     let updates = ecosystem.run();
     world.emit("update", updates);
 }, 10);
+
+//update funds
+setInterval( () => {
+    let fundsUpdate = ecosystem.conduit.fundsRaised;
+    world.emit('fundsUpdate', fundsUpdate);
+}, 30000);
 
 

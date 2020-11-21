@@ -10,23 +10,64 @@ socket.on('update', (updates) => {
     ecosystem = updates; //issue if this is happening asynch to draw?
 });
 
+socket.on('fundsUpdate', (fundsUpdate) => {
+    //make an array from funds and sort
+    let sorted = Object.keys(fundsUpdate).map((key) => [key, fundsUpdate[key].toFixed(2)]); //two decimal places
+    sorted.sort((a, b) => {return b[1] - a[1]});
+    console.log(sorted);
+
+    funds.sorted = sorted;
+});
+
 let ecosystem = {
     corpses: [],
     supply: [],
     critters: []
 };
 
+//ui box
+let monitor = {
+    position: {x: 0, y: 0},
+    size: {w: 0, h: 0},
+    shape: null,
+    overlay: 0
+}; //position, size, shape, overlay
+
+let funds = {
+    sorted: []
+};
+
+//assets
+function preload(){
+    monitor.shape = loadImage("assets/rounded_rectangle.png"); 
+}
+
 function setup() {
     //how to get d.width/height?
     createCanvas(1920,1080);
+    // createCanvas(3840,2160);
+    
     ellipseMode(CENTER);
     rectMode(CENTER);
+    imageMode(CENTER);
+    textAlign(LEFT, CENTER);
     noStroke();
+
+    monitor.size.w = width/8;
+    monitor.size.h = height/3;
+    monitor.position.x = width - monitor.size.w
+    monitor.position.y = height - monitor.size.h
+
 }
 
 function draw() {
     background(200, 240, 255);
     
+    drawEcosystem();
+    monitorFunds();
+}
+
+function drawEcosystem(){
     //draw the corpses
     ecosystem.corpses.forEach( (corpse) => { //x,y,r,fade
         fill(255,255,255,corpse.fade);
@@ -61,5 +102,18 @@ function draw() {
         fill(critCol);
         noStroke();
         ellipse(critter.position.x, critter.position.y, critter.r);
+    });
+}
+
+function monitorFunds(){
+    //draw the shape background -- need to make this transparent somehow
+    fill(0);
+    image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
+    let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
+    let sectionSize = monitor.size.h / (funds.sorted.length + 1); //fence postttt
+    textSize(sectionSize * 0.8);
+    funds.sorted.forEach( (fund) => {
+        text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
+        monitorOffset.y += sectionSize; //better to use index?
     });
 }
