@@ -33,6 +33,7 @@ class Critter {
             this.position = new Victor(Math.random() * d.width, Math.random() * d.height);
             // this.boid = new Boid(this.position.x, this.position.y);
             this.lifeForce = 100;
+            // ecosystem.worldLife += 100; //keep all changes to ecosystem
             //user created so first in family tree
             this.ancestry = {child: this.name, parents: [deets.god]};
         } else {

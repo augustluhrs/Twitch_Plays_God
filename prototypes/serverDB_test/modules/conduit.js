@@ -11,6 +11,7 @@ class Conduit{
             "school D": 0,
             "program E": 0
         };
+        this.totalRaised = 0;
     }
     getRandomTarget(){
         let r = Math.floor(Math.random() * this.placesToDonate.length);

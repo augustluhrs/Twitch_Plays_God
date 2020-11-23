@@ -10,13 +10,26 @@ socket.on('update', (updates) => {
     ecosystem = updates; //issue if this is happening asynch to draw?
 });
 
-socket.on('fundsUpdate', (fundsUpdate) => {
+socket.on('fundsUpdate', (conduit) => {
+    let fundsUpdate = conduit.fundsRaised;
+    // console.log('funds: ');
+    // console.log(conduit);
+    let total = conduit.totalRaised;
     //make an array from funds and sort
+    //TODO (toFixed "pattern")
     let sorted = Object.keys(fundsUpdate).map((key) => [key, fundsUpdate[key].toFixed(2)]); //two decimal places
     sorted.sort((a, b) => {return b[1] - a[1]});
-    console.log(sorted);
+    // console.log(sorted);
 
     funds.sorted = sorted;
+    funds.total = total;
+});
+
+socket.on('statsUpdate', (update) => {
+    // console.log("stats: ");
+    // console.log(update);
+    stats.critterCount = update.critterCount;
+    stats.worldLife = update.worldLife;
 });
 
 let ecosystem = {
@@ -36,6 +49,14 @@ let monitor = {
 let funds = {
     sorted: []
 };
+
+let stats = {
+    critterCount: 0,
+    worldLife: 0
+}
+
+//buttons
+let newCritterButt;
 
 //assets
 function preload(){
@@ -58,13 +79,21 @@ function setup() {
     monitor.position.x = width - monitor.size.w
     monitor.position.y = height - monitor.size.h
 
+    newCritterButt = createButton("Random Critter")
+        .position(width/4, height - 50)
+        .size(100, 50)
+        .mousePressed( () => {
+            socket.emit("newCritter");
+            console.log("newRandoCritter");
+        });
 }
 
 function draw() {
     background(200, 240, 255);
     
-    drawEcosystem();
     monitorFunds();
+    drawEcosystem(); //switching order so panel doesn't cover up
+    displayStats();
 }
 
 function drawEcosystem(){
@@ -116,4 +145,12 @@ function monitorFunds(){
         text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
         monitorOffset.y += sectionSize; //better to use index?
     });
+    text("Total Donated: " + funds.total.toFixed(2), monitorOffset.x, monitorOffset.y);
+}
+
+function displayStats(){
+    fill(0);
+    textSize(40);
+    text("Critter Count: " + stats.critterCount, width/2, height - 50);
+    text("Life in World: " + floor(stats.worldLife), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
 }

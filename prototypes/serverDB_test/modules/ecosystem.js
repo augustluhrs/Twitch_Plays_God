@@ -16,17 +16,20 @@ class Ecosystem {
     constructor(numAgents) {
         this.width = d.width;
         this.height = d.height;
-        this.critterCount = 0; //just for IDs
+        this.critterID = 0; //just for IDs
         this.critters = []; //the agents currently in the ecosystem    
         this.corpses = []; //currently decomposing critters
         this.supply = []; //the food that exists in the ecosystem
     
         this.conduit = new Conduit();
-        
+        this.worldLife = 0;
+        this.critterCount = 0;
         //create initial population -- need "new"?
         for (let i = 0; i < numAgents; i++) {
-            this.critters.push(new Critter(this.critterCount, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+            this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
             this.critterCount++;
+            this.critterID++;
+            this.worldLife += 100;
         }
 
         //not setting up quadtree here because new one every run
@@ -105,6 +108,14 @@ class Ecosystem {
         return updates;
     }
 
+    spawnRandomCritter() {
+        this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        this.critterCount++;
+        this.critterID++;
+        this.worldLife += 100;
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+    }
+
     makeFood(amount, pos) {
         this.supply.push(new Food(amount, pos));
     }
@@ -118,6 +129,8 @@ class Ecosystem {
                 return;
             }
         });
+        this.critterCount--;
+        this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
     checkForFood() {
@@ -155,7 +168,9 @@ class Ecosystem {
                             let inheritance = parentSacrificeA + parentSacrificeB;
                             //make new baby
                             console.log("new baby from " + this.critters[i].name + " and " + this.critters[j].name);
+                            this.critterID++;
                             this.critterCount++;
+                            this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
                             let newBaby = new Critter(this.critterCount, {parentA: this.critters[i], parentB: this.critters[j], inheritance: inheritance});
                             this.critters.push(newBaby);
                         }
@@ -168,8 +183,23 @@ class Ecosystem {
     }
 
     deposit(donation1, donation2) {
-        this.conduit.fundsRaised[donation1.target] += donation1.amount;
-        this.conduit.fundsRaised[donation2.target] += donation2.amount;
+        //scale to cents -- 1 life force = $0.01
+        let d1 = donation1.amount * 0.01;
+        let d2 = donation2.amount * 0.01;
+        this.conduit.fundsRaised[donation1.target] += d1;
+        this.conduit.fundsRaised[donation2.target] += d2;
+        this.conduit.totalRaised += d1 + d2;
+        this.worldLife -= (d1 + d2) * 100; //clunky
+        world.emit('fundsUpdate', this.conduit);
+        // console.log("conduit " + this.conduit.fundsRaised["program E"]);
+        this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife.toFixed(2)});
+    }
+
+    // good or bad?
+    ecosystemEmit(type, update){
+        if(type == "stats"){
+            world.emit("statsUpdate", update);
+        }
     }
 
 }

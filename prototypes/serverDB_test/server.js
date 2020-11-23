@@ -8,7 +8,9 @@
 
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
-let ecosystem = new Ecosystem(80);
+// let ecosystem = new Ecosystem(10);
+let ecosystem = new Ecosystem(10);
+
 
 //create server
 let port = process.env.PORT || 8080;
@@ -25,15 +27,25 @@ app.use(express.static('public'));
 let io = require('socket.io').listen(server)
 
 //clients
-var world = io.of('/')
+// var world = io.of('/')
+global.world = io.of('/') //lol global...
 
 
 //listen for anyone connecting to default namespace
 world.on('connection', function(socket){
     console.log('world: ' + socket.id);
-    world.emit('fundsUpdate', ecosystem.conduit.fundsRaised);
-    //new event listeners
+    world.emit('fundsUpdate', ecosystem.conduit);
+    world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife.toFixed(2)});
     
+    //new event listeners
+    socket.on("newCritter", (data) => {
+        if(data == undefined){
+            ecosystem.spawnRandomCritter();
+            console.log("spawn rando");
+        } else {
+            console.log("newCritter error");
+        }
+    });
     //listen for this client to disconnect
     socket.on('disconnect', function(){
         console.log('input client disconnected: ' + socket.id);
@@ -47,9 +59,9 @@ setInterval( () => {
 }, 10);
 
 //update funds
-setInterval( () => {
-    let fundsUpdate = ecosystem.conduit.fundsRaised;
-    world.emit('fundsUpdate', fundsUpdate);
-}, 30000);
+// setInterval( () => {
+//     let fundsUpdate = ecosystem.conduit.fundsRaised;
+//     world.emit('fundsUpdate', fundsUpdate);
+// }, 30000);
 
 

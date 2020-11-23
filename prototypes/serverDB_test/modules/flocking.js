@@ -15,7 +15,7 @@ class Boid {
         // this.position is external, this boid is just for motion force, but still need for qtree?
         this.position = critter.position;
         // this.posVector = new Victor(this.position.x, this.position.y);
-        this.perceptionRadius = critter.perceptionRadius || 50;
+        this.perceptionRadius = critter.perceptionRadius || 100;
         this.maxSpeed = critter.maxSpeed;
         this.maxForce = critter.maxForce || 0.05;
         this.desiredSeparation = critter.desiredSeparation || 25;
