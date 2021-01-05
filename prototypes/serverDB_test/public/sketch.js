@@ -96,6 +96,14 @@ function draw() {
     displayStats();
 }
 
+function mousePressed(){
+    if (mouseX > 50 && mouseX < width - 50 &&
+        mouseY > 50 && mouseY < height - 50){
+            console.log("food sprinkle");
+            socket.emit("newFood", {position: {x: mouseX, y: mouseY}});
+        }
+}
+
 function drawEcosystem(){
     //draw the corpses
     ecosystem.corpses.forEach( (corpse) => { //x,y,r,fade
@@ -140,12 +148,12 @@ function monitorFunds(){
     image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
     let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
     let sectionSize = monitor.size.h / (funds.sorted.length + 1); //fence postttt
-    textSize(sectionSize * 0.8);
+    textSize(sectionSize * 0.7);
     funds.sorted.forEach( (fund) => {
         text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
         monitorOffset.y += sectionSize; //better to use index?
     });
-    text("Total Donated: " + funds.total.toFixed(2), monitorOffset.x, monitorOffset.y);
+    text("Total Donated: $" + funds.total.toFixed(2), monitorOffset.x, monitorOffset.y);
 }
 
 function displayStats(){
