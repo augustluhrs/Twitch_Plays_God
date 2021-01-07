@@ -1,12 +1,13 @@
-var DNA = require("./DNA");
-var Victor = require("victor");
-var D = require("./defaults");
-let d = new D();
+const DNA = require("./DNA");
+const Victor = require("victor");
+const D = require("./defaults"); //this is still weird 1/7/21
+// let d = new D();
 const lerp = require('lerp');
 const Ecosystem = require("./ecosystem");
 // const Conduit = require("./conduit");
 const Boid = require("./flocking");
 const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
+const defaults = require("./defaults");
 
 class Critter {
     constructor (id, deets) {
@@ -30,7 +31,7 @@ class Critter {
 
         if (parentA == null || parentB == null) { //new beb
             //trying new victor vector library
-            this.position = new Victor(Math.random() * d.width, Math.random() * d.height);
+            this.position = new Victor(Math.random() * D.worldSize.width, Math.random() * D.worldSize.height);
             // this.boid = new Boid(this.position.x, this.position.y);
             this.lifeForce = 100;
             // ecosystem.worldLife += 100; //keep all changes to ecosystem
@@ -82,7 +83,7 @@ class Critter {
                             lerp(this.DNA.genes[0][2], randColor[0][2], Math.random() * 0.4)
                         ];
                     } else {
-                        this.DNA.genes[i] += d.rand_bm(-1,1,1);; 
+                        this.DNA.genes[i] += D.rand_bm(-1,1,1);; 
                         this.DNA.genes[i] = Math.min(Math.max(this.DNA.genes[i], 0), 1); //DIY constrain
                     }
                 }
@@ -91,19 +92,19 @@ class Critter {
             this.lifeForce = inheritance;
         }
 
-        // now map b/c of normalized genes, display genes not
+        // // now map b/c of normalized genes, display genes not
         this.color = this.DNA.color;
-        this.r = d.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
+        this.r = D.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
         // this.r = this.DNA.r;
-        this.maxSpeed = d.map(this.DNA.maxSpeed, 0, 1, 0, 3); //speed between 0-15
-        this.refractoryPeriod = d.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
+        this.maxSpeed = D.map(this.DNA.maxSpeed, 0, 1, 0, 3); //speed between 0-15
+        this.refractoryPeriod = D.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
         this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
-        this.minLifeToReproduce = d.map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
-        this.excretionRate = d.map(this.DNA.excretionRate, 0, 1, 10000, 100); //now making size+speed = effort --> excretion
+        this.minLifeToReproduce = D.map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
+        this.excretionRate = D.map(this.DNA.excretionRate, 0, 1, 10000, 100); //now making size+speed = effort --> excretion
         this.mutationRate = this.DNA.mutationRate; //not really necessary but whatever, keep it uniform
-        this.minLifeToDonate = d.map(this.DNA.minLifeToDonate, 0, 1, 1, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
+        this.minLifeToDonate = D.map(this.DNA.minLifeToDonate, 0, 1, 1, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
         this.donationPercentage = this.DNA.donationPercentage;
-        this.donationRate = d.map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
+        this.donationRate = D.map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
         
         //timers
         this.mateTimer = Math.floor(Math.random() * 1000 + 100);

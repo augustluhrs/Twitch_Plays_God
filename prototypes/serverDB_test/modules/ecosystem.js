@@ -6,16 +6,16 @@ const Critter = require("./critter");
 const Food = require("./food");
 const Corpse = require("./corpse");
 const D = require("./defaults");
-var d = new D();
+// var d = new D();
 const Conduit = require("./conduit");
 const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
-var boundary = new Rectangle(d.width / 2, d.height / 2, d.width / 2, d.height / 2);
+var boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.worldSize.width / 2, D.worldSize.height / 2);
 
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
     constructor(numAgents) {
-        this.width = d.width;
-        this.height = d.height;
+        this.width = D.worldSize.width;
+        this.height = D.worldSize.height;
         this.critterID = 0; //just for IDs
         this.critters = []; //the agents currently in the ecosystem    
         this.corpses = []; //currently decomposing critters
@@ -71,7 +71,7 @@ class Ecosystem {
             //check for donations
             let funds = critter.donate();
             if(funds != null) {
-                console.log("donation: " + funds.d1 + " " + funds.d2);
+                console.log("donation: " + JSON.stringify(funds.d1) + " " + JSON.stringify(funds.d2));
                 this.deposit(funds.d1, funds.d2)
             };
             //check for food and death
@@ -82,7 +82,7 @@ class Ecosystem {
                     this.die(excretion.death)
                 }
                 if (excretion.makeFood != null) {
-                    console.log("food at: " + excretion.makeFood.foodPos);
+                    console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
                     this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
                 }
             }

@@ -19,12 +19,34 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 
 ### Short Term Goals
 
+**January 2021**
+- [X] ~~finish this list~~
+- [ ] clean up backend code (logs + module reorganization)
+- [ ] clean up frontend code (modules)
+- [ ] new UI
+- [ ] critter creation (sliders)
+- [ ] critter creation (gene packs)
+- [ ] fix food bugs
+- [ ] critter action animations
+- [ ] click to show critter info (stats, donations, family tree)
+- [ ] environment effects
+- [ ] bigger world
+- [ ] databases
+- [ ] test out NNs
+- [ ] test out 3D creatures
+- [ ] procedural creatures and animations
+- [ ] look into Twitch overlays
+- [ ] glitch redo
+- [ ] twitch overlay
+
+
 **Server Database Stuff**
 - ~~set up ecosystem on server with exports~~
 - ~~socket display clientside, everything else on server~~
 - set up critter db
 - set up world db
 - set up backup db
+- set up conduit db
 - research backup best practices
 - manager so if crash, restarts
 - memory leaks?

@@ -5,13 +5,13 @@ const Victor = require("victor");
 const Critter = require("./critter");
 const D = require("./defaults");
 const { Circle } = require("./quadtree");
-var d = new D(); //i've gotta be doing something wrong...
+// var d = new D(); //i've gotta be doing something wrong...
 
 //just for calculating the flocking forces, actual position is outside
 class Boid {
     constructor(critter) {
         this.acceleration = new Victor(0, 0);
-        this.velocity = new Victor(d.map(Math.random(), 0, 1, -1, 1), d.map(Math.random(), 0, 1, -1, 1));
+        this.velocity = new Victor(D.map(Math.random(), 0, 1, -1, 1), D.map(Math.random(), 0, 1, -1, 1));
         // this.position is external, this boid is just for motion force, but still need for qtree?
         this.position = critter.position;
         // this.posVector = new Victor(this.position.x, this.position.y);
@@ -95,9 +95,9 @@ class Boid {
     }
 
     bounds() {
-        if (this.position.x > d.width - 10) {this.applyForce(new Victor(-1, 0))}
+        if (this.position.x > D.worldSize.width - 10) {this.applyForce(new Victor(-1, 0))}
         if (this.position.x < 10) {this.applyForce(new Victor(1, 0))}
-        if (this.position.y > d.height - 10) {this.applyForce(new Victor(0, -1))}
+        if (this.position.y > D.worldSize.height - 10) {this.applyForce(new Victor(0, -1))}
         if (this.position.y < 10) {this.applyForce(new Victor(0, 1))}
     }
 

@@ -2,8 +2,8 @@
 //https://github.com/CodingTrain/QuadTree/blob/master/quadtree.js
 
 const D = require("./defaults");
-let width = D.width;
-let height = D.height;
+let width = D.worldSize.width;
+let height = D.worldSize.height;
 
 class QuadTree{
     constructor(boundary, capacity) {
