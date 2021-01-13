@@ -117,11 +117,15 @@ class Critter {
     }
 
     //all the non-display updates
-    // live(critters) { 
     live(qtree) { 
         //flock
-        let velocity = this.boid.run(qtree);
+        let [velocity, snack] = this.boid.run(qtree);
         this.position.add(velocity);
+        //if eaten food
+        if (snack != undefined){
+            this.lifeForce += snack.amount;
+            return snack;
+        }
 
         // let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius)
         //nvm doing qtree look in flocking b/c that's where perception radius is
@@ -133,26 +137,6 @@ class Critter {
         // this.donate();
         // this.display();
     }
-    
-    /*
-    // update(critters) {
-    update(qtree) {
-        //flocking
-        // let velocity = this.boid.run(critters);
-        let velocity = this.boid.run(qtree);
-        this.position.add(velocity);
-    }
-    */
-
-    //removing for James' bounds flocking
-    /*
-    borders() { 
-        if (this.position.x < -this.r) this.position.x = d.width + this.r;
-        if (this.position.y < -this.r) this.position.y = d.height + this.r;
-        if (this.position.x > d.width + this.r) this.position.x = -this.r;
-        if (this.position.y > d.height + this.r) this.position.y = -this.r;
-    }
-    */
 
     excrete() {
         this.excretionTimer++;
@@ -209,6 +193,14 @@ class Critter {
         //need to convert from Victor
         let pos = {x: this.position.x, y: this.position.y};
         return {position: pos, r: this.r, color: this.color, life: this.lifeForce, isReadyToMate: isReadyToMate};
+    }
+
+    feed(qtree) {
+
+    }
+
+    mate(qtree) {
+
     }
 
 }

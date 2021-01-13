@@ -24,11 +24,17 @@ function rand_bm(min, max, skew) { // (box-mueller)
     return num;
 }
 
+function generate_ID() { //grabbed from https://gist.github.com/gordonbrander/2230317 -- thanks!
+    return '_' + Math.random().toString(36).substr(2, 9);
+}
+
 
 // module.exports = Defaults;
 module.exports.worldSize = worldSize;
 module.exports.map = map;
 module.exports.rand_bm = rand_bm;
+module.exports.generate_ID = generate_ID;
+
 
 /*
 //gotta be a better way of doing this, but fine as a placeholder

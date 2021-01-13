@@ -6,6 +6,7 @@ const Critter = require("./critter");
 const D = require("./defaults");
 const { Circle } = require("./quadtree");
 // var d = new D(); //i've gotta be doing something wrong...
+// const debug = require('debug')('boid');
 
 //just for calculating the flocking forces, actual position is outside
 class Boid {
@@ -14,6 +15,7 @@ class Boid {
         this.velocity = new Victor(D.map(Math.random(), 0, 1, -1, 1), D.map(Math.random(), 0, 1, -1, 1));
         // this.position is external, this boid is just for motion force, but still need for qtree?
         this.position = critter.position;
+        this.r = critter.r;
         // this.posVector = new Victor(this.position.x, this.position.y);
         this.perceptionRadius = critter.perceptionRadius || 100;
         this.maxSpeed = critter.maxSpeed;
@@ -30,11 +32,12 @@ class Boid {
     run (qtree) {
         let surroundings = this.lookAround(qtree);
         this.flock(surroundings.neighbors);
-        this.graze(surroundings.foodAround);
+        let snack = this.graze(surroundings.foodAround);
+        // console.log("snack: " + snack)
         this.bounds();
         this.update();
         this.position.add(this.velocity); //forgot i need to update this position too
-        return this.velocity;
+        return [this.velocity, snack];
     }
 
     lookAround (qtree) {
@@ -84,14 +87,23 @@ class Boid {
     }
 
     graze (foodAround) {
+        let snack = undefined;
         foodAround.forEach( (food) => {
-            //fine to do this for each b/c food drive is heavier? 
-            //will they get stuck between food? maybe should check for biggest food? or depends...
-            let foodVec = new Victor(food.position.x, food.position.y);
-            let hunger = this.seek(foodVec);
-            hunger.multiply(new Victor(this.hunger, this.hunger));
-            this.applyForce(hunger);
+            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r) {
+                // critter.lifeForce += food.amount;
+                // this.supply.splice(index, 1);
+                
+                snack = food; //send up to splice and add to lifeForce
+            } else {
+                //fine to do this for each b/c food drive is heavier? 
+                //will they get stuck between food? maybe should check for biggest food? or depends... -- edit: yes, TODO FIX
+                let foodVec = new Victor(food.position.x, food.position.y);
+                let hunger = this.seek(foodVec);
+                hunger.multiply(new Victor(this.hunger, this.hunger));
+                this.applyForce(hunger);
+            }
         });
+        return snack;
     }
 
     bounds() {
@@ -122,7 +134,7 @@ class Boid {
 
     seek (target) { //not sure if this is necessary, but might be able to use for food?
         let desired = target.subtract(this.position);
-        desired.normalize();
+        desired.normalize(); //removing to see if limit is enough, per james' suggestion 1/11
         desired.multiply(new Victor(this.maxSpeed, this.maxSpeed));
         let steer = desired.subtract(this.velocity);
         // let test = this.limit(steer, this.maxForce);
@@ -141,7 +153,7 @@ class Boid {
             if (d > 0 && d < this.desiredSeparation) {
                 let diff = this.position.clone(); //this.position is getting subtracted from!! without clone it was messing with this.position!! WHAT IS A REFERENCE
                 diff.subtract(critter.position);
-                diff.normalize();
+                // diff.normalize(); // 1/11 remove test
                 diff.divide(new Victor(d, d));
                 steer.add(diff);
                 count++;
@@ -155,7 +167,7 @@ class Boid {
 
         if (steer.magnitude() > 0) {
             // console.log("separation steer before " + steer);
-            steer.normalize();
+            steer.normalize(); // 1/11 remove test
             steer.multiply(new Victor(this.maxSpeed, this.maxSpeed));
             steer.subtract(this.velocity);
             steer = this.limit(steer, this.maxForce);
@@ -179,7 +191,7 @@ class Boid {
 
         if (count > 0) {
             sum.divide(new Victor(count, count));
-            sum.normalize();
+            sum.normalize(); // 1/11 remove test
             sum.multiply(new Victor(this.maxSpeed, this.maxSpeed));
             let steer = sum.subtract(this.velocity);
             // console.log("alignment steer before " + steer);

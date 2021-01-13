@@ -57,6 +57,8 @@ let stats = {
 
 //buttons
 let newCritterButt;
+let foodSprinkleToggle;
+let isFoodSprinkleOn = true;
 
 //assets
 function preload(){
@@ -86,6 +88,20 @@ function setup() {
             socket.emit("newCritter");
             console.log("newRandoCritter");
         });
+    foodSprinkleToggle = createButton("Food Sprinkle")
+        .position(width/4 - width/8, height - 50)
+        .size(100, 50)
+        .mousePressed( () => {
+            isFoodSprinkleOn = !isFoodSprinkleOn;
+            console.log("foodSprinkle toggled to: " + isFoodSprinkleOn);
+            if (isFoodSprinkleOn) {
+                foodSprinkleToggle.elt.style.backgroundColor = 'gold';
+                // foodSprinkleToggle.attribute('backgroundColor', 'gold');
+            } else {
+                foodSprinkleToggle.elt.style.backgroundColor= 'grey';
+            }
+        });
+    foodSprinkleToggle.elt.style.backgroundColor = 'gold';
 }
 
 function draw() {
@@ -98,10 +114,12 @@ function draw() {
 
 function mousePressed(){
     if (mouseX > 50 && mouseX < width - 50 &&
-        mouseY > 50 && mouseY < height - 50){
+        mouseY > 50 && mouseY < height - 50 && isFoodSprinkleOn){ //for food sprinkle
             console.log("food sprinkle");
             socket.emit("newFood", {position: {x: mouseX, y: mouseY}});
-        }
+    } else { //for checking critter info
+        socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
+    }
 }
 
 function drawEcosystem(){

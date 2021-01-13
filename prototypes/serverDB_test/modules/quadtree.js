@@ -187,6 +187,31 @@ class QuadTree{
     
         return found;
     }
+
+    remove(range, target, MODE) { //just hacked from query
+      if (!range.intersects(this.boundary)) {
+        return;
+      }
+
+      for (const [i, p] of this.points.entries()) { //need entries for destructuring to find index
+        if (range.contains(p)) {
+          if (MODE == "ID"){
+            if (p.data.id == target.id){
+              console.log("found and removed: " + p.data.id);
+              this.points.splice(i, 1);
+            }
+          }
+        }
+      }
+
+      if (this.divided) {
+        this.northwest.remove(range, target);
+        this.northeast.remove(range, target);
+        this.southwest.remove(range, target);
+        this.southeast.remove(range, target);
+      }
+      // return //not needed?
+  }
     
     closest(point, count, maxDistance) {
         if (typeof point === "undefined") {

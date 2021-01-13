@@ -6,6 +6,8 @@ class Food {
         this.amount = amount;
         this.position = pos;
         this.ripeRate = 100;
+        this.id = D.generate_ID();
+        // this.hasBeenEaten = false;
     }
 
     display() {

@@ -9,7 +9,9 @@ const D = require("./defaults");
 // var d = new D();
 const Conduit = require("./conduit");
 const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
-var boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.worldSize.width / 2, D.worldSize.height / 2);
+let boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.worldSize.width / 2, D.worldSize.height / 2);
+// const debug = require('debug')('ecosystem'); 
+
 
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
@@ -60,13 +62,34 @@ class Ecosystem {
             this.qtree.insert(point);
         });
     
-        //update all the critters then check for eating/reproducing
+        //update all the critter positions
         this.critters.forEach( (critter) => {
             //all serverside critter stuff
-            // critter.live(this.critters); //sending list for flock -- but want to use qtree instead because "snapshot"
-            critter.live(this.qtree);
+            // console.log(JSON.stringify(this.qtree.points))
+
+            let snack = critter.live(this.qtree);
+            if (snack != null) { //for now just for splicing food that the critter has eaten
+                //update supply, updates, and qtree -- don't need to do updates because will get it on the next run?
+                let snackIndex = this.supply.findIndex( (element) => {
+                    return element.id == snack.id
+                    // if (element.id == snack.id){
+                    //     return true
+                    // }
+                });
+                // let snackUpdate = updates.supply.findIndex( (element) => {
+                    // return element.id == snack.id
+                // });
+                // console.log(snackIndex, "dfdf", "snack.id")
+                this.supply.splice(snackIndex, 1);
+                console.log(critter.name + " has eaten: " + snack.id);
+                // let snackQtree = this.qtree.points -- no way to remove? just going to add a property to food
+                let foodRange = new Circle(critter.position.x, critter.position.y, critter.r + 10);
+                this.qtree.remove(foodRange, snack, "ID");
+            }
+
         });
 
+        //check for donations/excretions/deaths and then display
         this.critters.forEach( (critter) => {
             //check for donations
             let funds = critter.donate();
@@ -91,8 +114,12 @@ class Ecosystem {
         });
 
         //feed and fuck
-        this.checkForFood();
+        // this.checkForFood(); //now in run
         this.checkForMates();
+
+        this.critters.forEach( (critter) => {
+
+        });
     
         //decay, show, and remove corpses
         //does forEach get messed up if splicing? TODO check
@@ -132,7 +159,7 @@ class Ecosystem {
         this.critterCount--;
         this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
-
+    /*
     checkForFood() {
         this.supply.forEach( (food, index) => {
             if (food.ripeRate <= 0) {
@@ -143,10 +170,12 @@ class Ecosystem {
                         critter.lifeForce += food.amount;
                         this.supply.splice(index, 1);
                     }
+                    // let snack = critter.feed()
                 });
             }
         });
     }
+    */
 
     checkForMates() {
         //not doing forEach in favor of previous more optimized version, need to find a better way though
@@ -200,6 +229,10 @@ class Ecosystem {
         if(type == "stats"){
             world.emit("statsUpdate", update);
         }
+    }
+
+    clickInfo(position, client){ //add point to quad tree and send message to client if critter overlaps
+
     }
 
 }

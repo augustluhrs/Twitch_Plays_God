@@ -9,7 +9,7 @@
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
 // let ecosystem = new Ecosystem(10);
-let ecosystem = new Ecosystem(15);
+let ecosystem = new Ecosystem(1);
 
 
 //create server
@@ -49,7 +49,13 @@ world.on('connection', function(socket){
     });
     //food sprinkle
     socket.on("newFood", (data) => {
+        console.log("food sprinkle at: " + JSON.stringify(data.position));
         ecosystem.makeFood(2, data.position);
+    });
+
+    //critter info query
+    socket.on("clickInfo", (data) => {
+        ecosystem.clickInfo(data.position, socket.id);
     });
 
     //listen for this client to disconnect
@@ -62,7 +68,7 @@ world.on('connection', function(socket){
 setInterval( () => {
     let updates = ecosystem.run();
     world.emit("update", updates);
-}, 10);
+}, 10); //TODO is there a better way of doing this?
 
 //update funds
 // setInterval( () => {
