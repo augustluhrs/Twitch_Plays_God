@@ -28,19 +28,20 @@ class Boid {
         this.hunger = critter.hunger || 10; //to mult food seeking
     }
 
-    // run (critters) {
-    run (qtree) {
-        let surroundings = this.lookAround(qtree);
+    // main critter flocking/eat/mate function
+    run (self, qtree) {
+        let surroundings = this.lookAround(self, qtree);
         this.flock(surroundings.neighbors);
         let snack = this.graze(surroundings.foodAround);
+        let mate = this.cruise(self, surroundings.neighbors); //findMate() -- needs self for mating info
         // console.log("snack: " + snack)
         this.bounds();
         this.update();
         this.position.add(this.velocity); //forgot i need to update this position too
-        return [this.velocity, snack];
+        return [this.velocity, snack, mate];
     }
 
-    lookAround (qtree) {
+    lookAround (self, qtree) {
         let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius);
         let allAround = qtree.query(perception);
         let surroundings = {
@@ -50,12 +51,12 @@ class Boid {
 
         allAround.forEach( (thing) => {
             //no diff here between using undefined and null?
-            if (thing.data.DNA != undefined) { //is a critter
+            if (thing.data.DNA != undefined && thing.data.id != self.id) { //is a critter AND not self!
                 surroundings.neighbors.push(thing.data);
             } else if (thing.data.ripeRate != undefined) { //is a food
                 surroundings.foodAround.push(thing.data);
             } else {
-                console.log("what the hell are you? " + thing.data);
+                // console.log("what the hell are you? " + thing.data); //now that filtering for self this triggers
             }
 
 
@@ -72,6 +73,58 @@ class Boid {
         return surroundings; //becomes "critters" for flocking
     }
 
+    graze (foodAround) {
+        let snack = undefined;
+        foodAround.forEach( (food) => {
+            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r &&
+                food.ripeRate <= 0) {
+                snack = food; //send up to splice and add to lifeForce
+            } else {
+                //fine to do this for each b/c food drive is heavier? 
+                //will they get stuck between food? maybe should check for biggest food? or depends... -- edit: yes, TODO FIX
+                let foodVec = new Victor(food.position.x, food.position.y);
+                let hunger = this.seek(foodVec);
+                hunger.multiply(new Victor(this.hunger, this.hunger));
+                this.applyForce(hunger);
+            }
+        });
+        return snack;
+    }
+
+    cruise (self, neighbors) {
+        let mate = undefined;
+        //TODO why forEach vs for/of?
+        for (let neighbor of neighbors) {
+            if (Math.hypot((this.position.x - neighbor.position.x), (this.position.y - neighbor.position.y)) <= (this.r / 2 + neighbor.r / 2) &&
+                self.mateTimer <= 0 && self.lifeForce >= self.minLifeToReproduce) {
+                //eligible to mate with them if they want (close enough, timer down, and has enough life)
+                mate = neighbor;    
+                //so only one mate per loop right? might be fun to play with multi later
+                break; 
+            }
+        }
+        // neighbors.forEach( (critter) => {
+        //     if (Math.hypot((this.position.x - critter.position.x), (this.position.y - critter.position.y)) <= (this.r / 2 + critter.r / 2) &&
+        //         self.mateTimer <= 0 && self.lifeForce >= self.minLifeToReproduce) {
+        //         //eligible to mate with them if they want (close enough, timer down, and has enough life)
+        //         mate = critter;    
+        //         //so only one mate per loop right? might be fun to play with multi later
+        //         break; 
+        //     }
+        // });
+
+        return mate;
+    }
+
+    //
+    //
+    //
+    // FLOCKING AND MOVEMENT
+    //
+    //
+    //
+
+    
     flock (critters) {
         let separation = this.separation(critters);
         let alignment = this.alignment(critters);
@@ -84,26 +137,6 @@ class Boid {
         this.applyForce(separation);
         this.applyForce(alignment);
         this.applyForce(cohesion);
-    }
-
-    graze (foodAround) {
-        let snack = undefined;
-        foodAround.forEach( (food) => {
-            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r &&
-                food.ripeRate <= 0) {
-                
-                
-                snack = food; //send up to splice and add to lifeForce
-            } else {
-                //fine to do this for each b/c food drive is heavier? 
-                //will they get stuck between food? maybe should check for biggest food? or depends... -- edit: yes, TODO FIX
-                let foodVec = new Victor(food.position.x, food.position.y);
-                let hunger = this.seek(foodVec);
-                hunger.multiply(new Victor(this.hunger, this.hunger));
-                this.applyForce(hunger);
-            }
-        });
-        return snack;
     }
 
     bounds() {

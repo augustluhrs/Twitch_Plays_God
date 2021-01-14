@@ -7,12 +7,11 @@ const Ecosystem = require("./ecosystem");
 // const Conduit = require("./conduit");
 const Boid = require("./flocking");
 const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
-const defaults = require("./defaults");
 
 class Critter {
     constructor (id, deets) {
         //better name for deets? opts
-
+        this.id = id; //from D.generate_ID() now
         this.DNA = new DNA(); //will get overwritten if child
         let parentA = deets.parentA;
         let parentB = deets.parentB;
@@ -119,13 +118,14 @@ class Critter {
     //all the non-display updates
     live(qtree) { 
         //flock
-        let [velocity, snack] = this.boid.run(qtree);
+        let [velocity, snack, mate] = this.boid.run(this, qtree);
         this.position.add(velocity);
         //if eaten food
         if (snack != undefined){
             this.lifeForce += snack.amount;
-            return snack;
+            // return snack;
         }
+        return [snack, mate];
 
         // let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius)
         //nvm doing qtree look in flocking b/c that's where perception radius is
@@ -195,13 +195,13 @@ class Critter {
         return {position: pos, r: this.r, color: this.color, life: this.lifeForce, isReadyToMate: isReadyToMate};
     }
 
-    feed(qtree) {
+    // feed(qtree) {
 
-    }
+    // }
 
-    mate(qtree) {
+    // mate(qtree) {
 
-    }
+    // }
 
 }
 

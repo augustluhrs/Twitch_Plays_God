@@ -28,7 +28,7 @@ class Ecosystem {
         this.critterCount = 0;
         //create initial population -- need "new"?
         for (let i = 0; i < numAgents; i++) {
-            this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+            this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
             this.critterCount++;
             this.critterID++;
             this.worldLife += 100;
@@ -62,13 +62,15 @@ class Ecosystem {
             this.qtree.insert(point);
         });
     
-        //update all the critter positions
+        //update the main critter actions (move, eat, mate)
+        let mates = [];
         this.critters.forEach( (critter) => {
             //all serverside critter stuff
             // console.log(JSON.stringify(this.qtree.points))
 
-            let snack = critter.live(this.qtree);
-            if (snack != null) { //for now just for splicing food that the critter has eaten
+            let [snack, mate] = critter.live(this.qtree);
+            //critter eats
+            if (snack != undefined) { //for now just for splicing food that the critter has eaten
                 //update supply, updates, and qtree -- don't need to do updates because will get it on the next run?
                 let snackIndex = this.supply.findIndex( (element) => {
                     return element.id == snack.id
@@ -86,8 +88,17 @@ class Ecosystem {
                 let foodRange = new Circle(critter.position.x, critter.position.y, critter.r + 10);
                 this.qtree.remove(foodRange, snack, "ID");
             }
-
+            //critter mates -- to be resolved in checkForMates() below
+            if (mate != undefined) {
+                mates.push({self: critter, mate: mate});
+            } else {
+                critter.mateTimer -= 1;
+            }
         });
+
+        //feed and fuck
+        // this.checkForFood(); //now in run
+        this.checkForMates(mates);
 
         //check for donations/excretions/deaths and then display
         this.critters.forEach( (critter) => {
@@ -112,14 +123,6 @@ class Ecosystem {
             //update socket display positions
             updates.critters.push(critter.display()); //just the p5side display stuff
         });
-
-        //feed and fuck
-        // this.checkForFood(); //now in run
-        this.checkForMates();
-
-        this.critters.forEach( (critter) => {
-
-        });
     
         //decay, show, and remove corpses
         //does forEach get messed up if splicing? TODO check
@@ -136,7 +139,8 @@ class Ecosystem {
     }
 
     spawnRandomCritter() {
-        this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        // this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
         this.critterCount++;
         this.critterID++;
         this.worldLife += 100;
@@ -145,6 +149,7 @@ class Ecosystem {
 
     makeFood(amount, pos) {
         this.supply.push(new Food(amount, pos));
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
     //critter dies, splice from critters and add corpse
@@ -159,7 +164,7 @@ class Ecosystem {
         this.critterCount--;
         this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
-    /*
+    /* //now using graze method in flocking.js for quadtree usage
     checkForFood() {
         this.supply.forEach( (food, index) => {
             if (food.ripeRate <= 0) {
@@ -177,9 +182,38 @@ class Ecosystem {
     }
     */
 
-    checkForMates() {
+    checkForMates(mates) {
+        //now the mates are triggering in flocking for quadtree usage, but the ecosystem makes babies here
+        //just check for pair matches first
+        let pairs = [];
+        for (let i = mates.length - 1; i >= 0; i--) {
+            for (let j = 0; j < i; j++) { //so won't overlap with same pair again
+                // console.log(JSON.stringify(mates));
+                if (mates[i].self.id == mates[j].mate.id){
+                    pairs.push({A: mates[i].self, B: mates[j].self});
+                }
+            }
+        }
+        //then make babies from the matched pairs
+        pairs.forEach( (parents) => {
+            //reset mateTimers
+            parents.A.mateTimer += parents.A.refractoryPeriod;
+            parents.B.mateTimer += parents.B.refractoryPeriod;
+            //give to baby from parents
+            let parentSacrificeA = parents.A.lifeForce * parents.A.parentalSacrifice;
+            parents.A.lifeForce -= parentSacrificeA;
+            let parentSacrificeB = parents.B.lifeForce * parents.B.parentalSacrifice;
+            parents.B.lifeForce -= parentSacrificeB;
+            let inheritance = parentSacrificeA + parentSacrificeB;
+            //make da bebe
+            this.critterID++; //not using anymore right? will keep just in case
+            this.critterCount++;
+            this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
+            let newBaby = new Critter(D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
+            this.critters.push(newBaby);
+        });
+        /* //old way
         //not doing forEach in favor of previous more optimized version, need to find a better way though
-    
         for (let i = this.critters.length - 1; i >= 0; i--) {
             if (this.critters[i].mateTimer <= 0 && this.critters[i].lifeForce >= this.critters[i].minLifeToReproduce) { //if can mate
                 for (let j = 0; j < i; j++) { //really trying to not overlap with self
@@ -209,6 +243,7 @@ class Ecosystem {
                 this.critters[i].mateTimer -= 1;
             }
         }
+        */
     }
 
     deposit(donation1, donation2) {

@@ -9,7 +9,7 @@
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
 // let ecosystem = new Ecosystem(10);
-let ecosystem = new Ecosystem(10);
+let ecosystem = new Ecosystem(800);
 
 
 //create server
@@ -42,7 +42,7 @@ world.on('connection', function(socket){
     socket.on("newCritter", (data) => {
         if(data == undefined){
             ecosystem.spawnRandomCritter();
-            console.log("spawn rando");
+            // console.log("spawn rando");
         } else {
             console.log("newCritter error");
         }
@@ -50,6 +50,7 @@ world.on('connection', function(socket){
     //food sprinkle
     socket.on("newFood", (data) => {
         // console.log("food sprinkle at: " + JSON.stringify(data.position));
+        ecosystem.worldLife += 2;
         ecosystem.makeFood(2, data.position);
     });
 
