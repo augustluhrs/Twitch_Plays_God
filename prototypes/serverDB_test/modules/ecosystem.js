@@ -81,7 +81,7 @@ class Ecosystem {
                 // });
                 // console.log(snackIndex, "dfdf", "snack.id")
                 this.supply.splice(snackIndex, 1);
-                console.log(critter.name + " has eaten: " + snack.id);
+                // console.log(critter.name + " has eaten: " + snack.id);
                 // let snackQtree = this.qtree.points -- no way to remove? just going to add a property to food
                 let foodRange = new Circle(critter.position.x, critter.position.y, critter.r + 10);
                 this.qtree.remove(foodRange, snack, "ID");
@@ -94,18 +94,18 @@ class Ecosystem {
             //check for donations
             let funds = critter.donate();
             if(funds != null) {
-                console.log("donation: " + JSON.stringify(funds.d1) + " " + JSON.stringify(funds.d2));
+                // console.log("donation: " + JSON.stringify(funds.d1) + " " + JSON.stringify(funds.d2));
                 this.deposit(funds.d1, funds.d2)
             };
             //check for food and death
             let excretion = critter.excrete();
             if(excretion != null) {
                 if (excretion.death != null) {
-                    console.log("death: " + excretion.death.name);
+                    // console.log("death: " + excretion.death.name);
                     this.die(excretion.death)
                 }
                 if (excretion.makeFood != null) {
-                    console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
+                    // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
                     this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
                 }
             }
@@ -196,7 +196,7 @@ class Ecosystem {
                             this.critters[j].lifeForce -= parentSacrificeB;
                             let inheritance = parentSacrificeA + parentSacrificeB;
                             //make new baby
-                            console.log("new baby from " + this.critters[i].name + " and " + this.critters[j].name);
+                            // console.log("new baby from " + this.critters[i].name + " and " + this.critters[j].name);
                             this.critterID++;
                             this.critterCount++;
                             this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});

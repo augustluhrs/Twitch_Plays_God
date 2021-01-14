@@ -197,7 +197,7 @@ class QuadTree{
         if (range.contains(p)) {
           if (MODE == "ID"){
             if (p.data.id == target.id){
-              console.log("found and removed: " + p.data.id);
+              // console.log("found and removed: " + p.data.id);
               this.points.splice(i, 1);
             }
           }

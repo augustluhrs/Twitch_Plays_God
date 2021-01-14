@@ -9,7 +9,7 @@
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
 // let ecosystem = new Ecosystem(10);
-let ecosystem = new Ecosystem(1);
+let ecosystem = new Ecosystem(10);
 
 
 //create server
@@ -49,7 +49,7 @@ world.on('connection', function(socket){
     });
     //food sprinkle
     socket.on("newFood", (data) => {
-        console.log("food sprinkle at: " + JSON.stringify(data.position));
+        // console.log("food sprinkle at: " + JSON.stringify(data.position));
         ecosystem.makeFood(2, data.position);
     });
 

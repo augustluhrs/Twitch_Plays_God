@@ -89,9 +89,9 @@ class Boid {
     graze (foodAround) {
         let snack = undefined;
         foodAround.forEach( (food) => {
-            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r) {
-                // critter.lifeForce += food.amount;
-                // this.supply.splice(index, 1);
+            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r &&
+                food.ripeRate <= 0) {
+                
                 
                 snack = food; //send up to splice and add to lifeForce
             } else {
