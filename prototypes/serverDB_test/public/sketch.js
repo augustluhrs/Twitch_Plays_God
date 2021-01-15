@@ -32,6 +32,36 @@ socket.on('statsUpdate', (update) => {
     stats.worldLife = update.worldLife;
 });
 
+socket.on('clickInfo', (data) => {
+    console.log(data.critter)
+    if (data.client == socket.id && data.critter != undefined) {
+        // console.log('info received');
+        // infoDiv.show();
+        // textAlign("CENTER")
+        // ellipseMode("CENTER");
+        
+
+        //ugh have to convert to relative coords?...
+        overlay.x = data.position.x;
+        overlay.y = data.position.y;
+        overlay.critter = data.critter;
+
+        // infoGraphics.textAlign(CENTER);
+        // infoGraphics.noStroke();
+        // // infoGraphics.clear();
+        // // infoGraphics.background(data.critter.color[0], data.critter.color[1], data.critter.color[2])
+        // infoGraphics.background(200, 100);
+        // // infoGraphics.fill(255,255,255);
+        // infoGraphics.fill(0,0,0);
+        // // infoGraphics.textSize(20);
+        // infoGraphics.text(data.critter.name, overlay.w/2, overlay.y - overlay.h/2 + 20); //this bad too TODO fix
+        // // infoGraphics.background(data.critter.color);
+        isDisplayingInfo = true;
+    }
+});
+
+let canvas;
+
 let ecosystem = {
     corpses: [],
     supply: [],
@@ -60,6 +90,21 @@ let newCritterButt;
 let foodSprinkleToggle;
 let isFoodSprinkleOn = true;
 
+//click Info overlay
+// let infoDiv;
+let infoGraphics;
+// let overlayWidth = 200;
+// let overlayHeight = 200;
+let overlay = {
+    w: 200,
+    h: 200,
+    x: 0,
+    y: 0,
+    critter: {name: 'placeholder', color: [0, 0, 0]}
+}
+let isDisplayingInfo = false;
+
+
 //assets
 function preload(){
     monitor.shape = loadImage("assets/rounded_rectangle.png"); 
@@ -67,13 +112,13 @@ function preload(){
 
 function setup() {
     //how to get d.width/height?
-    createCanvas(1920,1080);
+    canvas = createCanvas(1920,1080);
     // createCanvas(3840,2160);
     
     ellipseMode(CENTER);
     rectMode(CENTER);
     imageMode(CENTER);
-    textAlign(LEFT, CENTER);
+    textAlign(CENTER);
     noStroke();
 
     monitor.size.w = width/8;
@@ -102,6 +147,15 @@ function setup() {
             }
         });
     foodSprinkleToggle.elt.style.backgroundColor = 'gold';
+
+    // infoDiv = createDiv('test')
+    // .position(width/2, height/2)
+    // .id('infoDiv');
+
+    infoGraphics = createGraphics(overlay.w, overlay.h);
+    
+    // .parent('infoDiv')
+    // .background(255,0,122);
 }
 
 function draw() {
@@ -110,15 +164,28 @@ function draw() {
     monitorFunds();
     drawEcosystem(); //switching order so panel doesn't cover up
     displayStats();
+    displayInfoOverlay();
 }
 
 function mousePressed(){
+    //just getting rid of overlay with click for now
+    // infoDiv.hide();
+    // isDisplayingInfo = false;
     if (mouseX > 50 && mouseX < width - 50 &&
         mouseY > 50 && mouseY < height - 50 && isFoodSprinkleOn){ //for food sprinkle
             console.log("food sprinkle");
             socket.emit("newFood", {position: {x: mouseX, y: mouseY}});
-    } else { //for checking critter info
-        socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
+    } else { 
+        //for checking critter info
+        if (isDisplayingInfo) {
+            isDisplayingInfo = false;
+            // infoGraphics.clear();
+        } else {
+            socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
+            // isDisplayingInfo = true;
+        }
+        // socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
+        // isDisplayingInfo = true;
     }
 }
 
@@ -163,6 +230,8 @@ function drawEcosystem(){
 function monitorFunds(){
     //draw the shape background -- need to make this transparent somehow
     fill(0);
+    textAlign(LEFT, CENTER);
+
     image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
     let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
     let sectionSize = monitor.size.h / (funds.sorted.length + 1); //fence postttt
@@ -179,4 +248,26 @@ function displayStats(){
     textSize(40);
     text("Critter Count: " + stats.critterCount, width/2, height - 50);
     text("Life in World: " + floor(stats.worldLife), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
+}
+
+function displayInfoOverlay(){
+    infoGraphics.clear();
+    infoGraphics.textAlign(CENTER);
+    infoGraphics.noStroke();
+    // infoGraphics.clear();
+    // infoGraphics.background(200, 100);
+    // infoGraphics.fill(255,255,255);
+    
+    infoGraphics.background(overlay.critter.color[0] * 255, overlay.critter.color[1] * 255, overlay.critter.color[2] * 255, 100);
+    infoGraphics.fill(0);
+    infoGraphics.textSize(20);
+    infoGraphics.text(overlay.critter.name, overlay.w / 2, overlay.h / 2); //this bad too TODO fix
+
+    // infoGraphics.text(overlay.critter.name, overlay.w/2, overlay.y - overlay.h/2 + 20); //this bad too TODO fix
+    
+    if (isDisplayingInfo) {
+        image(infoGraphics, overlay.x, overlay.y);
+    } else {
+        // console.log('?')
+    }
 }

@@ -9,7 +9,7 @@
 //now trying module.exports for the first time...
 const Ecosystem = require("./modules/ecosystem");
 // let ecosystem = new Ecosystem(10);
-let ecosystem = new Ecosystem(800);
+let ecosystem = new Ecosystem(8);
 
 
 //create server

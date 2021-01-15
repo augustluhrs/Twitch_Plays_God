@@ -267,7 +267,22 @@ class Ecosystem {
     }
 
     clickInfo(position, client){ //add point to quad tree and send message to client if critter overlaps
+        // console.log(position.x, position.y, client)
+        let clickQtree = new QuadTree(boundary, 4); //4 arbitrary capacity, can test later
+        this.critters.forEach( (critter) => {
+            //first add to qtree so can send it in .live
+            let point = new Point(critter.position.x, critter.position.y, critter);
+            clickQtree.insert(point);
+        });
+        let checkRadius = new Circle(position.x, position.y, 20); //10 too big? TODO check
+        let foundCritter = clickQtree.query(checkRadius);
+        console.log(JSON.stringify(foundCritter));
+        //sending to specific client even though only one world because will eventually want this individualized
+        // world.broadcast.to(client).emit('clickInfo', foundCritter);
+        if(foundCritter.length != 0){
+            world.emit('clickInfo', {position: position, critter: foundCritter[0].data, client: client}); //hmmm i need to learn more about sockets... TODO
 
+        }
     }
 
 }

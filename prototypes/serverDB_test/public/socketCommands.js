@@ -5,3 +5,5 @@
 function checkFundsRaised(){
     socket.emit('checkFunds');
 }
+
+//need to update this TODO
