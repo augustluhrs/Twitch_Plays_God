@@ -26,8 +26,6 @@ socket.on('fundsUpdate', (conduit) => {
 });
 
 socket.on('statsUpdate', (update) => {
-    // console.log("stats: ");
-    // console.log(update);
     stats.critterCount = update.critterCount;
     stats.worldLife = update.worldLife;
 });
@@ -36,26 +34,8 @@ socket.on('clickInfo', (data) => {
     console.log(data.critter)
     if (data.client == socket.id && data.critter != undefined) {
         // console.log('info received');
-        // infoDiv.show();
-        // textAlign("CENTER")
-        // ellipseMode("CENTER");
-        
-
-        //ugh have to convert to relative coords?...
-        overlay.x = data.position.x;
-        overlay.y = data.position.y;
+        overlay.position = data.position;
         overlay.critter = data.critter;
-
-        // infoGraphics.textAlign(CENTER);
-        // infoGraphics.noStroke();
-        // // infoGraphics.clear();
-        // // infoGraphics.background(data.critter.color[0], data.critter.color[1], data.critter.color[2])
-        // infoGraphics.background(200, 100);
-        // // infoGraphics.fill(255,255,255);
-        // infoGraphics.fill(0,0,0);
-        // // infoGraphics.textSize(20);
-        // infoGraphics.text(data.critter.name, overlay.w/2, overlay.y - overlay.h/2 + 20); //this bad too TODO fix
-        // // infoGraphics.background(data.critter.color);
         isDisplayingInfo = true;
     }
 });
@@ -91,23 +71,22 @@ let foodSprinkleToggle;
 let isFoodSprinkleOn = true;
 
 //click Info overlay
-// let infoDiv;
 let infoGraphics;
-// let overlayWidth = 200;
-// let overlayHeight = 200;
 let overlay = {
-    w: 200,
-    h: 200,
-    x: 0,
-    y: 0,
-    critter: {name: 'placeholder', color: [0, 0, 0]}
+    w: 400,
+    h: 800,
+    position: {x: 0,y: 0},
+    critter: {},
+    textSize: 25
 }
 let isDisplayingInfo = false;
 
 
 //assets
+let godIcon;
 function preload(){
-    monitor.shape = loadImage("assets/rounded_rectangle.png"); 
+    monitor.shape = loadImage("assets/rounded_rectangle.png");
+    godIcon = loadImage("assets/godIcon.jpg"); 
 }
 
 function setup() {
@@ -148,14 +127,8 @@ function setup() {
         });
     foodSprinkleToggle.elt.style.backgroundColor = 'gold';
 
-    // infoDiv = createDiv('test')
-    // .position(width/2, height/2)
-    // .id('infoDiv');
-
+    //for the click info overlay
     infoGraphics = createGraphics(overlay.w, overlay.h);
-    
-    // .parent('infoDiv')
-    // .background(255,0,122);
 }
 
 function draw() {
@@ -164,13 +137,11 @@ function draw() {
     monitorFunds();
     drawEcosystem(); //switching order so panel doesn't cover up
     displayStats();
-    displayInfoOverlay();
+    if(isDisplayingInfo) {displayInfoOverlay(overlay.critter)}
 }
 
 function mousePressed(){
     //just getting rid of overlay with click for now
-    // infoDiv.hide();
-    // isDisplayingInfo = false;
     if (mouseX > 50 && mouseX < width - 50 &&
         mouseY > 50 && mouseY < height - 50 && isFoodSprinkleOn){ //for food sprinkle
             console.log("food sprinkle");
@@ -179,13 +150,9 @@ function mousePressed(){
         //for checking critter info
         if (isDisplayingInfo) {
             isDisplayingInfo = false;
-            // infoGraphics.clear();
         } else {
             socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
-            // isDisplayingInfo = true;
         }
-        // socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
-        // isDisplayingInfo = true;
     }
 }
 
@@ -204,27 +171,28 @@ function drawEcosystem(){
 
     //draw the critters
     ecosystem.critters.forEach( (critter) => { //position,r,color,life,isReadyToMate
-        //radius mapping
-        // let mappedR = map(critter.r, 0, 1, 5, 50);
-        
-        //for lifeForce aura
-        let fadedColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
-        fill(fadedColor);
-        ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 100, 0, critter.r / 2));
-        
-        //show ring if ready to mate
-        noFill();
-        if(critter.isReadyToMate){
-            stroke(255);
-        }
-        ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 200, 0, critter.r / 2));
-
-        //base critter
-        let critCol = color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
-        fill(critCol);
-        noStroke();
-        ellipse(critter.position.x, critter.position.y, critter.r);
+        drawCritter(critter);
     });
+}
+
+function drawCritter(critter) {
+    //for lifeForce aura
+    let fadedColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+    fill(fadedColor);
+    ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 100, 0, critter.r / 2));
+    
+    //show ring if ready to mate
+    noFill();
+    if(critter.isReadyToMate){
+        stroke(255);
+    }
+    ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 200, 0, critter.r / 2));
+
+    //base critter
+    let critCol = color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
+    fill(critCol);
+    noStroke();
+    ellipse(critter.position.x, critter.position.y, critter.r); 
 }
 
 function monitorFunds(){
@@ -250,24 +218,86 @@ function displayStats(){
     text("Life in World: " + floor(stats.worldLife), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
 }
 
-function displayInfoOverlay(){
+function displayInfoOverlay(critter){
     infoGraphics.clear();
     infoGraphics.textAlign(CENTER);
     infoGraphics.noStroke();
-    // infoGraphics.clear();
-    // infoGraphics.background(200, 100);
-    // infoGraphics.fill(255,255,255);
-    
-    infoGraphics.background(overlay.critter.color[0] * 255, overlay.critter.color[1] * 255, overlay.critter.color[2] * 255, 100);
-    infoGraphics.fill(0);
-    infoGraphics.textSize(20);
-    infoGraphics.text(overlay.critter.name, overlay.w / 2, overlay.h / 2); //this bad too TODO fix
+    infoGraphics.imageMode(CENTER);
+    let critterColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255);
+    let fadedColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+    let backgroundColor = color((1 - critter.color[0]) * 255, (1 - critter.color[1])  * 255, (1 - critter.color[2])  * 255, 100);
+    // infoGraphics.background(backgroundColor);
+    infoGraphics.background(255, 100);
 
-    // infoGraphics.text(overlay.critter.name, overlay.w/2, overlay.y - overlay.h/2 + 20); //this bad too TODO fix
     
-    if (isDisplayingInfo) {
-        image(infoGraphics, overlay.x, overlay.y);
-    } else {
-        // console.log('?')
+    //name at top
+    // infoGraphics.fill(critterColor);
+    infoGraphics.fill(0);
+    infoGraphics.textSize(overlay.textSize + 10);
+    infoGraphics.text(critter.name, overlay.w / 2, overlay.h / 12);
+
+    //critter display -- doubled radius of all for visibility
+    //for lifeForce aura
+    infoGraphics.fill(fadedColor);
+    infoGraphics.ellipse(overlay.w / 2, overlay.h / 5, critter.r * 2 + map(critter.life, 0, 100, 0, critter.r));
+    //show ring if ready to mate
+    infoGraphics.noFill();
+    if(critter.mateTimer <= 0 && critter.life >= critter.minLifeToReproduce){ //isReadyToMate
+        infoGraphics.stroke(255);
     }
+    infoGraphics.ellipse(overlay.w / 2, overlay.h / 5, critter.r * 2 + map(critter.life, 0, 200, 0, critter.r));
+    //base critter
+    infoGraphics.fill(critterColor);
+    infoGraphics.noStroke();
+    infoGraphics.ellipse(overlay.w / 2, overlay.h / 5, critter.r * 2); 
+
+    //critter stats
+    // infoGraphics.fill(critterColor);
+    infoGraphics.fill(0);
+    infoGraphics.textAlign(LEFT, CENTER);
+    infoGraphics.textSize(overlay.textSize);
+    //life stats
+    infoGraphics.text("LIFE: " + critter.life.toFixed(2), overlay.w / 24, overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("Poop Rate: " + critter.excretionRate.toFixed(2), overlay.w / 24, 2 * overlay.h / 24 + overlay.h / 4);
+    // infoGraphics.text("Poop Timer: " + critter.excretionTimer, overlay.w / 24, 3 * overlay.h / 24 + overlay.h / 4);
+    //space then donation stats
+    infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), overlay.w / 24, 4 * overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), overlay.w / 24, 5 * overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("Min Life b4 Donation: " + critter.minLifeToDonate.toFixed(2), overlay.w / 24, 6 * overlay.h / 24 + overlay.h / 4);
+    // infoGraphics.text("Donation Timer: " + (floor(critter.donationRate) - critter.donationTimer), overlay.w / 24, 8 * overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("Donation Percentage: " + critter.donationPercentage.toFixed(2) * 100 + "%", overlay.w / 24, 7 * overlay.h / 24 + overlay.h / 4);
+    //space then mate stats
+    infoGraphics.text("Min Life b4 Mate: " + critter.minLifeToReproduce.toFixed(2), overlay.w / 24, 9 * overlay.h / 24 + overlay.h / 4);
+    // infoGraphics.text("Mate Timer: " + critter.mateTimer.toFixed(2), overlay.w / 24, 12 * overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("Inheritance Percentage: " + critter.parentalSacrifice.toFixed(2) * 100 + "%", overlay.w / 24, 10 * overlay.h / 24 + overlay.h / 4);
+    infoGraphics.text("Num Offspring: " + critter.offspring.length, overlay.w / 24, 11 * overlay.h / 24 + overlay.h / 4);
+    
+    //space then parents -- ooh draw!
+    // infoGraphics.fill(critterColor); //parentcolor?
+    //first gen vs children
+    infoGraphics.textAlign(CENTER);
+    infoGraphics.text("PARENTS:", overlay.w / 2, 19 * overlay.h / 24)
+    if (critter.ancestry.parents.length == 1) {
+        infoGraphics.text(critter.ancestry.parents[0].name, overlay.w / 2, 10 * overlay.h / 12);
+        infoGraphics.image(godIcon, overlay.w / 2, 11 * overlay.h / 12, 80, 80);
+    } else {
+        infoGraphics.text(critter.ancestry.parents[0].name, overlay.w / 4, 10 * overlay.h / 12);
+        infoGraphics.fill(critter.ancestry.parents[0].color[0] * 255, critter.ancestry.parents[0].color[1] * 255, critter.ancestry.parents[0].color[2] * 255);
+        infoGraphics.ellipse(overlay.w / 4, 11 * overlay.h / 12, critter.ancestry.parents[0].r);
+        // infoGraphics.fill(critterColor);
+        infoGraphics.fill(0);
+        infoGraphics.text(critter.ancestry.parents[1].name, 3 * overlay.w / 4, 10 * overlay.h / 12);
+        infoGraphics.fill(critter.ancestry.parents[1].color[0] * 255, critter.ancestry.parents[1].color[1] * 255, critter.ancestry.parents[1].color[2] * 255);
+        infoGraphics.ellipse(3 * overlay.w / 4, 11 * overlay.h / 12, critter.ancestry.parents[1].r);
+
+    }
+
+    //make sure overlay is not off screen
+    if(overlay.position.x <= overlay.w / 2) {overlay.position.x = overlay.w / 2 + 20};
+    if(overlay.position.x >= width - overlay.w / 2) {overlay.position.x = width - overlay.w / 2 - 20};
+    if(overlay.position.y <= overlay.h / 2) {overlay.position.y = overlay.h / 2 + 20};
+    if(overlay.position.y >= height - overlay.h / 2) {overlay.position.y = height - overlay.h / 2 - 20};
+
+    //draw overlay to canvas
+    image(infoGraphics, overlay.position.x, overlay.position.y);
 }

@@ -26,9 +26,9 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - [ ] new UI
 - [ ] critter creation (sliders)
 - [ ] critter creation (gene packs)
-- [ ] fix food bugs
+- [?] ~~fix food bugs~~
 - [ ] critter action animations
-- [ ] click to show critter info (stats, donations, family tree)
+- [X] ~~click to show critter info (stats, donations, family tree)~~
 - [ ] environment effects
 - [ ] bigger world
 - [ ] databases

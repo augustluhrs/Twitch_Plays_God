@@ -15,7 +15,8 @@ class Critter {
         this.DNA = new DNA(); //will get overwritten if child
         let parentA = deets.parentA;
         let parentB = deets.parentB;
-
+        this.offspring = [];
+        
         //name defaults to id
         if(deets['name']){
             this.name = deets.name;
@@ -26,37 +27,38 @@ class Critter {
         //every critter has altruism targets so this should be fine
         let primary = deets.primary;
         let secondary = deets.secondary;
-        this.altriusm = [primary, secondary];
+        this.donations = [{target: primary, total: 0},{target: secondary, total: 0}];
 
         if (parentA == null || parentB == null) { //new beb
             //trying new victor vector library
             this.position = new Victor(Math.random() * D.worldSize.width, Math.random() * D.worldSize.height);
             // this.boid = new Boid(this.position.x, this.position.y);
-            this.lifeForce = 100;
+            this.life = 100;
             // ecosystem.worldLife += 100; //keep all changes to ecosystem
             //user created so first in family tree
-            this.ancestry = {child: this.name, parents: [deets.god]};
+            this.ancestry = {child: this.name, parents: [{name: deets.god}]};
         } else {
             let inheritance = deets.inheritance;
-            this.ancestry = {child: this.name, parents:[parentA.ancestry, parentB.ancestry]};
+            this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
             this.position = new Victor(parentA.position.x, parentB.position.y); //not the best way but w/e for now
             // this.boid = new Boid(this.position.x, this.position.y);
             //altruism target crossover
             let parentAtarget, parentBtarget;
             if(Math.random()< 0.75){ //b/c primary is "dominant" gene
-                parentAtarget = parentA.altriusm[0];
+                parentAtarget = parentA.donations[0].target;
             } else {
-                parentAtarget = parentA.altriusm[1];
+                parentAtarget = parentA.donations[1].target;
             }
             if(Math.random()< 0.75){
-                parentBtarget = parentB.altriusm[0];
+                parentBtarget = parentB.donations[0].target;
             } else {
-                parentBtarget = parentB.altriusm[1];
+                parentBtarget = parentB.donations[1].target;
             }
             if(Math.random()< 0.5){
-                this.altriusm = [parentAtarget, parentBtarget];
+                this.donations = [{target: parentAtarget, total: 0},{target: parentBtarget, total: 0}];
             } else {
-                this.altriusm = [parentBtarget, parentAtarget];
+                this.donations = [{target: parentBtarget, total: 0},{target: parentAtarget, total: 0}];
+                
             }
             //crossover here now
             //color is a mix
@@ -88,7 +90,7 @@ class Critter {
                 }
             }
             this.DNA = new DNA(this.DNA); //hmm, this could be better
-            this.lifeForce = inheritance;
+            this.life = inheritance;
         }
 
         // // now map b/c of normalized genes, display genes not
@@ -116,13 +118,13 @@ class Critter {
     }
 
     //all the non-display updates
-    live(qtree) { 
+    live(self, qtree) { 
         //flock
-        let [velocity, snack, mate] = this.boid.run(this, qtree);
+        let [velocity, snack, mate] = this.boid.run(self, qtree);
         this.position.add(velocity);
         //if eaten food
         if (snack != undefined){
-            this.lifeForce += snack.amount;
+            this.life += snack.amount;
             // return snack;
         }
         return [snack, mate];
@@ -141,19 +143,19 @@ class Critter {
     excrete() {
         this.excretionTimer++;
         if (this.excretionTimer >= this.excretionRate) {
-            this.lifeForce -= this.foodScale;
+            this.life -= this.foodScale;
             let newFood;
             let foodPos = {
                 x: this.position.x,
                 y: this.position.y
             };
-            if (this.lifeForce == 0) { //very unlikely it's exactly 0
+            if (this.life == 0) { //very unlikely it's exactly 0
                 newFood = this.foodScale;
                 // Ecosystem.die(this);
                 return {death: this, makeFood: {amount: newFood, foodPos: foodPos}}
-            } else if (this.lifeForce < 0) {
-                // newFood = abs(this.lifeForce); //to make sure it only excretes the amount it had left
-                newFood = this.lifeForce + this.foodScale; //amount it had before
+            } else if (this.life < 0) {
+                // newFood = abs(this.life); //to make sure it only excretes the amount it had left
+                newFood = this.life + this.foodScale; //amount it had before
                 // Ecosystem.die(this);
                 return {death: this, makeFood: {amount: newFood, foodPos: foodPos}}
             } else {
@@ -168,13 +170,15 @@ class Critter {
 
     donate() {
         this.donationTimer++;
-        if(this.lifeForce >= this.minLifeToDonate && this.donationTimer >= this.donationRate){
+        if(this.life >= this.minLifeToDonate && this.donationTimer >= this.donationRate){
             this.donationTimer = 0;
-            let donation = this.lifeForce * this.donationPercentage;
-            this.lifeForce -= donation;
+            let donation = this.life * this.donationPercentage;
+            this.life -= donation;
             let primaryDonation = donation * .75; //doing this really laboriously b/c don't want pennies slipping through
-            let donation1 = {target: this.altriusm[0], amount: primaryDonation};
-            let donation2 = {target: this.altriusm[1], amount: donation - primaryDonation};
+            let donation1 = {target: this.donations[0].target, amount: primaryDonation};
+            let donation2 = {target: this.donations[1].target, amount: donation - primaryDonation};
+            this.donations[0].total += donation1.amount;
+            this.donations[1].total += donation2.amount;
             return {d1: donation1, d2: donation2};
             // Ecosystem.donate(donation1, donation2);
             // Conduit.fundsRaised[this.altriusm[0]] += primaryDonation;
@@ -187,12 +191,12 @@ class Critter {
         
     display() {
         let isReadyToMate = false;
-        if(this.mateTimer <= 0 && this.lifeForce >= this.minLifeToReproduce){
+        if(this.mateTimer <= 0 && this.life >= this.minLifeToReproduce){
             isReadyToMate = true;
         }
         //need to convert from Victor
         let pos = {x: this.position.x, y: this.position.y};
-        return {position: pos, r: this.r, color: this.color, life: this.lifeForce, isReadyToMate: isReadyToMate};
+        return {position: pos, r: this.r, color: this.color, life: this.life, isReadyToMate: isReadyToMate};
     }
 
     // feed(qtree) {

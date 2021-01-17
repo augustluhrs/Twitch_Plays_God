@@ -50,8 +50,8 @@ world.on('connection', function(socket){
     //food sprinkle
     socket.on("newFood", (data) => {
         // console.log("food sprinkle at: " + JSON.stringify(data.position));
-        ecosystem.worldLife += 2;
-        ecosystem.makeFood(2, data.position);
+        ecosystem.worldLife += 100;
+        ecosystem.makeFood(100, data.position);
     });
 
     //critter info query

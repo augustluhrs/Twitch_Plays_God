@@ -68,7 +68,7 @@ class Ecosystem {
             //all serverside critter stuff
             // console.log(JSON.stringify(this.qtree.points))
 
-            let [snack, mate] = critter.live(this.qtree);
+            let [snack, mate] = critter.live(critter, this.qtree);
             //critter eats
             if (snack != undefined) { //for now just for splicing food that the critter has eaten
                 //update supply, updates, and qtree -- don't need to do updates because will get it on the next run?
@@ -200,16 +200,19 @@ class Ecosystem {
             parents.A.mateTimer += parents.A.refractoryPeriod;
             parents.B.mateTimer += parents.B.refractoryPeriod;
             //give to baby from parents
-            let parentSacrificeA = parents.A.lifeForce * parents.A.parentalSacrifice;
-            parents.A.lifeForce -= parentSacrificeA;
-            let parentSacrificeB = parents.B.lifeForce * parents.B.parentalSacrifice;
-            parents.B.lifeForce -= parentSacrificeB;
+            let parentSacrificeA = parents.A.life * parents.A.parentalSacrifice;
+            parents.A.life -= parentSacrificeA;
+            let parentSacrificeB = parents.B.life * parents.B.parentalSacrifice;
+            parents.B.life -= parentSacrificeB;
             let inheritance = parentSacrificeA + parentSacrificeB;
             //make da bebe
             this.critterID++; //not using anymore right? will keep just in case
             this.critterCount++;
             this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
             let newBaby = new Critter(D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
+            // console.log("new baby at: " + JSON.stringify(newBaby.position));
+            parents.A.offspring.push({name: newBaby.name})
+            parents.B.offspring.push({name: newBaby.name})
             this.critters.push(newBaby);
         });
         /* //old way
@@ -274,9 +277,9 @@ class Ecosystem {
             let point = new Point(critter.position.x, critter.position.y, critter);
             clickQtree.insert(point);
         });
-        let checkRadius = new Circle(position.x, position.y, 20); //10 too big? TODO check
+        let checkRadius = new Circle(position.x, position.y, 30); //might have overlap, but want to prevent hard to click critters
         let foundCritter = clickQtree.query(checkRadius);
-        console.log(JSON.stringify(foundCritter));
+        // console.log(JSON.stringify(foundCritter));
         //sending to specific client even though only one world because will eventually want this individualized
         // world.broadcast.to(client).emit('clickInfo', foundCritter);
         if(foundCritter.length != 0){

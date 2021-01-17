@@ -95,16 +95,17 @@ class Boid {
         let mate = undefined;
         //TODO why forEach vs for/of?
         for (let neighbor of neighbors) {
-            if (Math.hypot((this.position.x - neighbor.position.x), (this.position.y - neighbor.position.y)) <= (this.r / 2 + neighbor.r / 2) &&
-                self.mateTimer <= 0 && self.lifeForce >= self.minLifeToReproduce) {
+            if (Math.hypot((self.position.x - neighbor.position.x), (self.position.y - neighbor.position.y)) <= (self.r / 2 + neighbor.r / 2) &&
+                self.mateTimer <= 0 && self.life >= self.minLifeToReproduce) {
                 //eligible to mate with them if they want (close enough, timer down, and has enough life)
                 mate = neighbor;    
+                // console.log(self.name + " likes " + mate.name);
                 //so only one mate per loop right? might be fun to play with multi later
                 break; 
             }
         }
         // neighbors.forEach( (critter) => {
-        //     if (Math.hypot((this.position.x - critter.position.x), (this.position.y - critter.position.y)) <= (this.r / 2 + critter.r / 2) &&
+        //     if (Math.hypot((self.position.x - critter.position.x), (this.position.y - critter.position.y)) <= (this.r / 2 + critter.r / 2) &&
         //         self.mateTimer <= 0 && self.lifeForce >= self.minLifeToReproduce) {
         //         //eligible to mate with them if they want (close enough, timer down, and has enough life)
         //         mate = critter;    
