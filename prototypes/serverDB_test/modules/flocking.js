@@ -5,17 +5,19 @@ const Victor = require("victor");
 const Critter = require("./critter");
 const D = require("./defaults");
 const { Circle } = require("./quadtree");
-var d = new D(); //i've gotta be doing something wrong...
+// var d = new D(); //i've gotta be doing something wrong...
+// const debug = require('debug')('boid');
 
 //just for calculating the flocking forces, actual position is outside
 class Boid {
     constructor(critter) {
         this.acceleration = new Victor(0, 0);
-        this.velocity = new Victor(d.map(Math.random(), 0, 1, -1, 1), d.map(Math.random(), 0, 1, -1, 1));
+        this.velocity = new Victor(D.map(Math.random(), 0, 1, -1, 1), D.map(Math.random(), 0, 1, -1, 1));
         // this.position is external, this boid is just for motion force, but still need for qtree?
         this.position = critter.position;
+        this.r = critter.r;
         // this.posVector = new Victor(this.position.x, this.position.y);
-        this.perceptionRadius = critter.perceptionRadius || 50;
+        this.perceptionRadius = critter.perceptionRadius || 100;
         this.maxSpeed = critter.maxSpeed;
         this.maxForce = critter.maxForce || 0.05;
         this.desiredSeparation = critter.desiredSeparation || 25;
@@ -26,18 +28,20 @@ class Boid {
         this.hunger = critter.hunger || 10; //to mult food seeking
     }
 
-    // run (critters) {
-    run (qtree) {
-        let surroundings = this.lookAround(qtree);
+    // main critter flocking/eat/mate function
+    run (self, qtree) {
+        let surroundings = this.lookAround(self, qtree);
         this.flock(surroundings.neighbors);
-        this.graze(surroundings.foodAround);
+        let snack = this.graze(surroundings.foodAround);
+        let mate = this.cruise(self, surroundings.neighbors); //findMate() -- needs self for mating info
+        // console.log("snack: " + snack)
         this.bounds();
         this.update();
         this.position.add(this.velocity); //forgot i need to update this position too
-        return this.velocity;
+        return [this.velocity, snack, mate];
     }
 
-    lookAround (qtree) {
+    lookAround (self, qtree) {
         let perception = new Circle(this.position.x, this.position.y, this.perceptionRadius);
         let allAround = qtree.query(perception);
         let surroundings = {
@@ -47,12 +51,12 @@ class Boid {
 
         allAround.forEach( (thing) => {
             //no diff here between using undefined and null?
-            if (thing.data.DNA != undefined) { //is a critter
+            if (thing.data.DNA != undefined && thing.data.id != self.id) { //is a critter AND not self!
                 surroundings.neighbors.push(thing.data);
             } else if (thing.data.ripeRate != undefined) { //is a food
                 surroundings.foodAround.push(thing.data);
             } else {
-                console.log("what the hell are you? " + thing.data);
+                // console.log("what the hell are you? " + thing.data); //now that filtering for self this triggers
             }
 
 
@@ -69,6 +73,59 @@ class Boid {
         return surroundings; //becomes "critters" for flocking
     }
 
+    graze (foodAround) {
+        let snack = undefined;
+        foodAround.forEach( (food) => {
+            if (Math.hypot((this.position.x - food.position.x), (this.position.y - food.position.y)) <= this.r &&
+                food.ripeRate <= 0) {
+                snack = food; //send up to splice and add to lifeForce
+            } else {
+                //fine to do this for each b/c food drive is heavier? 
+                //will they get stuck between food? maybe should check for biggest food? or depends... -- edit: yes, TODO FIX
+                let foodVec = new Victor(food.position.x, food.position.y);
+                let hunger = this.seek(foodVec);
+                hunger.multiply(new Victor(this.hunger, this.hunger));
+                this.applyForce(hunger);
+            }
+        });
+        return snack;
+    }
+
+    cruise (self, neighbors) {
+        let mate = undefined;
+        //TODO why forEach vs for/of?
+        for (let neighbor of neighbors) {
+            if (Math.hypot((self.position.x - neighbor.position.x), (self.position.y - neighbor.position.y)) <= (self.r / 2 + neighbor.r / 2) &&
+                self.mateTimer <= 0 && self.life >= self.minLifeToReproduce) {
+                //eligible to mate with them if they want (close enough, timer down, and has enough life)
+                mate = neighbor;    
+                // console.log(self.name + " likes " + mate.name);
+                //so only one mate per loop right? might be fun to play with multi later
+                break; 
+            }
+        }
+        // neighbors.forEach( (critter) => {
+        //     if (Math.hypot((self.position.x - critter.position.x), (this.position.y - critter.position.y)) <= (this.r / 2 + critter.r / 2) &&
+        //         self.mateTimer <= 0 && self.lifeForce >= self.minLifeToReproduce) {
+        //         //eligible to mate with them if they want (close enough, timer down, and has enough life)
+        //         mate = critter;    
+        //         //so only one mate per loop right? might be fun to play with multi later
+        //         break; 
+        //     }
+        // });
+
+        return mate;
+    }
+
+    //
+    //
+    //
+    // FLOCKING AND MOVEMENT
+    //
+    //
+    //
+
+    
     flock (critters) {
         let separation = this.separation(critters);
         let alignment = this.alignment(critters);
@@ -83,21 +140,10 @@ class Boid {
         this.applyForce(cohesion);
     }
 
-    graze (foodAround) {
-        foodAround.forEach( (food) => {
-            //fine to do this for each b/c food drive is heavier? 
-            //will they get stuck between food? maybe should check for biggest food? or depends...
-            let foodVec = new Victor(food.position.x, food.position.y);
-            let hunger = this.seek(foodVec);
-            hunger.multiply(new Victor(this.hunger, this.hunger));
-            this.applyForce(hunger);
-        });
-    }
-
     bounds() {
-        if (this.position.x > d.width - 10) {this.applyForce(new Victor(-1, 0))}
+        if (this.position.x > D.worldSize.width - 10) {this.applyForce(new Victor(-1, 0))}
         if (this.position.x < 10) {this.applyForce(new Victor(1, 0))}
-        if (this.position.y > d.height - 10) {this.applyForce(new Victor(0, -1))}
+        if (this.position.y > D.worldSize.height - 10) {this.applyForce(new Victor(0, -1))}
         if (this.position.y < 10) {this.applyForce(new Victor(0, 1))}
     }
 
@@ -122,7 +168,7 @@ class Boid {
 
     seek (target) { //not sure if this is necessary, but might be able to use for food?
         let desired = target.subtract(this.position);
-        desired.normalize();
+        desired.normalize(); //removing to see if limit is enough, per james' suggestion 1/11
         desired.multiply(new Victor(this.maxSpeed, this.maxSpeed));
         let steer = desired.subtract(this.velocity);
         // let test = this.limit(steer, this.maxForce);
@@ -141,7 +187,7 @@ class Boid {
             if (d > 0 && d < this.desiredSeparation) {
                 let diff = this.position.clone(); //this.position is getting subtracted from!! without clone it was messing with this.position!! WHAT IS A REFERENCE
                 diff.subtract(critter.position);
-                diff.normalize();
+                // diff.normalize(); // 1/11 remove test
                 diff.divide(new Victor(d, d));
                 steer.add(diff);
                 count++;
@@ -155,7 +201,7 @@ class Boid {
 
         if (steer.magnitude() > 0) {
             // console.log("separation steer before " + steer);
-            steer.normalize();
+            steer.normalize(); // 1/11 remove test
             steer.multiply(new Victor(this.maxSpeed, this.maxSpeed));
             steer.subtract(this.velocity);
             steer = this.limit(steer, this.maxForce);
@@ -179,7 +225,7 @@ class Boid {
 
         if (count > 0) {
             sum.divide(new Victor(count, count));
-            sum.normalize();
+            sum.normalize(); // 1/11 remove test
             sum.multiply(new Victor(this.maxSpeed, this.maxSpeed));
             let steer = sum.subtract(this.velocity);
             // console.log("alignment steer before " + steer);

@@ -19,28 +19,65 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 
 ### Short Term Goals
 
+**January 2021**
+- [X] ~~finish this list~~
+- [ ] clean up backend code (logs + module reorganization)
+- [ ] clean up frontend code (modules)
+- [ ] new UI
+- [ ] critter creation (sliders)
+- [ ] critter creation (gene packs)
+- [?] ~~fix food bugs~~
+- [ ] critter action animations
+- [X] ~~click to show critter info (stats, donations, family tree)~~
+- [ ] environment effects
+- [ ] bigger world
+- [ ] databases
+- [ ] test out NNs
+- [ ] test out 3D creatures
+- [ ] procedural creatures and animations
+- [ ] look into Twitch overlays
+- [ ] glitch redo
+- [ ] twitch overlay
+
+
 **Server Database Stuff**
 - ~~set up ecosystem on server with exports~~
 - ~~socket display clientside, everything else on server~~
 - set up critter db
 - set up world db
 - set up backup db
+- set up conduit db
 - research backup best practices
 - manager so if crash, restarts
+- memory leaks?
+    - global this?
+    - use strict?
+    - copy instead of reference?
+
+**Client Side Stuff**
+- world stats overlay
+- family trees
+- critter generation
+    - fast
+    - advanced with sliders
+    - full with puzzle gene packs and best critters (leftovers go to community pool?)
+- click to show critter info
+- funds raised monitor
+- sprinkle food down
+- learn React lol?
 
 **Ecosystem Stuff**
 - ~~quadtree!~~
 - ~~flocking!~~
 - try out NNs (DIY or ml5)
 - ~~remove pacman border, make solid~~
-- critter generation with sliders
-- new critter generation with genes instead of sliders
 - names and other characterizations
 - features beyond circles? (relevant for world changes)
-- mating pause
+- mating pause + hearts
 - eggs
 - ~~seek food~~
-- food coma
+- food coma + animation
+- poop blooms into food
 - donation animation/indicator
 - environment adaptations
     - weather preferences
@@ -52,11 +89,6 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - add terrain
 - add hazards
 - add climate
-
-**Webpage Stuff**
-- Add New Critter overlay
-- world stats overlay
-- family trees
 
 **Documentation Stuff**
 - behavior gifs
@@ -73,6 +105,9 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
     - reproduction minimums
     - excretion minimums (no death?)
 
+**Three JS Stuff**
+- test 3D ecosystem
+
 **Unity Stuff**
 - test 3D ecosystem
 - ML-Agents test
@@ -87,6 +122,11 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - research ads
 - research alternative payment sources
 - set up transparent ledger
+
+**Maybe Stuff**
+- agression?
+- family/tribe recognition?
+- attraction?
 
 
 ### Long Term Goals

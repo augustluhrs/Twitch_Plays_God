@@ -1,9 +1,49 @@
-//gotta be a better way of doing this, but fine as a placeholder
+//placeholder for DIY functions from p5
 
+const worldSize = {
+    width: 1920,
+    height: 1080
+}
+
+function map(n, start1, stop1, start2, stop2) {
+    const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+    return newval;
+}
+
+function rand_bm(min, max, skew) { // (box-mueller)
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+
+    num = num / 10.0 + 0.5; // Translate to 0 -> 1
+    if (num > 1 || num < 0) num = randn_bm(min, max, skew); // resample between 0 and 1 if out of range
+    num = Math.pow(num, skew); // Skew
+    num *= max - min; // Stretch to fill range
+    num += min; // offset to min
+    return num;
+}
+
+function generate_ID() { //grabbed from https://gist.github.com/gordonbrander/2230317 -- thanks!
+    return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+
+// module.exports = Defaults;
+module.exports.worldSize = worldSize;
+module.exports.map = map;
+module.exports.rand_bm = rand_bm;
+module.exports.generate_ID = generate_ID;
+
+
+/*
+//gotta be a better way of doing this, but fine as a placeholder
 class Defaults {
     constructor() {
         this.width = 1920;
         this.height = 1080;
+        // this.width = 3840;
+        // this.height = 2160;
     }
 
     map(n, start1, stop1, start2, stop2) {
@@ -26,5 +66,4 @@ class Defaults {
         return num;
     }
 }
-
-module.exports = Defaults;
+*/

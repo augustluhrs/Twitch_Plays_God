@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/augustluhrs/Twitch_Plays_God#readme",
   "dependencies": {
+    "debug": "^4.3.1",
     "lerp": "^1.0.3",
     "nedb": "^1.8.0",
     "socketio": "^1.0.0",
