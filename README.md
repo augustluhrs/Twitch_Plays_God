@@ -26,12 +26,12 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - [ ] new UI
 - [ ] critter creation (sliders)
 - [ ] critter creation (gene packs)
-- [?] ~~fix food bugs~~
+- [X] ~~fix food bugs~~ (i hope)
 - [ ] critter action animations
 - [X] ~~click to show critter info (stats, donations, family tree)~~
 - [ ] environment effects
 - [ ] bigger world
-- [ ] databases
+- [X] ~~ecosystem database~~
 - [ ] test out NNs
 - [ ] test out 3D creatures
 - [ ] procedural creatures and animations

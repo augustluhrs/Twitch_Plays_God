@@ -41,12 +41,12 @@ socket.on('clickInfo', (data) => {
 });
 
 let canvas;
-
-let ecosystem = {
-    corpses: [],
-    supply: [],
-    critters: []
-};
+let ecosystem; //undefined at first so server set up works
+// let ecosystem = {
+//     corpses: [],
+//     supply: [],
+//     critters: []
+// };
 
 //ui box
 let monitor = {
@@ -133,11 +133,16 @@ function setup() {
 
 function draw() {
     background(200, 240, 255);
-    
-    monitorFunds();
-    drawEcosystem(); //switching order so panel doesn't cover up
-    displayStats();
-    if(isDisplayingInfo) {displayInfoOverlay(overlay.critter)}
+    if(ecosystem != undefined){
+        monitorFunds();
+        drawEcosystem(); //switching order so panel doesn't cover up
+        displayStats();
+        if(isDisplayingInfo) {displayInfoOverlay(overlay.critter)}
+    } else {
+        textSize(100);
+        text("waiting for server to set up", width/2, height/2);
+    }
+
 }
 
 function mousePressed(){
@@ -215,7 +220,7 @@ function displayStats(){
     fill(0);
     textSize(40);
     text("Critter Count: " + stats.critterCount, width/2, height - 50);
-    text("Life in World: " + floor(stats.worldLife), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
+    text("Life in World: $" + (stats.worldLife / 100).toFixed(2), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
 }
 
 function displayInfoOverlay(critter){

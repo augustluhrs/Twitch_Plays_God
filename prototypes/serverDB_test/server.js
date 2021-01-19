@@ -1,16 +1,10 @@
 /**
+ *  TWITCH PLAYS GOD
  * 
- * 
- * 
+ *  Fall 2020 -- August Luhrs
  * 
  * 
  */
-
-//now trying module.exports for the first time...
-const Ecosystem = require("./modules/ecosystem");
-// let ecosystem = new Ecosystem(10);
-let ecosystem = new Ecosystem(8);
-
 
 //create server
 let port = process.env.PORT || 8080;
@@ -23,6 +17,57 @@ let server = require('http').createServer(app).listen(port, function(){
 //where we look for files
 app.use(express.static('public'));
 
+//nedb database stuff
+// const Datastore = require('nedb');
+// let db = new Datastore({filename: "databases/test.db", autoload: true});
+const {AsyncNedb} = require('nedb-async');
+let db = new AsyncNedb({filename: "databases/test.db", autoload: true});
+
+//ecosystem
+const Ecosystem = require("./modules/ecosystem");
+let ecosystem;
+ecosystemSetup();
+
+async function ecosystemSetup(){
+    console.log('setting up');
+    let docs = await db.asyncFind({type: "ecosystemUpdate"});
+    // console.log(docs.length);
+    if (docs.length != 0) {
+        // ecosystem.load(docs[0].ecoLog);
+        ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
+    } else {
+        ecosystem = new Ecosystem(8);
+        let ecoLog = ecosystem.save();
+        db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
+            if(err){
+                console.log("db err: " + err);
+            }
+            // console.log('ecosystem saved');
+        });
+    }
+    // console.log(JSON.stringify(docs));
+}
+/*
+    db.find({type: "ecosystemUpdate"}, function(err, docs) {
+        if (err) {console.log("set up err: " + err);}
+        console.log(JSON.stringify(docs));
+        if (docs.length != 0) {
+            // ecosystem.load(docs[0].ecoLog);
+            ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
+        } else {
+            ecosystem = new Ecosystem(8);
+            let ecoLog = ecosystem.save();
+            db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
+                if(err){
+                    console.log("db err: " + err);
+                }
+                // console.log('ecosystem saved');
+            });
+        }
+    });
+*/
+// let ecosystem = new Ecosystem(8);
+
 //create socket connection
 let io = require('socket.io').listen(server)
 
@@ -30,12 +75,14 @@ let io = require('socket.io').listen(server)
 // var world = io.of('/')
 global.world = io.of('/') //lol global...
 
-
 //listen for anyone connecting to default namespace
 world.on('connection', function(socket){
     console.log('world: ' + socket.id);
-    world.emit('fundsUpdate', ecosystem.conduit);
-    world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife.toFixed(2)});
+    //removing these so only updates when server is ready... wait no, can't b/c then sketch doesn't have certain variables...
+    if(ecosystem != undefined){
+        world.emit('fundsUpdate', ecosystem.conduit);
+        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife.toFixed(2)});
+    }
     
     //new event listeners
     //new critter
@@ -66,15 +113,57 @@ world.on('connection', function(socket){
 });
 
 //main run
+//wait for setup
+// while(ecosystem == undefined){
+    // console.log('setting up');
+// }
 setInterval( () => {
-    let updates = ecosystem.run();
-    world.emit("update", updates);
+    if (ecosystem != undefined){ //taxing?
+        let updates = ecosystem.run();
+        world.emit("update", updates);
+    }
 }, 10); //TODO is there a better way of doing this?
 
-//update funds
-// setInterval( () => {
-//     let fundsUpdate = ecosystem.conduit.fundsRaised;
-//     world.emit('fundsUpdate', fundsUpdate);
-// }, 30000);
+//save to db
+setInterval( () => {
+    //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
+    //do I need to save backups? hmm... maybe every hour?
+    backupDB();
+    // db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
+    //     if(err){
+    //         console.log("db err: " + err);
+    //     }
+    //     console.log('db updated');
+    // });
+}, 300000); //how fast? 5 mins, also prob need to save on exit? or does it matter? deterministic?
+
+setInterval( () => {
+    //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
+    //do I need to save backups? hmm... maybe every hour?
+    let ecoLog = ecosystem.save();
+    db.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+        .then(function(){console.log('db updated');})
+        .catch(function(err){console.log("backup err: " + err);});
+
+    // db.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
+    //     if(err){
+    //         console.log("db err: " + err);
+    //     }
+    //     console.log('db updated');
+    // });
+}, 3601000); //just to offset from main save
+
+global.backupDB = function(){
+    let ecoLog = ecosystem.save();
+    db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+        .then(function(){console.log('db updated');})
+        .catch(function(err){console.log("Update err: " + err);});
+}
+
+//for exiting
+// process.on("exit", function(code){
+//     backupDB();
+//     return console.log(`backed up, and exiting with code ${code}`);
+// })
 
 

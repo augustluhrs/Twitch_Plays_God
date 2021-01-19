@@ -15,26 +15,94 @@ let boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.wo
 
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
-    constructor(numAgents) {
-        this.width = D.worldSize.width;
-        this.height = D.worldSize.height;
-        this.critterID = 0; //just for IDs
-        this.critters = []; //the agents currently in the ecosystem    
-        this.corpses = []; //currently decomposing critters
-        this.supply = []; //the food that exists in the ecosystem
-    
-        this.conduit = new Conduit();
-        this.worldLife = 0;
-        this.critterCount = 0;
-        //create initial population -- need "new"?
-        for (let i = 0; i < numAgents; i++) {
-            this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
-            this.critterCount++;
-            this.critterID++;
-            this.worldLife += 100;
-        }
+    constructor(ecoSetup) {
+        if(typeof ecoSetup === "number"){
+            console.log("setting up new ecosystem");
+            this.width = D.worldSize.width;
+            this.height = D.worldSize.height;
+            // this.critterID = 0; //just for IDs
+            this.critters = []; //the agents currently in the ecosystem    
+            this.corpses = []; //currently decomposing critters
+            this.supply = []; //the food that exists in the ecosystem
+        
+            this.conduit = new Conduit();
+            this.worldLife = 0;
+            this.critterCount = 0;
+            //create initial population -- need "new"?
+            for (let i = 0; i < ecoSetup; i++) {
+                this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+                this.critterCount++;
+                // this.critterID++;
+                this.worldLife += 100;
+            }
+        } else if (typeof ecoSetup === "object") {
+            console.log("setting up ecosystem from save");
+            this.width = D.worldSize.width;
+            this.height = D.worldSize.height;
+            this.critters = []; //the agents currently in the ecosystem    
+            this.corpses = []; //currently decomposing critters
+            this.supply = [];
 
-        //not setting up quadtree here because new one every run
+            // let newCon = new Conduit();
+            // console.log("NEW CON" + JSON.stringify(new Conduit()));
+            // console.log("db con" + JSON.stringify(this.conduit));
+            // console.log(newCon instanceof Conduit);
+            // console.log(this.conduit instanceof Conduit);
+
+            // great, okay, so have to remake the stuff after db...
+            this.conduit = new Conduit(ecoSetup.conduit);
+            this.worldLife = 0;
+            this.critterCount = 0;
+            
+            for (let dbCritter of ecoSetup.ecoLog.critters){
+                let critter = new Critter(dbCritter);
+                this.critters.push(critter);
+                this.critterCount++;
+                this.worldLife += critter.life;
+            }
+            for (let dbFood of ecoSetup.ecoLog.supply) {
+                let food = new Food(dbFood);
+                this.supply.push(food);
+                this.worldLife += food.amount;
+            }
+            for (let dbCorpse of ecoSetup.ecoLog.corpses) {
+                let corpse = new Corpse(dbCorpse);
+                this.corpses.push(corpse);
+            }
+
+            // for (let thing of ecoSetup.ecoLog){
+            //     if (thing instanceof Critter) {
+            //         this.critters.push(thing);
+            //         this.critterCount++;
+            //         this.worldLife += thing.life;
+            //     }
+            //     if (thing instanceof Food) {
+            //         this.supply.push(thing);
+            //         this.worldLife += thing.amount;
+            //     }
+            //     if (thing instanceof Corpse) {
+            //         this.corpses.push(thing);
+            //     }
+            // }
+        } else {
+            console.log("ecosystem set up error: " + ecoSetup);
+            console.log(typeof ecoSetup);
+            console.log(typeof ecoSetup === "number");
+        }
+        console.log("ecosystem ready");
+        //doing this here so that funds and ecosystem will be ready from start -- nope...
+        // world.emit('fundsUpdate', this.conduit);
+        // world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife.toFixed(2)});
+    }
+
+    save() {
+        let ecoLog = {
+            critters: this.critters,
+            supply: this.supply,
+            corpses: this.corpses
+        }
+        console.log("ecosystem saved");
+        return ecoLog;
     }
 
     run() {
@@ -142,8 +210,9 @@ class Ecosystem {
         // this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
         this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
         this.critterCount++;
-        this.critterID++;
+        // this.critterID++;
         this.worldLife += 100;
+        backupDB();
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
@@ -156,7 +225,7 @@ class Ecosystem {
     die(deadCritter) {
         this.critters.forEach( (critter, index) => {
             if (critter == deadCritter) {
-                this.corpses.push(new Corpse({x: critter.position.x, y: critter.position.y}, critter.r));
+                this.corpses.push(new Corpse({x: critter.position.x, y: critter.position.y, r: critter.r}));
                 this.critters.splice(index, 1);
                 return;
             }
@@ -206,7 +275,7 @@ class Ecosystem {
             parents.B.life -= parentSacrificeB;
             let inheritance = parentSacrificeA + parentSacrificeB;
             //make da bebe
-            this.critterID++; //not using anymore right? will keep just in case
+            // this.critterID++; //not using anymore right? will keep just in case
             this.critterCount++;
             this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
             let newBaby = new Critter(D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
@@ -215,6 +284,12 @@ class Ecosystem {
             parents.B.offspring.push({name: newBaby.name})
             this.critters.push(newBaby);
         });
+
+        if (pairs.length != 0) {
+            backupDB();
+        }
+
+
         /* //old way
         //not doing forEach in favor of previous more optimized version, need to find a better way though
         for (let i = this.critters.length - 1; i >= 0; i--) {
