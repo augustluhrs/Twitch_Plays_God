@@ -225,7 +225,7 @@ class Ecosystem {
     die(deadCritter) {
         this.critters.forEach( (critter, index) => {
             if (critter == deadCritter) {
-                this.corpses.push(new Corpse({x: critter.position.x, y: critter.position.y, r: critter.r}));
+                this.corpses.push(new Corpse({position: {x: critter.position.x, y: critter.position.y}, r: critter.r}));
                 this.critters.splice(index, 1);
                 return;
             }
