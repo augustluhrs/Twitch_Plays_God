@@ -136,7 +136,7 @@ setInterval( () => {
 setInterval( () => {
     //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
     //do I need to save backups? hmm... maybe every hour?
-    backupDB();
+    global.backupDB();
     // db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
     //     if(err){
     //         console.log("db err: " + err);
