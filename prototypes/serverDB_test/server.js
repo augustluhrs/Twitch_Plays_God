@@ -22,6 +22,7 @@ app.use(express.static('public'));
 // let db = new Datastore({filename: "databases/test.db", autoload: true});
 const {AsyncNedb} = require('nedb-async');
 let db = new AsyncNedb({filename: "databases/test.db", autoload: true});
+let backupDB = new AsyncNedb({filename: "databases/backups.db", autoload: true});
 
 //ecosystem
 const Ecosystem = require("./modules/ecosystem");
@@ -46,6 +47,13 @@ async function ecosystemSetup(){
         });
     }
     // console.log(JSON.stringify(docs));
+}
+
+global.backupDB = function(){
+    let ecoLog = ecosystem.save();
+    db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+        .then(function(){console.log('db updated');})
+        .catch(function(err){console.log("Update err: " + err);});
 }
 /*
     db.find({type: "ecosystemUpdate"}, function(err, docs) {
@@ -141,7 +149,7 @@ setInterval( () => {
     //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
     //do I need to save backups? hmm... maybe every hour?
     let ecoLog = ecosystem.save();
-    db.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+    backupDB.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
         .then(function(){console.log('db updated');})
         .catch(function(err){console.log("backup err: " + err);});
 
@@ -153,12 +161,6 @@ setInterval( () => {
     // });
 }, 3601000); //just to offset from main save
 
-global.backupDB = function(){
-    let ecoLog = ecosystem.save();
-    db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-        .then(function(){console.log('db updated');})
-        .catch(function(err){console.log("Update err: " + err);});
-}
 
 //for exiting
 // process.on("exit", function(code){

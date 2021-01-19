@@ -64,9 +64,13 @@ class Critter {
                 //crossover here now
                 //color is a mix
                 this.DNA.genes[0] = [ //having to lerp each color individually
-                    lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
-                    lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], Math.random()),
-                    lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], Math.random())
+                    // lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
+                    // lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], Math.random()),
+                    // lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], Math.random())
+                    lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm()),
+                    lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm()),
+                    lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm())
+
                 ];
                 //for all genes but color, normal lerp
                 for (let i = 1; i < this.DNA.genes.length; i++) { 
@@ -118,7 +122,7 @@ class Critter {
             this.boid = new Boid(this);
         } else { //create from db
             this.id = critter.id;
-            this.DND = critter.DNA;
+            this.DNA = critter.DNA;
             this.offspring = critter.offspring;
             this.name = critter.name;
             this.donations = critter.donations;

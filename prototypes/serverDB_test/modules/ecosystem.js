@@ -159,6 +159,7 @@ class Ecosystem {
             //critter mates -- to be resolved in checkForMates() below
             if (mate != undefined) {
                 mates.push({self: critter, mate: mate});
+                // console.log('ilikeu');
             } else {
                 critter.mateTimer -= 1;
             }
