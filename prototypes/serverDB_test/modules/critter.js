@@ -10,7 +10,7 @@ const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
 
 class Critter {
     constructor (critter, deets) {
-        if (typeof critter === "string"){
+        if (typeof critter === "string"){ //hack to keep old constructor while also using critter objects in else below
             //better name for deets? opts
             this.id = critter; //from D.generate_ID() now
             this.DNA = new DNA(); //will get overwritten if child

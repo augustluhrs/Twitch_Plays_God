@@ -32,21 +32,17 @@ ecosystemSetup();
 async function ecosystemSetup(){
     console.log('setting up');
     let docs = await db.asyncFind({type: "ecosystemUpdate"});
-    // console.log(docs.length);
     if (docs.length != 0) {
-        // ecosystem.load(docs[0].ecoLog);
         ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
     } else {
-        ecosystem = new Ecosystem(8);
+        ecosystem = new Ecosystem(300);
         let ecoLog = ecosystem.save();
         db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
             if(err){
                 console.log("db err: " + err);
             }
-            // console.log('ecosystem saved');
         });
     }
-    // console.log(JSON.stringify(docs));
 }
 
 global.backupDB = function(){

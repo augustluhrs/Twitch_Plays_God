@@ -1,3 +1,7 @@
+let ecosystemSketch = function(p) {
+
+}
+
 let canvas;
 let ecosystem; //undefined at first so server set up works
 // let ecosystem = {
@@ -43,12 +47,12 @@ let isDisplayingInfo = false;
 
 //critter creation menu
 let creation;
-// let creationMenu = {
-//     w: 1500,
-//     h: 800,
-//     textSize: 40
-// }
-let creationMenu;
+let creationMenu = {
+    w: 1500,
+    h: 800,
+    textSize: 40
+}
+
 
 //assets
 let godIcon;
@@ -60,9 +64,8 @@ function preload(){
 function setup() {
     //how to get d.width/height?
     canvas = createCanvas(1920,1080);
-    canvas.parent("ecosystemCanvas");
     // createCanvas(3840,2160);
-
+    
     ellipseMode(CENTER);
     rectMode(CENTER);
     imageMode(CENTER);
@@ -100,17 +103,12 @@ function setup() {
         .size(100, 50)
         .mousePressed( () => {
             isCreating = !isCreating;
-            if(isCreating){
-                creationMenu = new p5(creationSketch, "critterCreation");
-            } else {
-                creationMenu.remove();
-            }
         });
 
 
     //for the overlays
     infoGraphics = createGraphics(overlay.w, overlay.h);
-    // creation = createGraphics(creationMenu.w, creationMenu.h);
+    creation = createGraphics(creationMenu.w, creationMenu.h);
     // setupCreation(creation);
 }
 
@@ -121,8 +119,7 @@ function draw() {
         drawEcosystem(); //switching order so panel doesn't cover up
         displayStats();
         if (isCreating) {
-            //TODO clean up this draw loop
-            // displayCreation(creation);
+            displayCreation(creation);
         } else if(isDisplayingInfo) {
             displayInfoOverlay(overlay.critter)
         }
@@ -212,4 +209,3 @@ function displayStats(){
     text("Critter Count: " + stats.critterCount, width/2, height - 50);
     text("Life in World: $" + (stats.worldLife / 100).toFixed(2), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
 }
-
