@@ -19,7 +19,32 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 
 ### Short Term Goals
 
-**January 2021**
+**Feb 2021 Update**
+Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on.
+
+- [ ] Critter Creation
+    - [ ] Separate page for now because too many issues with DOM
+    - [ ] A) Name, God, Starting Life
+    - [ ] B) Critter Preview, Color Picker
+    - [ ] C) Speed/Size, Excretion Rate
+    - [ ] D) Conduit Targets (bleedover from life too)
+    - [ ] E) Donations and Sex Sliders
+    - [ ] F) Cost Tallies and Create Button
+    - [ ] Go back to main page and click to drop
+- [ ] name crossover
+- [ ] community effects
+    - [ ] brainstorm playtestable community effect prototypes
+- [ ] Playtest (start day and week later followup)
+    - [ ] host on glitch
+    - [ ] get group
+    - [ ] intitial feedback survey
+    - [ ] week later feedback survey
+- [ ] Documentation
+    - [ ] get media
+    - [ ] update github with current project status and media
+    - [ ] add to website
+
+**Jan 2021 Update**
 - [X] ~~finish this list~~
 - [ ] clean up backend code (logs + module reorganization)
 - [ ] clean up frontend code (modules)

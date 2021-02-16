@@ -39,6 +39,7 @@ let creationSketch = function(p) {
             p.ellipse(this.x, this.y, p.map(bodySlider.yVal, 0, 1, 5, 50));
         }
     }
+    let primarySelect, secondarySelect, primaryInput, secondaryInput;
     //top right
     let colorPicker;
 
@@ -109,6 +110,9 @@ let creationSketch = function(p) {
     };
 
     //bottom middle
+    //getting rid of frequency stuff for cleaning up for now
+    let donationPercentageSlider, donationMinLifeSlider;
+    let sexPercentageSlider, sexMinLifeSlider;
 
     //bottom right
 
@@ -146,6 +150,16 @@ let creationSketch = function(p) {
             .parent("critterCreation")
             .style("position", "relative");
             // .style("margin", "auto");
+        primarySelect = p.createSelect()
+            .position(5 * p.width / 12, -8 * p.height / 12)
+            .parent("critterCreation")
+            .style("position", "relative")
+            .changed(selectChange);
+        secondarySelect = p.createSelect()
+            .position(5 * p.width / 12, -7 * p.height / 12)
+            .parent("critterCreation")
+            .style("position", "relative")
+            .changed(selectChange);
 
         //top right
         colorPicker = p.createColorPicker('#22AAFF')
@@ -163,7 +177,8 @@ let creationSketch = function(p) {
         bodySlider.yPos = bodySlider.yCenter;
 
         //bottom middle
-
+        donationPercentageSlider = p.createSlider(.01, 1, .5, .01)
+            .position()
 
         //bottom right
 
@@ -216,6 +231,11 @@ let creationSketch = function(p) {
                 bodySlider.xVal = map(bodySlider.xPos, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2, 0, 1);
                 bodySlider.yVal = map(bodySlider.yPos, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2, 1, 0);
             }
+    }
+
+    function selectChange(){
+        primarySelect.disable(secondarySelect.value());
+        secondarySelect.disable(primarySelect.value());
     }
 };
 
