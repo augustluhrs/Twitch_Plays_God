@@ -20,18 +20,29 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 ### Short Term Goals
 
 **Feb 2021 Update**
-Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on.
+Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
 
 - [ ] Critter Creation
-    - [ ] Separate page for now because too many issues with DOM
+    - [ ] Instance Mode with Page DOM Positioning
     - [ ] A) Name, God, Starting Life
     - [ ] B) Critter Preview, Color Picker
     - [ ] C) Speed/Size, Excretion Rate
     - [ ] D) Conduit Targets (bleedover from life too)
     - [ ] E) Donations and Sex Sliders
     - [ ] F) Cost Tallies and Create Button
-    - [ ] Go back to main page and click to drop
-- [ ] name crossover
+    - [ ] Go back to eco sketch and click to drop
+- [ ] Critter misc unessential
+    - [ ] name crossover
+    - [ ] hunger / food coma?
+    - [ ] prevent food from having out of bounds coords
+    - [ ] mutation rate option in creation
+- [ ] UI misc unessential
+    - [ ] Scrollable Donation List
+    - [ ] Font
+    - [ ] Conduit Background Swatch
+    - [X] Button Class
+    - [X] icon credit div at bottom
+    - [ ] color scheme 
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
 - [ ] Playtest (start day and week later followup)

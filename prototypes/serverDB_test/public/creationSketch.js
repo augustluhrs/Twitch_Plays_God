@@ -1,8 +1,6 @@
 //for the critter creation menu
 
-//no idea why the DOM stuff is weird in instance mode -- TODO find out why relative height is backwards?
-
-let creationSketch = function(p) {
+let creationInstance = function(p) { //should change to c?
     // let critterSizeMax = 50; //TODO where should I declare this globally? rn it's critter.js line 103
     //top left
     let nameInput, godInput;
@@ -33,8 +31,8 @@ let creationSketch = function(p) {
             let lifeForce = p.color(critterCol.levels[0], critterCol.levels[1], critterCol.levels[2], 100);
             // console.log(lifeForce);
             p.fill(lifeForce);
-            let critterR = map(bodySlider.yVal, 0, 1, 5, 50);
-            p.ellipse(this.x, this.y, critterR + map(startingLifeSlider.value(), 0, 10, 0, 4 * critterR));
+            let critterR = p.map(bodySlider.yVal, 0, 1, 5, 50);
+            p.ellipse(this.x, this.y, critterR + p.map(startingLifeSlider.value(), 0, 10, 0, 4 * critterR));
             p.fill(critterCol);
             p.ellipse(this.x, this.y, p.map(bodySlider.yVal, 0, 1, 5, 50));
         }
@@ -102,8 +100,8 @@ let creationSketch = function(p) {
             let poopY = this.yCenter + 3 * this.h / 5;
             p.stroke(100);
             p.line(this.xCenter - this.w / 2, poopY, this.xCenter + this.w / 2, poopY);
-            let dogPoopX = map(this.xVal + this.yVal, 0, 2, this.xCenter - this.w / 2, this.xCenter + this.w / 2);
-            let poopSize = map(this.xVal + this.yVal, 0, 2, 20, 50);
+            let dogPoopX = p.map(this.xVal + this.yVal, 0, 2, this.xCenter - this.w / 2, this.xCenter + this.w / 2);
+            let poopSize = p.map(this.xVal + this.yVal, 0, 2, 20, 50);
             p.tint(255, 255);
             p.image(dogPoop, dogPoopX, poopY, poopSize, poopSize);  
         }
@@ -129,17 +127,25 @@ let creationSketch = function(p) {
     //setup and draw
     p.setup = function() {
         //should do class / divs? should learn css...
-        p.createCanvas(1500, 800);
-        p.ellipseMode(CENTER);
-        p.rectMode(CENTER);
-        p.imageMode(CENTER);
-        p.textAlign(CENTER, CENTER);
+        // p.createCanvas(7 * page.width / 8, 6 * page.height / 8);
+        p.createCanvas(page.width, 7 * page.height / 8);
+
+        p.ellipseMode(p.CENTER);
+        p.rectMode(p.CENTER);
+        p.imageMode(p.CENTER);
+        p.textAlign(p.CENTER, p.CENTER);
+
+        //creating container so easy to remove when getting rid of creation screen
+        p.createSpan()
+            .id("creationSpan")
+            .parent("creationCanvas");
+            // .size(p.width, p.height);
 
         //top left
         startingLifeSlider = p.createSlider(.01, 10, .80, .01)
             .position(p.width / 50, -3 * p.height / 5)
             .size(3 * p.width / 10, 40)
-            .parent("critterCreation")
+            .parent("creationSpan")
             .style("position", "relative");
 
         //top middle
@@ -147,17 +153,17 @@ let creationSketch = function(p) {
         critterDisplay.y = p.height / 4;
         speedCheckbox = p.createCheckbox("show speed", true)
             .position(p.width / 2, -19 * p.height / 20) //WTF why is it relative to bottom???
-            .parent("critterCreation")
+            .parent("creationSpan")
             .style("position", "relative");
             // .style("margin", "auto");
         primarySelect = p.createSelect()
             .position(5 * p.width / 12, -8 * p.height / 12)
-            .parent("critterCreation")
+            .parent("creationSpan")
             .style("position", "relative")
             .changed(selectChange);
         secondarySelect = p.createSelect()
             .position(5 * p.width / 12, -7 * p.height / 12)
-            .parent("critterCreation")
+            .parent("creationSpan")
             .style("position", "relative")
             .changed(selectChange);
 
@@ -165,7 +171,7 @@ let creationSketch = function(p) {
         colorPicker = p.createColorPicker('#22AAFF')
             .position(3 * p.width / 4, -5 * p.height / 6)
             .size(200, 100)
-            .parent("critterCreation")
+            .parent("creationSpan")
             .style("position", "relative");
 
         //bottom left
@@ -177,8 +183,8 @@ let creationSketch = function(p) {
         bodySlider.yPos = bodySlider.yCenter;
 
         //bottom middle
-        donationPercentageSlider = p.createSlider(.01, 1, .5, .01)
-            .position()
+        // donationPercentageSlider = p.createSlider(.01, 1, .5, .01)
+        //     .position()
 
         //bottom right
 
@@ -186,10 +192,11 @@ let creationSketch = function(p) {
     };
 
     p.draw = function() {
-        p.background(200, 255, 200);
+        p.clear();
+        p.background(200, 255, 200, 200);
         
         //top left -- Names
-        p.textAlign(LEFT);
+        p.textAlign(p.LEFT);
         p.textSize(40);
         p.noStroke();
         p.fill(0);
@@ -228,8 +235,8 @@ let creationSketch = function(p) {
             p.mouseY <= bodySlider.yCenter + bodySlider.h / 2) {
                 bodySlider.xPos = p.mouseX;
                 bodySlider.yPos = p.mouseY;
-                bodySlider.xVal = map(bodySlider.xPos, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2, 0, 1);
-                bodySlider.yVal = map(bodySlider.yPos, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2, 1, 0);
+                bodySlider.xVal = p.map(bodySlider.xPos, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2, 0, 1);
+                bodySlider.yVal = p.map(bodySlider.yPos, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2, 1, 0);
             }
     }
 

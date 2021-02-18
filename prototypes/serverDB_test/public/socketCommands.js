@@ -8,7 +8,7 @@ socket.on('connect', function(){
 });
 
 socket.on('update', (updates) => {
-    ecosystem = updates; //issue if this is happening asynch to draw?
+    ecosystemSketch.ecosystem = updates; 
 });
 
 socket.on('fundsUpdate', (conduit) => {
@@ -22,21 +22,21 @@ socket.on('fundsUpdate', (conduit) => {
     sorted.sort((a, b) => {return b[1] - a[1]});
     // console.log(sorted);
 
-    funds.sorted = sorted;
-    funds.total = total;
+    ecosystemSketch.funds.sorted = sorted;
+    ecosystemSketch.funds.total = total;
 });
 
 socket.on('statsUpdate', (update) => {
-    stats.critterCount = update.critterCount;
-    stats.worldLife = update.worldLife;
+    ecosystemSketch.stats.critterCount = update.critterCount;
+    ecosystemSketch.stats.worldLife = update.worldLife;
 });
 
 socket.on('clickInfo', (data) => {
     console.log(data.critter)
     if (data.client == socket.id && data.critter != undefined) {
         // console.log('info received');
-        overlay.position = data.position;
-        overlay.critter = data.critter;
-        isDisplayingInfo = true;
+        ecosystemSketch.overlay.position = data.position;
+        ecosystemSketch.overlay.critter = data.critter;
+        ecosystemSketch.isDisplayingInfo = true;
     }
 });
