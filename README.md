@@ -23,19 +23,24 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
 
 - [ ] Critter Creation
-    - [ ] Instance Mode with Page DOM Positioning
-    - [ ] A) Name, God, Starting Life
-    - [ ] B) Critter Preview, Color Picker
-    - [ ] C) Speed/Size, Excretion Rate
+    - [X] Instance Mode with Page DOM Positioning
+    - [X] A) Name, God, Starting Life
+    - [X] B) Critter Preview, Color Picker
+    - [X] C) Speed/Size, Excretion Rate
     - [ ] D) Conduit Targets (bleedover from life too)
-    - [ ] E) Donations and Sex Sliders
-    - [ ] F) Cost Tallies and Create Button
+    - [X] E) Donations and Sex Sliders
+    - [X] F) Cost Tallies and Create Button
     - [ ] Go back to eco sketch and click to drop
+    - [ ] get user info from server
+    - [ ] send critter update to server
 - [ ] Critter misc unessential
     - [ ] name crossover
+    - [ ] name abuse prevention
     - [ ] hunger / food coma?
     - [ ] prevent food from having out of bounds coords
     - [ ] mutation rate option in creation
+    - [ ] donation animation
+    - [ ] mate animation
 - [ ] UI misc unessential
     - [ ] Scrollable Donation List
     - [ ] Font
@@ -43,8 +48,20 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] Button Class
     - [X] icon credit div at bottom
     - [ ] color scheme 
+    - [ ] title banner update
+    - [ ] updating life slider with personal funds max
+    - [ ] update donation targets with new targets
+    - [ ] clickable link to charity in select
+    - [ ] tooltip details if hover over
+        - [ ] donation
+        - [ ] mating
+        - [ ] excretion
+        - [ ] taxes
+    - [ ] creation menu defaults to last critter created
+    - [ ] misc layour adjustments
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
+    - [ ] food sprinkle
 - [ ] Playtest (start day and week later followup)
     - [ ] host on glitch
     - [ ] get group
@@ -54,6 +71,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] get media
     - [ ] update github with current project status and media
     - [ ] add to website
+    - [ ] create separate todo/changelog and update readme
 
 **Jan 2021 Update**
 - [X] ~~finish this list~~

@@ -42,7 +42,7 @@ let ecosystemInstance = function(e) {
     }
 
     e.setup = () => {
-        e.createCanvas(page.width, 7 * page.height / 8);
+        e.createCanvas(page.width, page.height);
         e.ellipseMode(e.CENTER);
         e.rectMode(e.CENTER);
         e.imageMode(e.CENTER);

@@ -11,6 +11,10 @@ let page = { //later should just find screen size and make relative for DOM
 }
 let creationSketch;
 
+let userData = {
+    funds: 10.00
+}
+
 let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
     let modeButton, modeSpan;

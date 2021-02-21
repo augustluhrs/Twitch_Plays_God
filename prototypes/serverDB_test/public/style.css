@@ -1,11 +1,11 @@
-/* html, body {
+html, body {
     margin: 0;
     padding: 0;
-} */
+}
   
-/* canvas {
-    display: flex; 
-} */
+canvas {
+    display: block; 
+}
 
 .button {
     /* display: flex; */
@@ -21,7 +21,7 @@
 
 #creationCanvas {
     position: absolute;
-    margin: 10px;
+    margin: 0px;
     top: 135px;
     left: 0px;
 }
