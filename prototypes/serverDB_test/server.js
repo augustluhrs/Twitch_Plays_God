@@ -35,7 +35,8 @@ async function ecosystemSetup(){
     if (docs.length != 0) {
         ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
     } else {
-        ecosystem = new Ecosystem(300);
+        // ecosystem = new Ecosystem(300);
+        ecosystem = new Ecosystem(0);
         let ecoLog = ecosystem.save();
         db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
             if(err){
@@ -93,9 +94,9 @@ world.on('connection', function(socket){
     socket.on("newCritter", (data) => {
         if(data == undefined){
             ecosystem.spawnRandomCritter();
-            // console.log("spawn rando");
         } else {
-            console.log("newCritter error");
+            ecosystem.spawnCritterFromUser(data);
+            console.log(`New Critter ${data.name} from ${data.ancestry.parents[0].name}`);
         }
     });
     //food sprinkle

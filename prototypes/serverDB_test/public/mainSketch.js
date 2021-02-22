@@ -15,6 +15,36 @@ let userData = {
     funds: 10.00
 }
 
+let newCritter = {
+    // this.id = critter.id;
+    // this.DNA = critter.DNA;
+    // this.offspring = critter.offspring;
+    name: "Critter Name",
+    donations: [{target: "NAACP", total: 0},{target: "Critical Role Foundation", total: 0}],
+    positionArray: [0,0],
+    // this.position = new Victor(critter.position.x, critter.position.y);
+    life: .8,
+    ancestry: {child: this.name, parents: [{name: "Your Name"}]},
+    // color: [45, 225, 194],
+    // color: p5.color(45, 225, 194),
+    color: "#2DE1C2",
+    r: 0.5,
+    maxSpeed: 0.5,
+    donationRate: 300000,
+    donationPercentage: .5,
+    minLifeToDonate: .5,
+    refractoryPeriod: 300000,
+    parentalSacrifice: .5,
+    minLifeToReproduce: .5,
+    // this.excretionRate = critter.excretionRate;
+    // this.mutationRate = critter.mutationRate;
+    // this.mateTimer = critter.mateTimer;
+    // this.excretionTimer = critter.excretionTimer;
+    // this.donationTimer = critter.donationTimer;
+    // this.foodScale = critter.foodScale;
+    // this.boid = new Boid(this);
+}
+
 // let conduitData = [
 //     {}
 // ]
@@ -27,7 +57,8 @@ conduitData["NAACP"] = 0;
 
 let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
-    let modeButton, modeSpan;
+    let modeSpan;
+    m.modeButton = null;
     let isCreating = false;
     // let credits;
 
@@ -47,7 +78,7 @@ let mainInstance = (m) => {
             .id("modeSpan")
             .position(0, 5 * m.height / 8)
             .size(page.width, m.height / 3);
-        modeButton = m.createButton("Create New Critter")
+        m.modeButton = m.createButton("Create New Critter")
             // .position(m.width/2, 3 *  m.height / 4) //fine to make canvas relative since at top for now
             .parent('modeSpan')
             .class("button")
@@ -58,13 +89,16 @@ let mainInstance = (m) => {
                 ecosystemSketch.isCreating = !ecosystemSketch.isCreating;
                 if(ecosystemSketch.isCreating){
                     creationSketch = new p5(creationInstance, 'creationCanvas');
-                    modeButton.html("Back To The World")
+                    m.modeButton.html("Back To The World")
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
                 } else {
-                    modeButton.html("Create New Critter")
+                    m.modeButton.html("Create New Critter")
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    ecosystemSketch.isReadyToSpawn = false;
+                    // document.getElementById("confirmationSpan").remove();
+
 
                     // for (let child of document.getElementById('creationCanvas').children) {
                     //     child.remove();

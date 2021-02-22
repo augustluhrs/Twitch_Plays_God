@@ -116,6 +116,11 @@ let creationInstance = function(c) { //should change to c?
 
     //bottom right
     let creationButton;
+    let startLife, equTax, totalCost, fundsAfter;
+    let genTax = 0.05;
+
+    //confirmation menu
+    let confirmationMenu;
 
     //preload assets
     c.preload = () => {
@@ -144,9 +149,12 @@ let creationInstance = function(c) { //should change to c?
             .id("creationSpan")
             .parent("creationCanvas");
             // .size(c.width, c.height);
+        // c.createSpan()
+        //     .id("confirmationSpan")
+        //     .parent("creationCanvas");
 
         //top left && bottom left
-        nameInput = c.createInput('Critter Name')
+        nameInput = c.createInput(newCritter.name)
             .parent("creationSpan")
             .position(c.width / 16, 1.25 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
@@ -156,7 +164,7 @@ let creationInstance = function(c) { //should change to c?
             //         nameInput.value("Critter Name");
             //     }
             // })
-        godInput = c.createInput('Your Name')
+        godInput = c.createInput(newCritter.ancestry.parents[0].name)
             .parent("creationSpan")
             .position(c.width / 16, 2.5 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
@@ -181,16 +189,26 @@ let creationInstance = function(c) { //should change to c?
         for (let [i, target] of targets.entries()) {
             primarySelect.option(target);
             secondarySelect.option(target);
-            if (i == 0) {
+            if (target == newCritter.donations[0].target) {
                 primarySelect.selected(target);
                 lastPrimary = target;
                 secondarySelect.disable(target);
             }
-            if (i == 1) {
+            if (target == newCritter.donations[1].target) {
                 secondarySelect.selected(target);
                 lastSecondary = target;
                 primarySelect.disable(target);
             }
+            // if (i == 0) {
+            //     primarySelect.selected(target);
+            //     lastPrimary = target;
+            //     secondarySelect.disable(target);
+            // }
+            // if (i == 1) {
+            //     secondarySelect.selected(target);
+            //     lastSecondary = target;
+            //     primarySelect.disable(target);
+            // }
         }
         primarySelect.option("other");
         secondarySelect.option("other");
@@ -208,7 +226,7 @@ let creationInstance = function(c) { //should change to c?
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
-        startingLifeSlider = c.createSlider(.01, 10, .80, .01)
+        startingLifeSlider = c.createSlider(.01, 10, newCritter.life, .01)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan");
@@ -216,33 +234,34 @@ let creationInstance = function(c) { //should change to c?
         //top middle
         critterDisplay.x = 8 * c.width / 16;
         critterDisplay.y = 3 * c.height / 9;
-        colorPicker = c.createColorPicker('#22AAFF')
+        // let defaultColor = c.color(newCritter.color[0], newCritter.color[1], newCritter.color[2])
+        colorPicker = c.createColorPicker(newCritter.color)
             .position(7 * c.width / 16, .5 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .parent("creationSpan");
 
         //bottom middle
-        donationCooldownSlider = c.createSlider(10000, 3600000, 300000, 10000)
+        donationCooldownSlider = c.createSlider(10000, 3600000, newCritter.donationRate, 10000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 5.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        donationPercentageSlider = c.createSlider(.01, 1, .5, .01)
+        donationPercentageSlider = c.createSlider(.01, 1, newCritter.donationPercentage, .01)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 5.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        donationMinLifeSlider = c.createSlider(.01, 5, .5, .01)
+        donationMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToDonate, .01)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 6.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingCooldownSlider = c.createSlider(10000, 3600000, 300000, 10000)
+        matingCooldownSlider = c.createSlider(10000, 3600000, newCritter.refractoryPeriod, 10000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 7.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingPercentageSlider = c.createSlider(.01, 1, .5, .01)
+        matingPercentageSlider = c.createSlider(.01, 1, newCritter.parentalSacrifice, .01)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 7.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingMinLifeSlider = c.createSlider(.01, 5, .5, .01)
+        matingMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToReproduce, .01)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 8.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
@@ -252,8 +271,12 @@ let creationInstance = function(c) { //should change to c?
         bodySlider.yCenter = 2 * c.height / 9;
         bodySlider.w = 3 * c.width / 16;
         bodySlider.h = 3 * c.width / 16; //square for now
-        bodySlider.xPos = bodySlider.xCenter;
-        bodySlider.yPos = bodySlider.yCenter;
+        bodySlider.xVal = newCritter.maxSpeed;
+        bodySlider.yVal = newCritter.r;
+        bodySlider.xPos = c.map(newCritter.maxSpeed, 0, 1, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2);
+        bodySlider.yPos = c.map(newCritter.r, 1, 0, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2);
+        // bodySlider.xPos = bodySlider.xCenter;
+        // bodySlider.yPos = bodySlider.yCenter;
 
         //bottom right
         creationButton = c.createButton("CREATE CRITTER")
@@ -262,6 +285,17 @@ let creationInstance = function(c) { //should change to c?
             .position(13.25 * c.width / 16, 7.25 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .mousePressed(c.createCritter);
+
+        //confirmation menu
+        // confirmationMenu = c.createGraphics(page.width, page.height)
+        //     .parent("confirmationSpan")
+        //     .background(21, 96, 100, 150)
+        //     .hide();
+        // confirmationMenu.createButton("ABORT")
+        //     .parent("confirmationSpan")
+        //     .class("button")
+        //     .position(7 * c.width / 16, 8 * c.height / 9)
+        //     .mousePressed(cancelCreate);
     };
 
     c.draw = () => {
@@ -318,13 +352,23 @@ let creationInstance = function(c) { //should change to c?
         // c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 11 * c.width / 16, 5.5 * c.height / 9, 12.75 * c.width / 16, 7 * c.height / 9);
         c.textAlign(c.LEFT, c.BOTTOM);
         // let startLife = startingLifeSlider.value().toFixed(2);
-        let startLife = startingLifeSlider.value();
-        let equTax = startLife * .1;
+        startLife = startingLifeSlider.value();
+        equTax = startLife * .1;
         if(equTax < .1){equTax = .1};
         // equTax = equTax.toFixed(2);
-        let genTax = 0.05;
-        c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.75 * c.width / 16, 7 * c.height / 9);
-
+        // genTax = 0.05;
+        totalCost = (startLife + equTax + genTax).toFixed(2);
+        fundsAfter = userData.funds.toFixed(2) - parseFloat(totalCost).toFixed(2); //no idea why toFixed isn't working as expected
+        fundsAfter = fundsAfter.toFixed(2);
+        c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${totalCost}\n\n$${userData.funds.toFixed(2)}\n$${fundsAfter}`, 13.75 * c.width / 16, 7 * c.height / 9);
+        // c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.75 * c.width / 16, 7 * c.height / 9);
+        if(fundsAfter < 0) {
+            creationButton.style("background-color", "red");
+            creationButton.html("NOT ENOUGH FUNDS")
+        } else {
+            creationButton.style("background-color", "#156064");
+            creationButton.html("CREATE CRITTER")
+        }
 
         //trying to fix bug where critter doesn't show
         if (isNaN(critterDisplay.x)) {
@@ -439,9 +483,44 @@ let creationInstance = function(c) { //should change to c?
     }
     
     c.createCritter = () => {
-        console.log('creating critter');
+        // console.log('creating critter');
+        //not doing confirmation pop up for now
+        if (fundsAfter >= 0) {
+            newCritter.name = nameInput.value();
+            let targetA = primarySelect.value();
+            let targetB = secondarySelect.value();
+            if (targetA == "other"){targetA = otherPrimary.value()}
+            if (targetB == "other"){targetB = otherSecondary.value()}
+            newCritter.donations = [{target: targetA, total: 0},{target: targetB, total: 0}];
+            // positionArray = [0,0]; //done in ecosystem
+            newCritter.life = startingLifeSlider.value();
+            newCritter.ancestry = {child: nameInput.value(), parents: [{name: godInput.value()}]};
+            // color = colorPicker.color();
+            newCritter.color = colorPicker.value(); //hex now
+            newCritter.maxSpeed = bodySlider.xVal;
+            newCritter.r = bodySlider.yVal;
+            newCritter.donationRate = donationCooldownSlider.value();
+            newCritter.donationPercentage = donationPercentageSlider.value();
+            newCritter.minLifeToDonate = donationMinLifeSlider.value();
+            newCritter.refractoryPeriod = matingCooldownSlider.value();
+            newCritter.parentalSacrifice = matingPercentageSlider.value();
+            newCritter.minLifeToReproduce = matingMinLifeSlider.value();
+
+            //close menu and go back to ecosystem to plop down
+            mainSketch.modeButton.html('Abort Critter');
+            c.select("#creationSpan").hide();
+            c.select("#defaultCanvas2").hide();
+            ecosystemSketch.isReadyToSpawn = true;
+            // document.getElementById("creationSpan").remove();
+            // document.getElementById("defaultCanvas2").remove();
+        } 
     }
 };
+
+// let cancelCreate = () => {
+//     confirmationMenu.hide();
+// }
+
 
 /* -- old way before switching to instance mode
 let nameInput;

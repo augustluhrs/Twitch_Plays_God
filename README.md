@@ -30,23 +30,30 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] D) Conduit Targets
     - [X] E) Donations and Sex Sliders
     - [X] F) Cost Tallies and Create Button
-    - [ ] Go back to eco sketch and click to drop
-    - [ ] get user info from server
-    - [ ] send critter update to server
+    - [X] Go back to eco sketch and click to drop
+    - [ ] get user info from server (funds)
+    - [X] send critter update to server
     - [ ] send new conduit targets to server
+    - [ ] update funds object in server with new targets
+    - [ ] life in world update on critter life
 - [ ] Critter misc unessential
     - [ ] name crossover
     - [ ] name abuse prevention
     - [ ] hunger / food coma?
     - [ ] prevent food from having out of bounds coords
-    - [ ] mutation rate option in creation
+    - [ ] ~~mutation rate option in creation~~
     - [ ] donation animation
     - [ ] mate animation
+    - [ ] update mate ring size
+    - [ ] fix color lerp in offspring
+    - [ ] update critter overlay
+    - [ ] navigable family tree
 - [ ] UI misc unessential
     - [ ] Scrollable Donation List
     - [ ] Font
     - [ ] Conduit Background Swatch
     - [X] Button Class
+    - [ ] button class update
     - [X] icon credit div at bottom
     - [ ] color scheme 
     - [ ] title banner update
@@ -58,10 +65,11 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
         - [ ] excretion
         - [ ] taxes
         - [ ] everything else
-    - [ ] creation menu defaults to last critter created
+    - [X] creation menu defaults to last critter created
     - [ ] misc layout adjustments
-    - [ ] confirmation pop up
-    - [ ] change mode button "back to ecosystem"
+    - [ ] ~~confirmation pop up~~
+    - [X] change mode button "back to ecosystem"
+    - [ ] disclaimer and legal info
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle

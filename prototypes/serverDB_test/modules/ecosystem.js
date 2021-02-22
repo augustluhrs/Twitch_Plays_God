@@ -30,7 +30,7 @@ class Ecosystem {
             this.critterCount = 0;
             //create initial population -- need "new"?
             for (let i = 0; i < ecoSetup; i++) {
-                this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+                this.critters.push(new Critter("ecosystem", D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
                 this.critterCount++;
                 // this.critterID++;
                 this.worldLife += 100;
@@ -55,7 +55,7 @@ class Ecosystem {
             this.critterCount = 0;
             
             for (let dbCritter of ecoSetup.ecoLog.critters){
-                let critter = new Critter(dbCritter);
+                let critter = new Critter("db", dbCritter);
                 this.critters.push(critter);
                 this.critterCount++;
                 this.worldLife += critter.life;
@@ -207,9 +207,20 @@ class Ecosystem {
         return updates;
     }
 
+    spawnCritterFromUser(critter) {
+        // this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        // this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        this.critters.push(new Critter("user", critter));
+        this.critterCount++;
+        // this.critterID++;
+        this.worldLife += 100;
+        backupDB();
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+    }
+
     spawnRandomCritter() {
         // this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
-        this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        this.critters.push(new Critter("ecosystem", D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
         this.critterCount++;
         // this.critterID++;
         this.worldLife += 100;
@@ -279,7 +290,7 @@ class Ecosystem {
             // this.critterID++; //not using anymore right? will keep just in case
             this.critterCount++;
             this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
-            let newBaby = new Critter(D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
+            let newBaby = new Critter("ecosystem", D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
             // console.log("new baby at: " + JSON.stringify(newBaby.position));
             parents.A.offspring.push({name: newBaby.name})
             parents.B.offspring.push({name: newBaby.name})

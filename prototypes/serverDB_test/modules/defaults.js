@@ -28,12 +28,23 @@ function generate_ID() { //grabbed from https://gist.github.com/gordonbrander/22
     return '_' + Math.random().toString(36).substr(2, 9);
 }
 
+//thanks to Tim Down https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+
 
 // module.exports = Defaults;
 module.exports.worldSize = worldSize;
 module.exports.map = map;
 module.exports.rand_bm = rand_bm;
 module.exports.generate_ID = generate_ID;
+module.exports.hexToRgb = hexToRgb;
 
 
 /*

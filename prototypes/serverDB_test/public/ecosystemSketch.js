@@ -22,6 +22,8 @@ let ecosystemInstance = function(e) {
     
     //buttons
     e.isCreating = false;
+    e.isReadyToSpawn = false;
+    let notFirstClick = 0;
     
     //click Info overlay
     let infoGraphics;
@@ -33,6 +35,7 @@ let ecosystemInstance = function(e) {
         textSize: 25
     }
     e.isDisplayingInfo = false;
+    
 
     //assets
     let godIcon;
@@ -63,8 +66,19 @@ let ecosystemInstance = function(e) {
             e.monitorFunds();
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
-            if (e.isCreating) {
-                //nothing??
+            if (e.isReadyToSpawn) {
+                //only shows after create Critter button pressed
+                notFirstClick++;
+                e.push();
+                e.fill(0);
+                e.noStroke();
+                e.textAlign(e.CENTER, e.CENTER);
+                e.textSize(e.height / 10);
+                e.text("Click to Drop Critter into Ecosystem", e.width / 2 , e.height / 4)
+                e.fill(newCritter.color);
+                // e.noStroke();
+                e.ellipse(e.mouseX, e.mouseY, e.map(newCritter.r, 0, 1, 5, 50));
+                e.pop();
             } else if(e.isDisplayingInfo) {
                 e.displayInfoOverlay(e.overlay.critter)
             }
@@ -75,8 +89,26 @@ let ecosystemInstance = function(e) {
     }
 
     e.mousePressed = () => {
-        if (e.isCreating) {
-            //if creating, no interaction off menu
+        if (e.isReadyToSpawn && notFirstClick > 1) {
+            //drops critter into scene if in bounds
+            if(e.mouseX >= 10 &&
+                e.mouseX <= e.width - 10 &&
+                e.mouseY >= 10 &&
+                e.mouseY <= e.height - 10) {
+                    //send server the critter info
+                    newCritter.positionArray = [e.mouseX, e.mouseY];
+                    socket.emit("newCritter", newCritter);
+                    //update user data in server
+
+
+                    //reset
+                    e.isReadyToSpawn = false;
+                    e.isCreating = false;
+                    document.getElementById("defaultCanvas2").remove();
+                    document.getElementById("creationSpan").remove();
+                    mainSketch.modeButton.html("Create New Critter");
+                    notFirstClick = 0;
+                }
         } else { 
             //for checking critter info
             if (e.isDisplayingInfo) {
@@ -125,6 +157,26 @@ let ecosystemInstance = function(e) {
         e.noStroke();
         e.ellipse(critter.position.x, critter.position.y, critter.r); 
     }
+
+    // let drawBaby = (critter) => {
+    //     //for lifeForce aura
+    //     // let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+    //     // e.fill(fadedColor);
+    //     // e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 100, 0, critter.r / 2));
+        
+    //     //show ring if ready to mate
+    //     // e.noFill();
+    //     // if(critter.isReadyToMate){
+    //     //     e.stroke(255);
+    //     // }
+    //     // e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 200, 0, critter.r / 2));
+    
+    //     //base critter
+    //     // let critCol = e.color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
+    //     e.fill(newCritter.color);
+    //     e.noStroke();
+    //     e.ellipse(mouseX, mouseY, newCritter.r); 
+    // }
 
     e.monitorFunds = () => { //need to make scrollable TODO
         //draw the shape background -- need to make this transparent somehow

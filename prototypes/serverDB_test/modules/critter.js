@@ -9,8 +9,9 @@ const Boid = require("./flocking");
 const {QuadTree, Point, Circle, Rectangle} = require("./quadtree");
 
 class Critter {
-    constructor (critter, deets) {
-        if (typeof critter === "string"){ //hack to keep old constructor while also using critter objects in else below
+    constructor (source, critter, deets) {
+        if(source == "ecosystem") {
+        // if (typeof critter === "string"){ //hack to keep old constructor while also using critter objects in else below
             //better name for deets? opts
             this.id = critter; //from D.generate_ID() now
             this.DNA = new DNA(); //will get overwritten if child
@@ -120,7 +121,7 @@ class Critter {
 
             //at end so flocking has all info
             this.boid = new Boid(this);
-        } else { //create from db
+        } else if (source == "db") { //create from db
             this.id = critter.id;
             this.DNA = critter.DNA;
             this.offspring = critter.offspring;
@@ -146,6 +147,58 @@ class Critter {
             this.foodScale = critter.foodScale;
             this.boid = new Boid(this);
             //gotta be a better way to organize the critters....
+        } else if (source == "user"){
+            //generating from client side creation menu -- wonky because client side uses normalized values, need to reorganize DNA
+            this.id = D.generate_ID();
+            this.DNA = new DNA();
+            this.offspring = [];
+            this.name = critter.name;
+            this.donations = critter.donations;
+            this.position = new Victor(critter.positionArray[0], critter.positionArray[1]);
+            this.life = critter.life * 100; //ugh need to change critter life to cents....
+            this.ancestry = critter.ancestry;
+            //this.color = critter.color; //ugh hex.... how to convert...
+            let rgbColor = D.hexToRgb(critter.color);
+            // console.log(rgbColor);
+            let normalizedColor = [D.map(rgbColor.r, 0, 255, 0, 1), D.map(rgbColor.g, 0, 255, 0, 1), D.map(rgbColor.b, 0, 255, 0, 1)]
+            this.DNA.color = normalizedColor;
+            this.color = normalizedColor;
+            this.DNA.r = critter.r;
+            this.DNA.maxSpeed = critter.maxSpeed;
+            this.r = D.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
+            this.maxSpeed = D.map(this.DNA.maxSpeed, 0, 1, 0, 3); //speed between 0-15
+            this.DNA.excretionRate = (critter.r + critter.maxSpeed) / 2; 
+            this.excretionRate = D.map(this.DNA.excretionRate, 0, 1, 10000, 100); 
+            //having to reverse engineer these... and update the max of these rates and stuff
+            this.donationRate = critter.donationRate;
+            this.donationPercentage = critter.donationPercentage;
+            this.minLifeToDonate = critter.minLifeToDonate * 100; //ugh need to change critter life to cents....
+            this.refractoryPeriod = critter.refractoryPeriod;
+            this.parentalSacrifice = critter.parentalSacrifice;
+            this.minLifeToReproduce = critter.minLifeToReproduce * 100;
+            this.DNA.donationRate = D.map(this.donationRate, 10000, 3600000, 0, 1);
+            this.DNA.donationPercentage = this.donationPercentage;
+            this.DNA.minLifeToDonate = D.map(this.minLifeToDonate, 1, 500, 0, 1); 
+            // this.DNA.minLifeToDonate = D.map(this.minLifeToDonate, 0.01, 5, 0, 1); 
+            this.DNA.refractoryPeriod = D.map(this.refractoryPeriod, 10000, 3600000, 0, 1); 
+            this.DNA.parentalSacrifice = this.parentalSacrifice;
+            this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, 1, 500, 0, 1); 
+            // this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, 0.01, 5, 0, 1); 
+
+            //gotta redo DNA to get genes matching
+            this.DNA = new DNA(this.DNA);
+
+            //timers
+            this.mateTimer = Math.floor(Math.random() * 1000 + 100);
+            this.excretionTimer = Math.floor(Math.random() * 500);
+            this.donationTimer = Math.floor(Math.random() * 1000);
+
+            //misc
+            this.mutationRate = this.DNA.mutationRate;
+            this.foodScale = 10;
+            this.boid = new Boid(this);
+        } else {
+            console.log("source error in critter creation");
         }
     }
 
