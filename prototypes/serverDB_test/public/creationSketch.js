@@ -9,6 +9,7 @@ let creationInstance = function(c) { //should change to c?
     //top left && bottom left
     let nameInput, godInput;
     let primarySelect, secondarySelect, primaryInput, secondaryInput, lastPrimary, lastSecondary;
+    let otherPrimary, otherSecondary;
     let startingLifeSlider, startingLife;
 
     //top middle
@@ -96,13 +97,20 @@ let creationInstance = function(c) { //should change to c?
             c.ellipse(this.xPos, this.yPos, this.w / 12);
 
             //poop slider
-            let poopY = this.yCenter + 3 * this.h / 5;
-            c.stroke(100);
+            let poopY = this.yCenter + 3.5 * this.h / 5;
+            c.stroke(200);
             c.line(this.xCenter - this.w / 2, poopY, this.xCenter + this.w / 2, poopY);
             let dogPoopX = c.map(this.xVal + this.yVal, 0, 2, this.xCenter - this.w / 2, this.xCenter + this.w / 2);
             let poopSize = c.map(this.xVal + this.yVal, 0, 2, 20, 50);
             c.tint(255, 255);
-            c.image(dogPoop, dogPoopX, poopY, poopSize, poopSize);  
+            c.image(dogPoop, dogPoopX, poopY, poopSize, poopSize); 
+            c.fill(0);
+            c.noStroke();
+            c.textSize(fontSmall);
+            c.textAlign(c.LEFT, c.CENTER);
+            c.text("Poops Rarely", this.xCenter - this.w / 2, this.yCenter + 4 * this.h / 5);
+            c.textAlign(c.RIGHT, c.CENTER);
+            c.text("Poops Often", this.xCenter + this.w / 2, this.yCenter + 4 * this.h / 5);
         }
     };
 
@@ -142,6 +150,7 @@ let creationInstance = function(c) { //should change to c?
             .parent("creationSpan")
             .position(c.width / 16, 1.25 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
+            .class("whitebox")
             // .input(() => { //just for reset, nvm couldn't backspace all the way
             //     if (nameInput.value() == ""){
             //         nameInput.value("Critter Name");
@@ -149,19 +158,23 @@ let creationInstance = function(c) { //should change to c?
             // })
         godInput = c.createInput('Your Name')
             .parent("creationSpan")
-            .position(c.width / 16, 2.25 * c.height / 9)
+            .position(c.width / 16, 2.5 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
+            .class("whitebox")
         primarySelect = c.createSelect()
             .id("primarySelect")
             .position(c.width / 16, 4 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan")
+            .class("whitebox")
+            // .option("other")
             .changed(primaryUpdate);
         secondarySelect = c.createSelect()
             .id("secondarySelect")
             .position(c.width / 16, 6 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan")
+            .class("whitebox")
             .changed(secondaryUpdate);
         // console.log(conduitData);
         let targets = Object.keys(conduitData);
@@ -179,6 +192,22 @@ let creationInstance = function(c) { //should change to c?
                 primarySelect.disable(target);
             }
         }
+        primarySelect.option("other");
+        secondarySelect.option("other");
+        otherPrimary = c.createInput("Enter new non-profit")
+            .id("otherPrimary")
+            .parent("creationSpan")
+            .position(c.width / 16, 4.5 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .class("whitebox")
+            .hide();
+        otherSecondary = c.createInput("Enter new non-profit")
+            .id("otherSecondary")
+            .parent("creationSpan")
+            .position(c.width / 16, 6.5 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .class("whitebox")
+            .hide();
         startingLifeSlider = c.createSlider(.01, 10, .80, .01)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
@@ -186,9 +215,9 @@ let creationInstance = function(c) { //should change to c?
 
         //top middle
         critterDisplay.x = 8 * c.width / 16;
-        critterDisplay.y = 1 * c.height / 9;
+        critterDisplay.y = 3 * c.height / 9;
         colorPicker = c.createColorPicker('#22AAFF')
-            .position(7 * c.width / 16, 2 * c.height / 9)
+            .position(7 * c.width / 16, .5 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .parent("creationSpan");
 
@@ -219,8 +248,8 @@ let creationInstance = function(c) { //should change to c?
             .size(2.5 * c.width / 16, .25 * c.height / 9)
 
         //top right
-        bodySlider.xCenter = 13 * c.width / 16;
-        bodySlider.yCenter = 2.5 * c.height / 9;
+        bodySlider.xCenter = 13.5 * c.width / 16;
+        bodySlider.yCenter = 2 * c.height / 9;
         bodySlider.w = 3 * c.width / 16;
         bodySlider.h = 3 * c.width / 16; //square for now
         bodySlider.xPos = bodySlider.xCenter;
@@ -237,7 +266,8 @@ let creationInstance = function(c) { //should change to c?
 
     c.draw = () => {
         c.clear();
-        c.background(200, 255, 200, 225);
+        // c.background(200, 255, 200, 225); //light green
+        c.background(102, 113, 18); //changing to solid for now for better pop and no clutter from underneath text
 
         //text stuff
         c.textAlign(c.LEFT, c.CENTER);
@@ -246,7 +276,8 @@ let creationInstance = function(c) { //should change to c?
         //top left && bottom left
         c.fill(0);
         c.textSize(fontLarge);
-        c.text(`${nameInput.value()}`, .5 * c.width / 16, c.height / 9);
+        c.textAlign(c.LEFT, c.CENTER);
+        c.text(`${nameInput.value()}`, .5 * c.width / 16, .75 * c.height / 9);
         c.text(`${godInput.value()}`, .5 * c.width / 16, 2 * c.height / 9);
         c.text("Donation Target A", .5 * c.width / 16, 3.5 * c.height / 9);
         c.text("Donation Target B", .5 * c.width / 16, 5.5 * c.height / 9);
@@ -254,10 +285,14 @@ let creationInstance = function(c) { //should change to c?
 
         //top middle
         critterDisplay.show();
+        c.textSize(fontSmall);
+        c.textAlign(c.CENTER, c.CENTER);
+        c.text("Critter Color", 8 * c.width / 16, 1.75 * c.height / 9)
 
         //bottom middle
         c.fill(0);
         c.textSize(fontLarge);
+        c.textAlign(c.LEFT, c.CENTER);
         c.text(`Giving`, 5.5 * c.width / 16, 4.75 * c.height / 9);
         drawCritter(6.5 * c.width / 16, 5.75 * c.height / 9, false, true)
         c.text(`Mating`, 5.5 * c.width / 16, 6.75 * c.height / 9);
@@ -343,8 +378,13 @@ let creationInstance = function(c) { //should change to c?
                 secondaryOptions.elt[j].disabled = false;
             }
         }
-        secondarySelect.disable(primarySelect.value());
-        lastPrimary = primarySelect.value();
+        if(primarySelect.value() == "other"){
+            c.select("#otherPrimary").show();
+        } else {
+            c.select("#otherPrimary").hide();
+            secondarySelect.disable(primarySelect.value());
+            lastPrimary = primarySelect.value();
+        }
     }
 
     function secondaryUpdate(){
@@ -360,8 +400,13 @@ let creationInstance = function(c) { //should change to c?
                 secondaryOptions.elt[j].disabled = false;
             }
         }
-        primarySelect.disable(secondarySelect.value());
-        lastSecondary = secondarySelect.value();
+        if(secondarySelect.value() == "other"){
+            c.select("#otherSecondary").show();
+        } else {
+            c.select("#otherSecondary").hide();
+            primarySelect.disable(secondarySelect.value());
+            lastSecondary = secondarySelect.value();
+        }
     }
 
     // function secondaryUpdate(){

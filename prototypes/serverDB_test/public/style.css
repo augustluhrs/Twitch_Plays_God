@@ -19,6 +19,10 @@ canvas {
     font-size: large;
 }
 
+.whitebox {
+    font-size: large;
+}
+
 #creationCanvas {
     position: absolute;
     margin: 0px;

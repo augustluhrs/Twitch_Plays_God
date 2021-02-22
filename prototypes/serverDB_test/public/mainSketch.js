@@ -58,9 +58,11 @@ let mainInstance = (m) => {
                 ecosystemSketch.isCreating = !ecosystemSketch.isCreating;
                 if(ecosystemSketch.isCreating){
                     creationSketch = new p5(creationInstance, 'creationCanvas');
+                    modeButton.html("Back To The World")
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
                 } else {
+                    modeButton.html("Create New Critter")
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
 

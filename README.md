@@ -27,12 +27,13 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] A) Name, God, Starting Life
     - [X] B) Critter Preview, Color Picker
     - [X] C) Speed/Size, Excretion Rate
-    - [ ] D) Conduit Targets (bleedover from life too)
+    - [X] D) Conduit Targets
     - [X] E) Donations and Sex Sliders
     - [X] F) Cost Tallies and Create Button
     - [ ] Go back to eco sketch and click to drop
     - [ ] get user info from server
     - [ ] send critter update to server
+    - [ ] send new conduit targets to server
 - [ ] Critter misc unessential
     - [ ] name crossover
     - [ ] name abuse prevention
@@ -50,15 +51,17 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] color scheme 
     - [ ] title banner update
     - [ ] updating life slider with personal funds max
-    - [ ] update donation targets with new targets
     - [ ] clickable link to charity in select
     - [ ] tooltip details if hover over
         - [ ] donation
         - [ ] mating
         - [ ] excretion
         - [ ] taxes
+        - [ ] everything else
     - [ ] creation menu defaults to last critter created
-    - [ ] misc layour adjustments
+    - [ ] misc layout adjustments
+    - [ ] confirmation pop up
+    - [ ] change mode button "back to ecosystem"
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
