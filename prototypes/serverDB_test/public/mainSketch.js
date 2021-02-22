@@ -15,6 +15,16 @@ let userData = {
     funds: 10.00
 }
 
+// let conduitData = [
+//     {}
+// ]
+let conduitData = {};
+conduitData["Critical Role Foundation"] = 0;
+conduitData["Processing Foundation"] = 0;
+conduitData["PETA"] = 0;
+conduitData["NAACP"] = 0;
+// console.log(conduitData)
+
 let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
     let modeButton, modeSpan;

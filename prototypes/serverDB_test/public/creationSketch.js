@@ -8,7 +8,7 @@ let creationInstance = function(c) { //should change to c?
 
     //top left && bottom left
     let nameInput, godInput;
-    let primarySelect, secondarySelect, primaryInput, secondaryInput;
+    let primarySelect, secondarySelect, primaryInput, secondaryInput, lastPrimary, lastSecondary;
     let startingLifeSlider, startingLife;
 
     //top middle
@@ -147,20 +147,38 @@ let creationInstance = function(c) { //should change to c?
             //         nameInput.value("Critter Name");
             //     }
             // })
-        godInput = c.createInput('God\'s Name (Yours)')
+        godInput = c.createInput('Your Name')
             .parent("creationSpan")
             .position(c.width / 16, 2.25 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
         primarySelect = c.createSelect()
+            .id("primarySelect")
             .position(c.width / 16, 4 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan")
-            .changed(selectChange);
+            .changed(primaryUpdate);
         secondarySelect = c.createSelect()
+            .id("secondarySelect")
             .position(c.width / 16, 6 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan")
-            .changed(selectChange);
+            .changed(secondaryUpdate);
+        // console.log(conduitData);
+        let targets = Object.keys(conduitData);
+        for (let [i, target] of targets.entries()) {
+            primarySelect.option(target);
+            secondarySelect.option(target);
+            if (i == 0) {
+                primarySelect.selected(target);
+                lastPrimary = target;
+                secondarySelect.disable(target);
+            }
+            if (i == 1) {
+                secondarySelect.selected(target);
+                lastSecondary = target;
+                primarySelect.disable(target);
+            }
+        }
         startingLifeSlider = c.createSlider(.01, 10, .80, .01)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
@@ -168,9 +186,9 @@ let creationInstance = function(c) { //should change to c?
 
         //top middle
         critterDisplay.x = 8 * c.width / 16;
-        critterDisplay.y = 1.5 * c.height / 9;
+        critterDisplay.y = 1 * c.height / 9;
         colorPicker = c.createColorPicker('#22AAFF')
-            .position(7 * c.width / 16, 3 * c.height / 9)
+            .position(7 * c.width / 16, 2 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .parent("creationSpan");
 
@@ -258,9 +276,10 @@ let creationInstance = function(c) { //should change to c?
 
         //bottom right
         c.fill(0);
+        c.noStroke();
         c.textSize(fontSmall);
         c.textAlign(c.RIGHT, c.BOTTOM); //kind of doing this backwards...
-        c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 12.75 * c.width / 16, 7 * c.height / 9);
+        c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 13.25 * c.width / 16, 7 * c.height / 9);
         // c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 11 * c.width / 16, 5.5 * c.height / 9, 12.75 * c.width / 16, 7 * c.height / 9);
         c.textAlign(c.LEFT, c.BOTTOM);
         // let startLife = startingLifeSlider.value().toFixed(2);
@@ -269,7 +288,7 @@ let creationInstance = function(c) { //should change to c?
         if(equTax < .1){equTax = .1};
         // equTax = equTax.toFixed(2);
         let genTax = 0.05;
-        c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.25 * c.width / 16, 7 * c.height / 9);
+        c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.75 * c.width / 16, 7 * c.height / 9);
 
 
         //trying to fix bug where critter doesn't show
@@ -293,10 +312,64 @@ let creationInstance = function(c) { //should change to c?
             }
     }
 
-    function selectChange(){
-        primarySelect.disable(secondarySelect.value());
+    // function selectChange(sel){
+    // function selectChange(sel){
+        // if (sel == 1) {
+        //     secondarySelect.disable(primarySelect.value());
+        //     primarySelect.option(lastPrimary);
+        //     secondarySelect.option(lastPrimary);
+        //     lastPrimary = primarySelect.value();
+        // }
+        // if (sel == 2) {
+        //     primarySelect.disable(secondarySelect.value());
+        //     primarySelect.option(lastSecondary);
+        //     secondarySelect.option(lastSecondary);
+        //     lastSecondary = secondarySelect.value();
+        // }
+    //     primarySelect.disable(secondarySelect.value());
+    //     secondarySelect.disable(primarySelect.value());
+    // }
+    //fucking select bullshit, should make PR for p5 or something, ridiculous that you can't enable if you can disable
+    function primaryUpdate(){
+        let primaryOptions = c.select("#primarySelect");
+        let secondaryOptions = c.select("#secondarySelect");
+        for (let i = 0; i < primaryOptions.elt.length; i++) {
+            if(primaryOptions.elt[i].value == lastPrimary){
+                primaryOptions.elt[i].disabled = false;
+            }
+        }
+        for (let j = 0; j < secondaryOptions.elt.length; j++) {
+            if(secondaryOptions.elt[j].value == lastPrimary){
+                secondaryOptions.elt[j].disabled = false;
+            }
+        }
         secondarySelect.disable(primarySelect.value());
+        lastPrimary = primarySelect.value();
     }
+
+    function secondaryUpdate(){
+        let primaryOptions = c.select("#primarySelect");
+        let secondaryOptions = c.select("#secondarySelect");
+        for (let i = 0; i < primaryOptions.elt.length; i++) {
+            if(primaryOptions.elt[i].value == lastSecondary){
+                primaryOptions.elt[i].disabled = false;
+            }
+        }
+        for (let j = 0; j < secondaryOptions.elt.length; j++) {
+            if(secondaryOptions.elt[j].value == lastSecondary){
+                secondaryOptions.elt[j].disabled = false;
+            }
+        }
+        primarySelect.disable(secondarySelect.value());
+        lastSecondary = secondarySelect.value();
+    }
+
+    // function secondaryUpdate(){
+    //     primarySelect.disable(secondarySelect.value());
+    //     primarySelect.option(lastSecondary);
+    //     secondarySelect.option(lastSecondary);
+    //     lastSecondary = secondarySelect.value();
+    // }
 
     function drawCritter(x, y, mating, giving){
         c.push();
@@ -315,7 +388,7 @@ let creationInstance = function(c) { //should change to c?
         }
         if(giving){
             c.textSize(fontSmall);
-            c.text("✨", x + c.random(-100, 75), y + c.random(-80, 0));
+            c.text("✨", x + c.random(-100, 75), y + c.random(-80, 40));
         }
         c.pop();
     }
