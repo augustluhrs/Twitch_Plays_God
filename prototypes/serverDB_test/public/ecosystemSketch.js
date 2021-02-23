@@ -11,8 +11,13 @@ let ecosystemInstance = function(e) {
         overlay: 0
     };
 
-    e.funds = {
-        sorted: []
+    // e.funds = {
+    //     sorted: []
+    // };
+
+    e.donations = {
+        sorted: [],
+        total: 0
     };
     
     e.stats = {
@@ -185,20 +190,26 @@ let ecosystemInstance = function(e) {
     
         e.image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
         let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
-        let sectionSize = monitor.size.h / (e.funds.sorted.length + 1); //fence postttt
+        let sectionSize = monitor.size.h / (e.donations.sorted.length + 1); //fence postttt
         e.textSize(sectionSize * 0.7);
-        e.funds.sorted.forEach( (fund) => {
-            e.text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
+        e.donations.sorted.forEach( (org) => {
+            // e.text(org["target"] + ": $" + org["funds"], monitorOffset.x, monitorOffset.y);
+            e.text(`${org["target"]}: $${parseFloat(org["funds"].toFixed(2))}`, monitorOffset.x, monitorOffset.y);
+            
             monitorOffset.y += sectionSize; //better to use index?
         });
-        e.text("Total Donated: $" + e.funds.total.toFixed(2), monitorOffset.x, monitorOffset.y);
+        // e.donations.sorted.forEach( (fund) => {
+        //     e.text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
+        //     monitorOffset.y += sectionSize; //better to use index?
+        // });
+        e.text("Total Donated: $" + parseFloat(e.donations.total).toFixed(2), monitorOffset.x, monitorOffset.y);
     }
 
     e.displayStats = () => {
         e.fill(0);
         e.textSize(40);
         e.text("Critter Count: " + e.stats.critterCount, e.width/2, e.height - 50);
-        e.text("Life in World: $" + (e.stats.worldLife / 100).toFixed(2), 3 * e.width/4, e.height - 50); //can't "toFixed" b/c starts as 0??
+        e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 3 * e.width/4, e.height - 50); //need to make sure it's a float everytime I want to round?
     }
 
     e.displayInfoOverlay = (critter) => {
@@ -235,17 +246,15 @@ let ecosystemInstance = function(e) {
         infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2); 
     
         //critter stats
-        // infoGraphics.fill(critterColor);
         infoGraphics.fill(0);
         infoGraphics.textAlign(e.LEFT, e.CENTER);
         infoGraphics.textSize(e.overlay.textSize);
         //life stats
         infoGraphics.text("LIFE: " + critter.life.toFixed(2), e.overlay.w / 24, e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Poop Rate: " + critter.excretionRate.toFixed(2), e.overlay.w / 24, 2 * e.overlay.h / 24 + e.overlay.h / 4);
-        // infoGraphics.text("Poop Timer: " + critter.excretionTimer, e.overlay.w / 24, 3 * e.overlay.h / 24 + e.overlay.h / 4);
         //space then donation stats
-        infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
-        infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
+             // infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
+             // infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Min Life b4 Donation: " + critter.minLifeToDonate.toFixed(2), e.overlay.w / 24, 6 * e.overlay.h / 24 + e.overlay.h / 4);
         // infoGraphics.text("Donation Timer: " + (floor(critter.donationRate) - critter.donationTimer), e.overlay.w / 24, 8 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Donation Percentage: " + critter.donationPercentage.toFixed(2) * 100 + "%", e.overlay.w / 24, 7 * e.overlay.h / 24 + e.overlay.h / 4);

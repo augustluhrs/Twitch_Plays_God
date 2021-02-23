@@ -35,7 +35,7 @@ class Critter {
                 //trying new victor vector library
                 this.position = new Victor(Math.random() * D.worldSize.width, Math.random() * D.worldSize.height);
                 // this.boid = new Boid(this.position.x, this.position.y);
-                this.life = 100;
+                this.life = 1;
                 // ecosystem.worldLife += 100; //keep all changes to ecosystem
                 //user created so first in family tree
                 this.ancestry = {child: this.name, parents: [{name: deets.god}]};
@@ -117,7 +117,7 @@ class Critter {
             this.mateTimer = Math.floor(Math.random() * 1000 + 100);
             this.excretionTimer = Math.floor(Math.random() * 500);
             this.donationTimer = Math.floor(Math.random() * 1000);
-            this.foodScale = 10; //where else can I set this?
+            this.foodScale = D.foodScale; //where else can I set this?
 
             //at end so flocking has all info
             this.boid = new Boid(this);
@@ -155,7 +155,7 @@ class Critter {
             this.name = critter.name;
             this.donations = critter.donations;
             this.position = new Victor(critter.positionArray[0], critter.positionArray[1]);
-            this.life = critter.life * 100; //ugh need to change critter life to cents....
+            this.life = critter.life;
             this.ancestry = critter.ancestry;
             //this.color = critter.color; //ugh hex.... how to convert...
             let rgbColor = D.hexToRgb(critter.color);
@@ -172,17 +172,17 @@ class Critter {
             //having to reverse engineer these... and update the max of these rates and stuff
             this.donationRate = critter.donationRate;
             this.donationPercentage = critter.donationPercentage;
-            this.minLifeToDonate = critter.minLifeToDonate * 100; //ugh need to change critter life to cents....
+            this.minLifeToDonate = critter.minLifeToDonate;
             this.refractoryPeriod = critter.refractoryPeriod;
             this.parentalSacrifice = critter.parentalSacrifice;
-            this.minLifeToReproduce = critter.minLifeToReproduce * 100;
+            this.minLifeToReproduce = critter.minLifeToReproduce;
             this.DNA.donationRate = D.map(this.donationRate, 10000, 3600000, 0, 1);
             this.DNA.donationPercentage = this.donationPercentage;
-            this.DNA.minLifeToDonate = D.map(this.minLifeToDonate, 1, 500, 0, 1); 
+            this.DNA.minLifeToDonate = D.map(this.minLifeToDonate, .01, 5, 0, 1); 
             // this.DNA.minLifeToDonate = D.map(this.minLifeToDonate, 0.01, 5, 0, 1); 
             this.DNA.refractoryPeriod = D.map(this.refractoryPeriod, 10000, 3600000, 0, 1); 
             this.DNA.parentalSacrifice = this.parentalSacrifice;
-            this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, 1, 500, 0, 1); 
+            this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, .1, 5, 0, 1); 
             // this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, 0.01, 5, 0, 1); 
 
             //gotta redo DNA to get genes matching
@@ -195,7 +195,7 @@ class Critter {
 
             //misc
             this.mutationRate = this.DNA.mutationRate;
-            this.foodScale = 10;
+            this.foodScale = D.foodScale;
             this.boid = new Boid(this);
         } else {
             console.log("source error in critter creation");
@@ -255,16 +255,23 @@ class Critter {
 
     donate() {
         this.donationTimer++;
+        // console.log(this.donationTimer - this.donationRate);
         if(this.life >= this.minLifeToDonate && this.donationTimer >= this.donationRate){
+            // console.log(this.name + "donating")
             this.donationTimer = 0;
-            let donation = this.life * this.donationPercentage;
+            let donation = parseFloat((this.life * this.donationPercentage).toFixed(2)); //WHAT THE FUCK, toFixed returns a string???? WHYYY
             this.life -= donation;
-            let primaryDonation = donation * .75; //doing this really laboriously b/c don't want pennies slipping through
+            // console.log(`donation ${donation}`);
+            let primaryDonation = parseFloat((donation * .75).toFixed(2)); //doing this really laboriously b/c don't want pennies slipping through
             let donation1 = {target: this.donations[0].target, amount: primaryDonation};
-            let donation2 = {target: this.donations[1].target, amount: donation - primaryDonation};
+            let donation2 = {target: this.donations[1].target, amount: parseFloat((donation - primaryDonation).toFixed(2))}; //ughhhhhhhh
             this.donations[0].total += donation1.amount;
             this.donations[1].total += donation2.amount;
-            return {d1: donation1, d2: donation2};
+            // console.log('asdfa');
+            // console.log([donation1, donation2]);
+            return [donation1, donation2];
+
+            // return {d1: donation1, d2: donation2};
             // Ecosystem.donate(donation1, donation2);
             // Conduit.fundsRaised[this.altriusm[0]] += primaryDonation;
             // Conduit.fundsRaised[this.altriusm[1]] += donation - primaryDonation;
@@ -283,15 +290,6 @@ class Critter {
         let pos = {x: this.position.x, y: this.position.y};
         return {position: pos, r: this.r, color: this.color, life: this.life, isReadyToMate: isReadyToMate};
     }
-
-    // feed(qtree) {
-
-    // }
-
-    // mate(qtree) {
-
-    // }
-
 }
 
 module.exports = Critter;

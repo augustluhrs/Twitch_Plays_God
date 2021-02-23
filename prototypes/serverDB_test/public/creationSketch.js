@@ -241,7 +241,8 @@ let creationInstance = function(c) { //should change to c?
             .parent("creationSpan");
 
         //bottom middle
-        donationCooldownSlider = c.createSlider(10000, 3600000, newCritter.donationRate, 10000)
+        //not sure if millis is the right rate for cooldown, seems to be 100 per second
+        donationCooldownSlider = c.createSlider(1000, 360000, newCritter.donationRate, 1000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 5.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
@@ -253,7 +254,7 @@ let creationInstance = function(c) { //should change to c?
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 6.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingCooldownSlider = c.createSlider(10000, 3600000, newCritter.refractoryPeriod, 10000)
+        matingCooldownSlider = c.createSlider(1000, 360000, newCritter.refractoryPeriod, 1000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 7.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
@@ -333,10 +334,10 @@ let creationInstance = function(c) { //should change to c?
         drawCritter(6.5 * c.width / 16, 7.75 * c.height / 9, true, false);
 
         c.textSize(fontSmall);
-        c.text(`Donation Cooldown: ${donationCooldownSlider.value() / 1000} seconds`, 7.75 * c.width / 16, 5 * c.height / 9);
+        c.text(`Donation Cooldown: ${donationCooldownSlider.value() / 100} seconds`, 7.75 * c.width / 16, 5 * c.height / 9);
         c.text(`Donation Percentage: ${donationPercentageSlider.value() * 100}%`, 7.75 * c.width / 16, 5.5 * c.height / 9);
         c.text(`Minimum Life Needed: $${donationMinLifeSlider.value()}`, 7.75 * c.width / 16, 6 * c.height / 9);
-        c.text(`Mating Cooldown: ${matingCooldownSlider.value() / 1000} seconds`, 7.75 * c.width / 16, 7 * c.height / 9);
+        c.text(`Mating Cooldown: ${matingCooldownSlider.value() / 100} seconds`, 7.75 * c.width / 16, 7 * c.height / 9);
         c.text(`Mating Percentage: ${matingPercentageSlider.value() * 100}%`, 7.75 * c.width / 16, 7.5 * c.height / 9);
         c.text(`Minimum Life Needed: $${matingMinLifeSlider.value()}`, 7.75 * c.width / 16, 8 * c.height / 9);
         
@@ -391,23 +392,6 @@ let creationInstance = function(c) { //should change to c?
             }
     }
 
-    // function selectChange(sel){
-    // function selectChange(sel){
-        // if (sel == 1) {
-        //     secondarySelect.disable(primarySelect.value());
-        //     primarySelect.option(lastPrimary);
-        //     secondarySelect.option(lastPrimary);
-        //     lastPrimary = primarySelect.value();
-        // }
-        // if (sel == 2) {
-        //     primarySelect.disable(secondarySelect.value());
-        //     primarySelect.option(lastSecondary);
-        //     secondarySelect.option(lastSecondary);
-        //     lastSecondary = secondarySelect.value();
-        // }
-    //     primarySelect.disable(secondarySelect.value());
-    //     secondarySelect.disable(primarySelect.value());
-    // }
     //fucking select bullshit, should make PR for p5 or something, ridiculous that you can't enable if you can disable
     function primaryUpdate(){
         let primaryOptions = c.select("#primarySelect");

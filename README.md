@@ -15,6 +15,9 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 - *The Selfish Gene* by Richard Dawkins
 - *Joyful Militancy* by carla bergman and Nick Montgomery
 
+## References
+- [*Free Rice* by The World Food Programme](https://freerice.com/about) -- look into their AD practices
+
 ## Current Project TODO
 
 ### Short Term Goals
@@ -33,9 +36,10 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] Go back to eco sketch and click to drop
     - [ ] get user info from server (funds)
     - [X] send critter update to server
-    - [ ] send new conduit targets to server
-    - [ ] update funds object in server with new targets
-    - [ ] life in world update on critter life
+    - [X] send new conduit targets to server
+    - [X] update funds object in server with new targets
+    - [X] life in world update on critter life
+    - [X] critter donation update
 - [ ] Critter misc unessential
     - [ ] name crossover
     - [ ] name abuse prevention
@@ -48,6 +52,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] fix color lerp in offspring
     - [ ] update critter overlay
     - [ ] navigable family tree
+    - [ ] change foodScale to poopSize and have body size be correlated
 - [ ] UI misc unessential
     - [ ] Scrollable Donation List
     - [ ] Font
@@ -70,6 +75,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] ~~confirmation pop up~~
     - [X] change mode button "back to ecosystem"
     - [ ] disclaimer and legal info
+    - [ ] foundations with links are verified, eventually send non-verified names to checker
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
@@ -83,6 +89,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] update github with current project status and media
     - [ ] add to website
     - [ ] create separate todo/changelog and update readme
+    - [ ] design document with standards
 
 **Jan 2021 Update**
 - [X] ~~finish this list~~

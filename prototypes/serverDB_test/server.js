@@ -86,7 +86,7 @@ world.on('connection', function(socket){
     //removing these so only updates when server is ready... wait no, can't b/c then sketch doesn't have certain variables...
     if(ecosystem != undefined){
         world.emit('fundsUpdate', ecosystem.conduit);
-        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife.toFixed(2)});
+        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife}); //toFixed...
     }
     
     //new event listeners
@@ -147,7 +147,7 @@ setInterval( () => {
     //do I need to save backups? hmm... maybe every hour?
     let ecoLog = ecosystem.save();
     backupDB.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-        .then(function(){console.log('db updated');})
+        .then(function(){console.log('db backed up');})
         .catch(function(err){console.log("backup err: " + err);});
 
     // db.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {

@@ -45,9 +45,6 @@ let newCritter = {
     // this.boid = new Boid(this);
 }
 
-// let conduitData = [
-//     {}
-// ]
 let conduitData = {};
 conduitData["Critical Role Foundation"] = 0;
 conduitData["Processing Foundation"] = 0;

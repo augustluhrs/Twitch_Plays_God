@@ -33,7 +33,7 @@ class Ecosystem {
                 this.critters.push(new Critter("ecosystem", D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
                 this.critterCount++;
                 // this.critterID++;
-                this.worldLife += 100;
+                this.worldLife += 1;
             }
         } else if (typeof ecoSetup === "object") {
             console.log("setting up ecosystem from save");
@@ -41,13 +41,7 @@ class Ecosystem {
             this.height = D.worldSize.height;
             this.critters = []; //the agents currently in the ecosystem    
             this.corpses = []; //currently decomposing critters
-            this.supply = [];
-
-            // let newCon = new Conduit();
-            // console.log("NEW CON" + JSON.stringify(new Conduit()));
-            // console.log("db con" + JSON.stringify(this.conduit));
-            // console.log(newCon instanceof Conduit);
-            // console.log(this.conduit instanceof Conduit);
+            this.supply = []; //fud
 
             // great, okay, so have to remake the stuff after db...
             this.conduit = new Conduit(ecoSetup.conduit);
@@ -69,25 +63,9 @@ class Ecosystem {
                 let corpse = new Corpse(dbCorpse);
                 this.corpses.push(corpse);
             }
-
-            // for (let thing of ecoSetup.ecoLog){
-            //     if (thing instanceof Critter) {
-            //         this.critters.push(thing);
-            //         this.critterCount++;
-            //         this.worldLife += thing.life;
-            //     }
-            //     if (thing instanceof Food) {
-            //         this.supply.push(thing);
-            //         this.worldLife += thing.amount;
-            //     }
-            //     if (thing instanceof Corpse) {
-            //         this.corpses.push(thing);
-            //     }
-            // }
         } else {
             console.log("ecosystem set up error: " + ecoSetup);
             console.log(typeof ecoSetup);
-            console.log(typeof ecoSetup === "number");
         }
         console.log("ecosystem ready");
         //doing this here so that funds and ecosystem will be ready from start -- nope...
@@ -175,7 +153,8 @@ class Ecosystem {
             let funds = critter.donate();
             if(funds != null) {
                 // console.log("donation: " + JSON.stringify(funds.d1) + " " + JSON.stringify(funds.d2));
-                this.deposit(funds.d1, funds.d2)
+                // this.deposit(funds.d1, funds.d2)
+                this.deposit(funds);
             };
             //check for food and death
             let excretion = critter.excrete();
@@ -208,12 +187,15 @@ class Ecosystem {
     }
 
     spawnCritterFromUser(critter) {
-        // this.critters.push(new Critter(this.critterID, {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
-        // this.critters.push(new Critter(D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
+        //create critter and check Conduit
         this.critters.push(new Critter("user", critter));
+        this.conduit.checkNewCritterTargets(critter.donations) //other donation stuff happens in .deposit()
+
+        //update stats
         this.critterCount++;
-        // this.critterID++;
-        this.worldLife += 100;
+        this.worldLife += critter.life;
+
+        //server update
         backupDB();
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
@@ -223,7 +205,7 @@ class Ecosystem {
         this.critters.push(new Critter("ecosystem", D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
         this.critterCount++;
         // this.critterID++;
-        this.worldLife += 100;
+        this.worldLife += 1;
         backupDB();
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
@@ -300,53 +282,33 @@ class Ecosystem {
         if (pairs.length != 0) {
             backupDB();
         }
-
-
-        /* //old way
-        //not doing forEach in favor of previous more optimized version, need to find a better way though
-        for (let i = this.critters.length - 1; i >= 0; i--) {
-            if (this.critters[i].mateTimer <= 0 && this.critters[i].lifeForce >= this.critters[i].minLifeToReproduce) { //if can mate
-                for (let j = 0; j < i; j++) { //really trying to not overlap with self
-                    if (this.critters[j].mateTimer <= 0 && this.critters[j].lifeForce >= this.critters[j].minLifeToReproduce) { //if both parents are ready
-                        if (Math.hypot((this.critters[i].position.x - this.critters[j].position.x), (this.critters[i].position.y - this.critters[j].position.y)) 
-                        <= ((this.critters[i].r / 2) + (this.critters[j].r / 2))) { //close enough to mate
-                            //reset mateTimers
-                            this.critters[i].mateTimer += this.critters[i].refractoryPeriod;
-                            this.critters[j].mateTimer += this.critters[j].refractoryPeriod;
-                            //give to baby from parents
-                            let parentSacrificeA = this.critters[i].lifeForce * this.critters[i].parentalSacrifice;
-                            this.critters[i].lifeForce -= parentSacrificeA;
-                            let parentSacrificeB = this.critters[j].lifeForce * this.critters[j].parentalSacrifice;
-                            this.critters[j].lifeForce -= parentSacrificeB;
-                            let inheritance = parentSacrificeA + parentSacrificeB;
-                            //make new baby
-                            // console.log("new baby from " + this.critters[i].name + " and " + this.critters[j].name);
-                            this.critterID++;
-                            this.critterCount++;
-                            this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
-                            let newBaby = new Critter(this.critterCount, {parentA: this.critters[i], parentB: this.critters[j], inheritance: inheritance});
-                            this.critters.push(newBaby);
-                        }
-                    }
-                }
-            } else {
-                this.critters[i].mateTimer -= 1;
-            }
-        }
-        */
     }
 
-    deposit(donation1, donation2) {
-        //scale to cents -- 1 life force = $0.01
-        let d1 = donation1.amount * 0.01;
-        let d2 = donation2.amount * 0.01;
-        this.conduit.fundsRaised[donation1.target] += d1;
-        this.conduit.fundsRaised[donation2.target] += d2;
-        this.conduit.totalRaised += d1 + d2;
-        this.worldLife -= (d1 + d2) * 100; //clunky
+    // deposit(donation1, donation2) {
+    deposit(donations) {
+        let d1 = donations[0].amount;
+        let d2 = donations[1].amount;
+        let totalDonation = this.conduit.makeDonation(donations);
+        // this.conduit.totalRaised += d1 + d2;
+        this.conduit.totalRaised += totalDonation;
+        
+        // console.log(typeof this.worldLife);
+        // console.log(`1: ${this.worldLife}`)
+        // console.log(totalDonation);
+        // this.worldLife -= (d1 + d2);
+        this.worldLife -= parseFloat(totalDonation.toFixed(2)); //this is so fucking ridiculous
+        this.worldLife = parseFloat(this.worldLife.toFixed(2));
+        // console.log(typeof this.worldLife);
+        // console.log(`2: ${this.worldLife}`)
         world.emit('fundsUpdate', this.conduit);
-        // console.log("conduit " + this.conduit.fundsRaised["program E"]);
-        this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife.toFixed(2)});
+        // console.log(typeof this.worldLife);
+        // console.log(`3: ${this.worldLife}`)
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+        // console.log(typeof this.worldLife);
+        // console.log(`4: ${this.worldLife}`)
+
+
+        // this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
     // good or bad?

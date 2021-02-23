@@ -5,6 +5,8 @@ const worldSize = {
     height: 1080
 }
 
+let foodScale = 0.1; //not const so community can adjust?
+
 function map(n, start1, stop1, start2, stop2) {
     const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
     return newval;
@@ -45,6 +47,7 @@ module.exports.map = map;
 module.exports.rand_bm = rand_bm;
 module.exports.generate_ID = generate_ID;
 module.exports.hexToRgb = hexToRgb;
+module.exports.foodScale = foodScale;
 
 
 /*
