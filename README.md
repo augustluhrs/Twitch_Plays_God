@@ -34,7 +34,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] E) Donations and Sex Sliders
     - [X] F) Cost Tallies and Create Button
     - [X] Go back to eco sketch and click to drop
-    - [ ] get user info from server (funds)
+    - [X] get user info from server (funds)
     - [X] send critter update to server
     - [X] send new conduit targets to server
     - [X] update funds object in server with new targets
@@ -50,11 +50,14 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] mate animation
     - [ ] update mate ring size
     - [ ] fix color lerp in offspring
+    - [ ] test no mutation -- something weird happening in crossover
     - [ ] update critter overlay
     - [ ] navigable family tree
     - [ ] change foodScale to poopSize and have body size be correlated
 - [ ] UI misc unessential
-    - [ ] Scrollable Donation List
+    - [X] Scrollable Donation List
+    - [ ] Collapsable Donation List
+    - [ ] Donation Div Class
     - [ ] Font
     - [ ] Conduit Background Swatch
     - [X] Button Class
@@ -62,7 +65,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] icon credit div at bottom
     - [ ] color scheme 
     - [ ] title banner update
-    - [ ] updating life slider with personal funds max
+    - [X] updating life slider with personal funds max
     - [ ] clickable link to charity in select
     - [ ] tooltip details if hover over
         - [ ] donation

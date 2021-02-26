@@ -45,13 +45,6 @@ let newCritter = {
     // this.boid = new Boid(this);
 }
 
-let conduitData = {};
-conduitData["Critical Role Foundation"] = 0;
-conduitData["Processing Foundation"] = 0;
-conduitData["PETA"] = 0;
-conduitData["NAACP"] = 0;
-// console.log(conduitData)
-
 let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
     let modeSpan;
@@ -87,6 +80,8 @@ let mainInstance = (m) => {
                 if(ecosystemSketch.isCreating){
                     creationSketch = new p5(creationInstance, 'creationCanvas');
                     m.modeButton.html("Back To The World")
+                    document.getElementById("orgList").style.display = "none";
+
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
                 } else {
@@ -94,6 +89,15 @@ let mainInstance = (m) => {
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
                     ecosystemSketch.isReadyToSpawn = false;
+
+                    //ugh wrong place for these
+                    // document.getElementById("orgList").style.display = "block";
+                    // document.getElementById("orgList").hidden = false; // not sure why this doesn't work
+                    // document.getElementById("orgList").removeAttribute("hidden");
+                    // document.getElementById("orgList").removeAttribute("display");
+                    // console.log('asdfads');
+
+
                     // document.getElementById("confirmationSpan").remove();
 
 

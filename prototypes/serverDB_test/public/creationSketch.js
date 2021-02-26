@@ -185,8 +185,10 @@ let creationInstance = function(c) { //should change to c?
             .class("whitebox")
             .changed(secondaryUpdate);
         // console.log(conduitData);
-        let targets = Object.keys(conduitData);
-        for (let [i, target] of targets.entries()) {
+        // let targets = Object.keys(conduitData);
+        // for (let [i, target] of targets.entries()) {
+        for (let org of ecosystemSketch.donations.sorted) {
+            let target = org.target;
             primarySelect.option(target);
             secondarySelect.option(target);
             if (target == newCritter.donations[0].target) {
@@ -226,7 +228,7 @@ let creationInstance = function(c) { //should change to c?
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
-        startingLifeSlider = c.createSlider(.01, 10, newCritter.life, .01)
+        startingLifeSlider = c.createSlider(.01, userData.funds, newCritter.life, .01)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan");
@@ -489,6 +491,9 @@ let creationInstance = function(c) { //should change to c?
             newCritter.refractoryPeriod = matingCooldownSlider.value();
             newCritter.parentalSacrifice = matingPercentageSlider.value();
             newCritter.minLifeToReproduce = matingMinLifeSlider.value();
+
+            //update funds in mainSketch
+            // userData.funds -= newCritter.life; //nvm only if placed
 
             //close menu and go back to ecosystem to plop down
             mainSketch.modeButton.html('Abort Critter');

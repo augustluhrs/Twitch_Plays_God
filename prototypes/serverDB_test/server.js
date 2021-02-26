@@ -23,6 +23,8 @@ app.use(express.static('public'));
 const {AsyncNedb} = require('nedb-async');
 let db = new AsyncNedb({filename: "databases/test.db", autoload: true});
 let backupDB = new AsyncNedb({filename: "databases/backups.db", autoload: true});
+// let godsDB = new AsyncNedb({filename: "databases/gods.db", autoload: true});
+
 
 //ecosystem
 const Ecosystem = require("./modules/ecosystem");
@@ -34,6 +36,7 @@ async function ecosystemSetup(){
     let docs = await db.asyncFind({type: "ecosystemUpdate"});
     if (docs.length != 0) {
         ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
+        // ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit, gods: docs[0].gods});
     } else {
         // ecosystem = new Ecosystem(300);
         ecosystem = new Ecosystem(0);

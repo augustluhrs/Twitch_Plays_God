@@ -47,12 +47,16 @@ class Conduit{
                 org["funds"] += parseFloat(donationB.toFixed(2));
             }
         }
-
+        // console.log("before");
+        // console.log(this.donations);
         //sort for use by client side scroll -- sorting by object properties thanks to https://flaviocopes.com/how-to-sort-array-of-objects-by-property-javascript/
         this.donations = this.donations.sort((a, b) => {
-            (a.funds < b.funds) ? 1 : -1 //less than because sorting biggest first
-            // return b-a
+            // (a.funds < b.funds) ? 1 : -1 //less than because sorting biggest first
+            if (a.funds < b.funds) { return 1 }
+            else { return -1 }
         });
+        // console.log("after");
+        // console.log(this.donations);
 
         //update total Raised in ecosystem because then sends the update of worldLIfe too
         // console.log(`askdfljasdlfk ${donationA + donationB}`)

@@ -23,6 +23,10 @@ canvas {
     font-size: large;
 }
 
+.orgDivs {
+    font-size: large;
+}
+
 #creationCanvas {
     position: absolute;
     margin: 0px;

@@ -63,12 +63,40 @@ let ecosystemInstance = function(e) {
         monitor.position.y = e.height - monitor.size.h
 
         infoGraphics = e.createGraphics(e.overlay.w, e.overlay.h);
+
+        //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
+        let listWidth = e.width / 6 + "px";
+        let listHeight = e.height / 3 + "px";
+
+        //having issues with this not being declared in time
+        // e.createDiv()
+        //     .parent("ecosystemCanvas")
+        //     .id("orgList")
+        //     .position(7 * e.width / 8, 2 * e.height/3)
+        //     .style("height", listHeight)
+        //     .style("width", listWidth)
+        //     .style("overflow", "scroll");
+
+        //nvm don't need this because gets fundsUpdate on load?
+        e.select("#orgList")
+            .position(5 * e.width / 6, 2 * e.height/3)
+            .style("height", listHeight)
+            .style("width", listWidth)
+            .style("overflow", "scroll");
+        // e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
+        //     .parent("orgList")
+        //     .class("orgDivs")
+        // for (let org of e.donations.sorted) {
+        //    e.createDiv(`${org.target}: $${parseFloat(org.funds.toFixed(2))}`)
+        //     .parent("orgList")
+        //     .class("orgDivs")
+        // }
     }
 
     e.draw = () => {
         e.background(200, 240, 255);
         if(e.ecosystem != undefined){
-            e.monitorFunds();
+            // e.monitorFunds(); //now only doing this when getting a funds update
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
             if (e.isReadyToSpawn) {
@@ -103,7 +131,9 @@ let ecosystemInstance = function(e) {
                     //send server the critter info
                     newCritter.positionArray = [e.mouseX, e.mouseY];
                     socket.emit("newCritter", newCritter);
-                    //update user data in server
+                    //update user data in server -- for now just mainSketch obj
+                    userData.funds -= parseFloat(newCritter.life.toFixed(2));
+                    userData.funds = parseFloat(userData.funds.toFixed(2)); // i fucking hate this issue
 
 
                     //reset
@@ -111,6 +141,7 @@ let ecosystemInstance = function(e) {
                     e.isCreating = false;
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    document.getElementById("orgList").style.display = "inherit"; //brings back org list, no idea what the style it's inheriting is
                     mainSketch.modeButton.html("Create New Critter");
                     notFirstClick = 0;
                 }
@@ -183,7 +214,32 @@ let ecosystemInstance = function(e) {
     //     e.ellipse(mouseX, mouseY, newCritter.r); 
     // }
 
-    e.monitorFunds = () => { //need to make scrollable TODO
+    e.monitorFunds = () => { 
+        // console.log("monitor Funds")
+        // for (let child of document.getElementById("orgList").children) {
+        //     console.log(child);
+        //     child.remove();
+        // }
+        //not sure why i can't just remove the children, weird dupe bugs, just removing whole thing and remaking
+        e.select("#orgList").remove();
+        let listWidth = e.width / 6 + "px";
+        let listHeight = e.height / 3 + "px";
+        e.createDiv()
+            .parent("ecosystemCanvas")
+            .id("orgList")
+            .position(5 * e.width / 6, 2 * e.height/3)
+            .style("height", listHeight)
+            .style("width", listWidth)
+            .style("overflow", "scroll");
+        e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
+            .parent("orgList")
+            .class("orgDivs")
+        for (let org of e.donations.sorted) {
+            e.createDiv(`${org.target}: $${parseFloat(org.funds.toFixed(2))}`)
+                .parent("orgList")
+                .class("orgDivs")
+        }
+        /* OLD WAY
         //draw the shape background -- need to make this transparent somehow
         e.fill(0);
         e.textAlign(e.LEFT, e.CENTER);
@@ -191,7 +247,7 @@ let ecosystemInstance = function(e) {
         e.image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
         let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
         let sectionSize = monitor.size.h / (e.donations.sorted.length + 1); //fence postttt
-        e.textSize(sectionSize * 0.7);
+        e.textSize(sectionSize * 0.5);
         e.donations.sorted.forEach( (org) => {
             // e.text(org["target"] + ": $" + org["funds"], monitorOffset.x, monitorOffset.y);
             e.text(`${org["target"]}: $${parseFloat(org["funds"].toFixed(2))}`, monitorOffset.x, monitorOffset.y);
@@ -203,11 +259,13 @@ let ecosystemInstance = function(e) {
         //     monitorOffset.y += sectionSize; //better to use index?
         // });
         e.text("Total Donated: $" + parseFloat(e.donations.total).toFixed(2), monitorOffset.x, monitorOffset.y);
+        */
     }
 
     e.displayStats = () => {
         e.fill(0);
         e.textSize(40);
+        e.text(`My Funds: $${userData.funds}`, e.width / 4, e.height - 50);
         e.text("Critter Count: " + e.stats.critterCount, e.width/2, e.height - 50);
         e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 3 * e.width/4, e.height - 50); //need to make sure it's a float everytime I want to round?
     }
