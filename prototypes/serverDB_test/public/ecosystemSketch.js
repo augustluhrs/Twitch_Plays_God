@@ -100,7 +100,7 @@ let ecosystemInstance = function(e) {
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
             if (e.isReadyToSpawn) {
-                //only shows after create Critter button pressed
+                // only shows after create Critter button pressed
                 notFirstClick++;
                 e.push();
                 e.fill(0);
@@ -221,24 +221,32 @@ let ecosystemInstance = function(e) {
         //     child.remove();
         // }
         //not sure why i can't just remove the children, weird dupe bugs, just removing whole thing and remaking
-        e.select("#orgList").remove();
-        let listWidth = e.width / 6 + "px";
-        let listHeight = e.height / 3 + "px";
-        e.createDiv()
-            .parent("ecosystemCanvas")
-            .id("orgList")
-            .position(5 * e.width / 6, 2 * e.height/3)
-            .style("height", listHeight)
-            .style("width", listWidth)
-            .style("overflow", "scroll");
-        e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
-            .parent("orgList")
-            .class("orgDivs")
-        for (let org of e.donations.sorted) {
-            e.createDiv(`${org.target}: $${parseFloat(org.funds.toFixed(2))}`)
+        if(!e.isCreating){ //had to put this here because fundsUpdate during creation would make it appear
+            e.select("#orgList").remove();
+            let listWidth = e.width / 6 + "px";
+            let listHeight = e.height / 3 + "px";
+            e.createDiv()
+                .parent("ecosystemCanvas")
+                .id("orgList")
+                .class("scroll-hide")
+                .position(5 * e.width / 6, 2 * e.height/3)
+                .style("height", listHeight)
+                .style("width", listWidth)
+                .style("overflow", "scroll");
+            e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
                 .parent("orgList")
                 .class("orgDivs")
+            e.createDiv(`&nbsp;`) //space after TOTAL -- should proabably use something else eventually (https://stackoverflow.com/questions/3416454/how-to-make-an-empty-div-take-space)
+                .parent("orgList")
+                .class("orgDivs")
+            // for(let i = 0; i<10; i++) { //just for testing scroll -- eventually might need to show some other way that the list continues
+            for (let org of e.donations.sorted) {
+                e.createDiv(`${org.target}: $${parseFloat(org.funds.toFixed(2))}`)
+                    .parent("orgList")
+                    .class("orgDivs")
+            }
         }
+        // }
         /* OLD WAY
         //draw the shape background -- need to make this transparent somehow
         e.fill(0);
@@ -311,8 +319,8 @@ let ecosystemInstance = function(e) {
         infoGraphics.text("LIFE: " + critter.life.toFixed(2), e.overlay.w / 24, e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Poop Rate: " + critter.excretionRate.toFixed(2), e.overlay.w / 24, 2 * e.overlay.h / 24 + e.overlay.h / 4);
         //space then donation stats
-             // infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
-             // infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
+        infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
+        infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Min Life b4 Donation: " + critter.minLifeToDonate.toFixed(2), e.overlay.w / 24, 6 * e.overlay.h / 24 + e.overlay.h / 4);
         // infoGraphics.text("Donation Timer: " + (floor(critter.donationRate) - critter.donationTimer), e.overlay.w / 24, 8 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Donation Percentage: " + critter.donationPercentage.toFixed(2) * 100 + "%", e.overlay.w / 24, 7 * e.overlay.h / 24 + e.overlay.h / 4);

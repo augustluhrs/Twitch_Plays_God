@@ -274,6 +274,7 @@ class Ecosystem {
             this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
             let newBaby = new Critter("ecosystem", D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
             // console.log("new baby at: " + JSON.stringify(newBaby.position));
+            console.log(`new baby: ${newBaby.name}`);
             parents.A.offspring.push({name: newBaby.name})
             parents.B.offspring.push({name: newBaby.name})
             this.critters.push(newBaby);

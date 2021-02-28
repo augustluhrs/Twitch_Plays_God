@@ -34,16 +34,13 @@ class Critter {
             if (parentA == null || parentB == null) { //new beb
                 //trying new victor vector library
                 this.position = new Victor(Math.random() * D.worldSize.width, Math.random() * D.worldSize.height);
-                // this.boid = new Boid(this.position.x, this.position.y);
                 this.life = 1;
-                // ecosystem.worldLife += 100; //keep all changes to ecosystem
                 //user created so first in family tree
                 this.ancestry = {child: this.name, parents: [{name: deets.god}]};
-            } else {
+            } else { //crossover
                 let inheritance = deets.inheritance;
                 this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
                 this.position = new Victor(parentA.position.x, parentB.position.y); //not the best way but w/e for now
-                // this.boid = new Boid(this.position.x, this.position.y);
                 //altruism target crossover
                 let parentAtarget, parentBtarget;
                 if(Math.random()< 0.75){ //b/c primary is "dominant" gene
@@ -56,31 +53,34 @@ class Critter {
                 } else {
                     parentBtarget = parentB.donations[1].target;
                 }
-                if(Math.random()< 0.5){
+                if (Math.random()< 0.5) {
                     this.donations = [{target: parentAtarget, total: 0},{target: parentBtarget, total: 0}];
                 } else {
                     this.donations = [{target: parentBtarget, total: 0},{target: parentAtarget, total: 0}];
-                    
                 }
                 //crossover here now
                 //color is a mix
+                console.log(`color genes: ${this.DNA.genes[0]} BEFORE`)
+
                 this.DNA.genes[0] = [ //having to lerp each color individually
                     // lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
                     // lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], Math.random()),
                     // lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], Math.random())
-                    lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm()),
-                    lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm()),
-                    lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm())
-
+                    lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm(0, 1)),
+                    lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
+                    lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm(0, 1))
                 ];
+                console.log(`color genes: ${this.DNA.genes[0]}, A: ${parentA.DNA.genes[0]}, B: ${parentB.DNA.genes[0]}`)
                 //for all genes but color, normal lerp
                 for (let i = 1; i < this.DNA.genes.length; i++) { 
-                    this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], Math.random());
+                    // this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], Math.random());
+                    this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], D.rand_bm(0, 1));
                 }
 
                 //mutation
                 for (let i = 0; i < 8; i++) {
                     if (Math.random() < this.DNA.mutationRate) {
+                        console.log(`MUTATION: ${i}`);
                         //color mutation
                         if (i == 0) {
                             let randColor = [Math.random(), Math.random(), Math.random()];
@@ -90,12 +90,16 @@ class Critter {
                                 lerp(this.DNA.genes[0][2], randColor[0][2], Math.random() * 0.4)
                             ];
                         } else {
-                            this.DNA.genes[i] += D.rand_bm(-1,1,1);; 
+                            // this.DNA.genes[i] += D.rand_bm(-1,1,1);; 
+                            this.DNA.genes[i] += D.rand_bm(-1,1);; 
                             this.DNA.genes[i] = Math.min(Math.max(this.DNA.genes[i], 0), 1); //DIY constrain
                         }
                     }
                 }
+                console.log(`dna before: ${this.DNA.color} and ${this.DNA.genes[0]}`)
+
                 this.DNA = new DNA(this.DNA); //hmm, this could be better
+                console.log(`dna after: ${this.DNA.color} and ${this.DNA.genes[0]}`)
                 this.life = inheritance;
             }
 
@@ -104,15 +108,21 @@ class Critter {
             this.r = D.map(this.DNA.r, 0, 1, 5, 50); //radius between 5-50;
             // this.r = this.DNA.r;
             this.maxSpeed = D.map(this.DNA.maxSpeed, 0, 1, 0, 3); //speed between 0-15
-            this.refractoryPeriod = D.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
-            this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
-            this.minLifeToReproduce = D.map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
+            // this.refractoryPeriod = D.map(this.DNA.refractoryPeriod, 0, 1, 0, 1000); //changing from 30-100 to 0-1000
+            // this.parentalSacrifice = this.DNA.parentalSacrifice; //not mapped because a proportion of life force already
+            // this.minLifeToReproduce = D.map(this.DNA.minLifeToReproduce, 0, 1, 10, 200); //changing from 10-100 to 10-200
             this.excretionRate = D.map(this.DNA.excretionRate, 0, 1, 10000, 100); //now making size+speed = effort --> excretion
             this.mutationRate = this.DNA.mutationRate; //not really necessary but whatever, keep it uniform
-            this.minLifeToDonate = D.map(this.DNA.minLifeToDonate, 0, 1, 1, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
+            // this.minLifeToDonate = D.map(this.DNA.minLifeToDonate, 0, 1, 1, 200); //hmm, why 200? same as reproduce -- but is that too dangerous?
+            // this.donationPercentage = this.DNA.donationPercentage;
+            // this.donationRate = D.map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
+            this.donationRate = D.map(this.DNA.donationRate, 0, 1, 10000, 3600000);
             this.donationPercentage = this.DNA.donationPercentage;
-            this.donationRate = D.map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
-            
+            this.minLifeToDonate = D.map(this.DNA.minLifeToDonate, 0, 1, .01, 5);
+            this.refractoryPeriod = D.map(this.DNA.refractoryPeriod, 0, 1, 10000, 3600000);
+            this.parentalSacrifice = this.DNA.parentalSacrifice;
+            this.minLifeToReproduce = D.map(this.DNA.minLifeToReproduce, 0, 1, .01, 5);
+
             //timers
             this.mateTimer = Math.floor(Math.random() * 1000 + 100);
             this.excretionTimer = Math.floor(Math.random() * 500);
@@ -150,7 +160,8 @@ class Critter {
         } else if (source == "user"){
             //generating from client side creation menu -- wonky because client side uses normalized values, need to reorganize DNA
             this.id = D.generate_ID();
-            this.DNA = new DNA();
+            // this.DNA = new DNA(); //really gotta redo DNA....
+            this.DNA = {};
             this.offspring = [];
             this.name = critter.name;
             this.donations = critter.donations;
@@ -161,6 +172,7 @@ class Critter {
             let rgbColor = D.hexToRgb(critter.color);
             // console.log(rgbColor);
             let normalizedColor = [D.map(rgbColor.r, 0, 255, 0, 1), D.map(rgbColor.g, 0, 255, 0, 1), D.map(rgbColor.b, 0, 255, 0, 1)]
+            // console.log(normalizedColor);
             this.DNA.color = normalizedColor;
             this.color = normalizedColor;
             this.DNA.r = critter.r;
@@ -185,7 +197,7 @@ class Critter {
             this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, .1, 5, 0, 1); 
             // this.DNA.minLifeToReproduce = D.map(this.minLifeToReproduce, 0.01, 5, 0, 1); 
 
-            //gotta redo DNA to get genes matching
+            //gotta redo DNA to get genes matching -- fuck this doesn't do what I thought, fixed now though
             this.DNA = new DNA(this.DNA);
 
             //timers

@@ -43,20 +43,28 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] Critter misc unessential
     - [ ] name crossover
     - [ ] name abuse prevention
+    - [ ] face?
     - [ ] hunger / food coma?
     - [ ] prevent food from having out of bounds coords
     - [ ] ~~mutation rate option in creation~~
     - [ ] donation animation
     - [ ] mate animation
+    - [ ] eating animation
     - [ ] update mate ring size
     - [ ] fix color lerp in offspring
-    - [ ] test no mutation -- something weird happening in crossover
+    - [X] test no mutation -- something weird happening in crossover
+    - [ ] fix crossover
     - [ ] update critter overlay
     - [ ] navigable family tree
     - [ ] change foodScale to poopSize and have body size be correlated
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
     - [ ] Collapsable Donation List
+    - [X] hide scrollbar
+    - [X] hide donations list on menu click and if fundsUpdate
+    - [ ] no overlap between critter overlay and funds monitor... keep left or hide?
+    - [ ] max height of donation dropdown select
+    - [ ] filter donation select by category...
     - [ ] Donation Div Class
     - [ ] Font
     - [ ] Conduit Background Swatch
@@ -79,6 +87,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] change mode button "back to ecosystem"
     - [ ] disclaimer and legal info
     - [ ] foundations with links are verified, eventually send non-verified names to checker
+    - [ ] look into "em" instead of px
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
@@ -93,6 +102,10 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] add to website
     - [ ] create separate todo/changelog and update readme
     - [ ] design document with standards
+    - [ ] prettier / ESLint?
+    - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
+    - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
+- [ ] needs some sort of new theming...
 
 **Jan 2021 Update**
 - [X] ~~finish this list~~

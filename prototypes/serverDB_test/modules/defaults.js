@@ -12,17 +12,45 @@ function map(n, start1, stop1, start2, stop2) {
     return newval;
 }
 
-function rand_bm(min, max, skew) { // (box-mueller)
+// function rand_bm(min, max, skew) { // (box-mueller)
+//     let u = 0, v = 0;
+//     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+//     while(v === 0) v = Math.random();
+//     let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+//     console.log(`1 num: ${num}`)
+
+//     num = num / 10.0 + 0.5; // Translate to 0 -> 1
+//     console.log(`2 num: ${num}`)
+
+//     if (num > 1 || num < 0) {
+//         num = randn_bm(min, max, skew);
+//     } // resample between 0 and 1 if out of range
+//     num = Math.pow(num, skew); // Skew
+//     console.log(`3 num: ${num}`)
+
+//     num *= max - min; // Stretch to fill range
+//     num += min; // offset to min
+//     console.log(`4 num: ${num}`)
+//     return num;
+// }
+
+//changing to just min,max
+function rand_bm(min, max) { // (box-mueller)
     let u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
     while(v === 0) v = Math.random();
     let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-
+    // console.log(`1 num: ${num}`)
     num = num / 10.0 + 0.5; // Translate to 0 -> 1
-    if (num > 1 || num < 0) num = randn_bm(min, max, skew); // resample between 0 and 1 if out of range
-    num = Math.pow(num, skew); // Skew
+    // console.log(`2 num: ${num}`)
+    if (num > 1 || num < 0) {
+        num = randn_bm(min, max);
+    } // resample between 0 and 1 if out of range
+    // console.log(`3 num: ${num}`)
     num *= max - min; // Stretch to fill range
+    // console.log(`4 num: ${num}`)
     num += min; // offset to min
+    console.log(`5 num: ${num}`)
     return num;
 }
 

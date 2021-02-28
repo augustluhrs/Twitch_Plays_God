@@ -1,6 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
+    /* overflow: hidden; */
 }
   
 canvas {
@@ -26,6 +27,29 @@ canvas {
 .orgDivs {
     font-size: large;
 }
+
+/* https://dev.to/ashwamegh/how-to-hide-scrollbar-from-any-html-element-dae */
+/* https://www.w3schools.com/css/css_pseudo_elements.asp */
+.scroll-hide::-webkit-scrollbar { 
+    width: 0 !important;
+    display: none; 
+}
+
+
+/* couldn't get it to work without doing it in html-- https://codepen.io/paulobrien/pen/yEjOwG */
+/* .select {
+	width:200px;
+	position:absolute;
+	left:0;
+	top:0;
+}
+.select-holder {
+	display:inline-block;
+	position:relative;
+	width:200px;
+	height:1.5em;
+	background:#f9f9f9;
+} */
 
 #creationCanvas {
     position: absolute;

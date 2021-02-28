@@ -169,14 +169,29 @@ let creationInstance = function(c) { //should change to c?
             .position(c.width / 16, 2.5 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
+        // primarySelectHolder = c.createSpan()
+        //     .class("select-holder")
+        //     .parent("creationSpan")
+        //     .id("p-holder")
         primarySelect = c.createSelect()
             .id("primarySelect")
             .position(c.width / 16, 4 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan")
+            // .parent("p-holder")
             .class("whitebox")
+            // .style("size", "6")
+            // .class("select")
             // .option("other")
             .changed(primaryUpdate);
+            //okay need to figure out how to limit size of dropdown, initial google didn't help
+        // primarySelect.elt.addEventListener("mousedown", () => {
+        //     console.log(primarySelect.elt.options.length);
+        //     if(primarySelect.elt.options.length>6){
+        //         primarySelect.elt.style.size = 6;
+        //         // primarySelect.style("size", "6");
+        //     }
+        // })
         secondarySelect = c.createSelect()
             .id("secondarySelect")
             .position(c.width / 16, 6 * c.height / 9)

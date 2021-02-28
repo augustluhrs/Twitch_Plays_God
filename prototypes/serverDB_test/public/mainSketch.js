@@ -49,7 +49,7 @@ let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
     let modeSpan;
     m.modeButton = null;
-    let isCreating = false;
+    // let isCreating = false;
     // let credits;
 
     m.preload = () => {
