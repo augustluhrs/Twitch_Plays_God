@@ -139,7 +139,8 @@ class Ecosystem {
                 mates.push({self: critter, mate: mate});
                 // console.log('ilikeu');
             } else {
-                critter.mateTimer -= 1;
+                // critter.mateTimer -= 1;
+                critter.mateTimer++;
             }
         });
 
@@ -252,7 +253,7 @@ class Ecosystem {
         for (let i = mates.length - 1; i >= 0; i--) {
             for (let j = 0; j < i; j++) { //so won't overlap with same pair again
                 // console.log(JSON.stringify(mates));
-                if (mates[i].self.id == mates[j].mate.id){
+                if (mates[i].self.id == mates[j].mate.id && mates[i].mate.id == mates[j].self.id){ //adding the double check in case throuple...
                     pairs.push({A: mates[i].self, B: mates[j].self});
                 }
             }
@@ -260,8 +261,10 @@ class Ecosystem {
         //then make babies from the matched pairs
         pairs.forEach( (parents) => {
             //reset mateTimers
-            parents.A.mateTimer += parents.A.refractoryPeriod;
-            parents.B.mateTimer += parents.B.refractoryPeriod;
+            // parents.A.mateTimer += parents.A.refractoryPeriod;
+            // parents.B.mateTimer += parents.B.refractoryPeriod;
+            parents.A.mateTimer = 0;
+            parents.B.mateTimer = 0;
             //give to baby from parents
             let parentSacrificeA = parents.A.life * parents.A.parentalSacrifice;
             parents.A.life -= parentSacrificeA;

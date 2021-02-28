@@ -31,7 +31,7 @@ class Critter {
             let secondary = deets.secondary;
             this.donations = [{target: primary, total: 0},{target: secondary, total: 0}];
 
-            if (parentA == null || parentB == null) { //new beb
+            if (parentA == null || parentB == null) { //new beb from random
                 //trying new victor vector library
                 this.position = new Victor(Math.random() * D.worldSize.width, Math.random() * D.worldSize.height);
                 this.life = 1;
@@ -127,6 +127,7 @@ class Critter {
             this.mateTimer = Math.floor(Math.random() * 1000 + 100);
             this.excretionTimer = Math.floor(Math.random() * 500);
             this.donationTimer = Math.floor(Math.random() * 1000);
+
             this.foodScale = D.foodScale; //where else can I set this?
 
             //at end so flocking has all info
@@ -295,7 +296,7 @@ class Critter {
         
     display() {
         let isReadyToMate = false;
-        if(this.mateTimer <= 0 && this.life >= this.minLifeToReproduce){
+        if(this.mateTimer >= this.refractoryPeriod && this.life >= this.minLifeToReproduce){
             isReadyToMate = true;
         }
         //need to convert from Victor
