@@ -51,12 +51,15 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] mate animation
     - [ ] eating animation
     - [ ] update mate ring size
-    - [ ] fix color lerp in offspring
+    - [X] fix color lerp in offspring
+    - [X] change colormode to HSL
+    - [ ] add a fix to the HSL lerp that blends naturally
     - [X] test no mutation -- something weird happening in crossover
-    - [ ] fix crossover
+    - [X] fix crossover
     - [ ] update critter overlay
     - [ ] navigable family tree
     - [ ] change foodScale to poopSize and have body size be correlated
+    - [ ] ~~aggression? family? too much for this version...~~
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
     - [ ] Collapsable Donation List
@@ -91,6 +94,10 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
+- [ ] backend updates
+    - [ ] change dbs -- one for static critter info (could have more stats too like time of death and total lifespan, ancestry details, etc.)
+    - [ ] one for dynamic eco data
+    - [ ] user gods db for stats
 - [ ] Playtest (start day and week later followup)
     - [ ] host on glitch
     - [ ] get group

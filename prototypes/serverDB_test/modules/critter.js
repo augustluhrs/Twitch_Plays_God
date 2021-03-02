@@ -61,12 +61,33 @@ class Critter {
                 //crossover here now
                 //color is a mix
                 // console.log(`color genes: ${this.DNA.genes[0]} BEFORE`)
-
-                this.DNA.genes[0] = [ //having to lerp each color individually
-                    // lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
-                    // lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], Math.random()),
-                    // lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], Math.random())
-                    lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm(0, 1)),
+                // this.DNA.genes[0] = [ //having to lerp each color individually
+                //     // lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
+                //     // lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], Math.random()),
+                //     // lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], Math.random())
+                //     lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm(0, 1)),
+                //     lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
+                //     lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm(0, 1))
+                // ];
+                
+                //now lerping with intuitive HSL blending -- could use culori but i think this is fine since my use case is so limited
+                let hueLerp;
+                if(Math.abs(parentA.DNA.genes[0][0] - parentB.DNA.genes[0][0]) >= .5){ //makes sure always takes the shortest path around the hue ring
+                    let smallerVal;
+                    if(parentA.DNA.genes[0][0] > parentB.DNA.genes[0][0]){
+                        smallerVal = parentB.DNA.genes[0][0] + 1; //since normalized, this is like adding 360
+                        hueLerp = lerp(parentA.DNA.genes[0][0], smallerVal, D.rand_bm(0, 1));
+                        hueLerp -= 1;
+                    } else {
+                        smallerVal = parentA.DNA.genes[0][0] + 1;
+                        hueLerp = lerp(parentB.DNA.genes[0][0], smallerVal, D.rand_bm(0, 1));
+                        hueLerp -= 1;
+                    }
+                } else {
+                    hueLerp = lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm(0, 1))
+                }
+                this.DNA.genes[0] = [ //lerping hue normally unless would need to cross over 0, sat and light lerping normally
+                    hueLerp,
                     lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
                     lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm(0, 1))
                 ];
@@ -313,7 +334,7 @@ class Critter {
         }
         //need to convert from Victor
         let pos = {x: this.position.x, y: this.position.y};
-        return {position: pos, r: this.r, color: this.color, life: this.life, isReadyToMate: isReadyToMate};
+        return {position: pos, r: this.r, color: this.color, life: this.life, isReadyToMate: isReadyToMate, minLifeToReproduce: this.minLifeToReproduce};
     }
 }
 

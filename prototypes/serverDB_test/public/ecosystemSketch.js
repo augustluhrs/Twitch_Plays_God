@@ -184,7 +184,7 @@ let ecosystemInstance = function(e) {
         let fadedColor = e.color(critter.color[0] * 360, critter.color[1]  * 100, critter.color[2]  * 100, 0.4); //alpha scale to 1 //hmm maybe not color issue?
         // console.log(fadedColor);
         e.fill(fadedColor);
-        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 5, 0, critter.r / 2)); //ugh this was still set to earlier life range
+        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 5, 0, critter.r)); //ugh this was still set to earlier life range
         
         //show ring if ready to mate -- white HSL is 0, 0, 100
         e.noFill();
@@ -192,7 +192,10 @@ let ecosystemInstance = function(e) {
             // e.stroke(255);
             e.stroke(0, 0, 100);
         }
-        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 10, 0, critter.r / 2));
+        // e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 10, 0, critter.r / 2));
+        // e.ellipse(critter.position.x, critter.position.y, 3 * critter.r / 4);
+        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.minLifeToReproduce, 0, 5, 0, critter.r));
+
     
         //base critter
         // let critCol = e.color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
@@ -319,13 +322,20 @@ let ecosystemInstance = function(e) {
         //critter display -- doubled radius of all for visibility
         //for lifeForce aura
         infoGraphics.fill(fadedColor);
-        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 5, 0, critter.r));
+        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, (critter.r + e.map(critter.life, 0, 5, 0, critter.r)) * 2);
         //show ring if ready to mate
         infoGraphics.noFill();
-        if(critter.mateTimer <= 0 && critter.life >= critter.minLifeToReproduce){ //isReadyToMate
+        if(critter.mateTimer >= critter.refractoryPeriod && critter.life >= critter.minLifeToReproduce){ //isReadyToMate
+        //     infoGraphics.stroke(0, 0, 100);
+        // }
+        // if(critter.isReadyToMate){
+            // e.stroke(255);
+            infoGraphics.strokeWeight(4);
             infoGraphics.stroke(0, 0, 100);
         }
-        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 10, 0, critter.r));
+        // infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 10, 0, critter.r));
+        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, (critter.r + e.map(critter.minLifeToReproduce, 0, 5, 0, critter.r)) * 2);
+
         //base critter
         infoGraphics.fill(critterColor);
         infoGraphics.noStroke();

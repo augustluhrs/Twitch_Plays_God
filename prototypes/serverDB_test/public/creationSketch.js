@@ -267,7 +267,7 @@ let creationInstance = function(c) { //should change to c?
         // let normalizedColor = [D.map(hslColor[0], 0, 360, 0, 1), D.map(hslColor[1], 0, 100, 0, 1), D.map(hslColor[2], 0, 100, 0, 1)];
         // this.DNA.color = normalizedColor;
         let hslColor = c.color(newCritter.colorPicker);
-        console.log(hslColor);
+        // console.log(hslColor);
         colorPicker = c.createColorPicker(hslColor) //issue now that this is a string....
             .position(7 * c.width / 16, .5 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
@@ -518,8 +518,8 @@ let creationInstance = function(c) { //should change to c?
             newCritter.color = colorPicker.color().toString("hsl");
             newCritter.colorPicker = colorPicker.color().toString("#rrggbb");
             // console.log(typeof newCritter.color);
-            console.log(newCritter.color);
-            console.log(newCritter.colorPicker);
+            // console.log(newCritter.color);
+            // console.log(newCritter.colorPicker);
 
             newCritter.maxSpeed = bodySlider.xVal;
             newCritter.r = bodySlider.yVal;
