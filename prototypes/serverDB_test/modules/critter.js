@@ -23,7 +23,7 @@ class Critter {
             if(deets['name']){
                 this.name = deets.name;
             } else {
-                this.name = critter.toString();
+                this.name = critter.toString(); //will be overwritten if beb, now using crossover
             }
 
             //every critter has altruism targets so this should be fine
@@ -39,8 +39,52 @@ class Critter {
                 this.ancestry = {child: this.name, parents: [{name: deets.god}]};
             } else { //crossover
                 let inheritance = deets.inheritance;
-                this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
                 this.position = new Victor(parentA.position.x, parentB.position.y); //not the best way but w/e for now
+                //name crossover -- random subset of each parent name, then random arrangement to make child name
+                // let randEndA = Math.floor(Math.random() * (parentA.name.length - randStartA)) + randStartA; //makes sure it's always greater than or equal to start but less than length
+                // let nameA = parentA.name.substr(randStartA, randEndA);
+                //nvm can use substring instead and it'll flip if end is smaller than start -- no real diff but w/e i use substring in color so should stay consistent
+                //now making sure each name is at least two letters
+                let randStartA, randEndA, randStartB, randEndB;
+                let nameA = "";
+                let nameB = "";
+                while(nameA.length < 2){
+                    randStartA = Math.floor(Math.random() * parentA.name.length);
+                    randEndA = Math.floor(Math.random() * parentA.name.length + 1);
+                    nameA = parentA.name.substring(randStartA, randEndA);
+                }
+                while(nameB.length < 2) {
+                    randStartB = Math.floor(Math.random() * parentB.name.length);
+                    randEndB = Math.floor(Math.random() * parentB.name.length + 1);
+                    nameB = parentB.name.substring(randStartB, randEndB);
+                }
+                // let randStartA = Math.floor(Math.random() * parentA.name.length);
+                // let randEndA = Math.floor(Math.random() * parentA.name.length + 1);
+                // let nameA = parentA.name.substring(randStartA, randEndA);
+                console.log(`${parentA.name}, ${randStartA}, ${randEndA}, ${nameA}`);
+                // let randStartB = Math.floor(Math.random() * parentB.name.length);
+                // let randEndB = Math.floor(Math.random() * parentB.name.length + 1);
+                // let nameB = parentB.name.substring(randStartB, randEndB);
+                console.log(`${parentB.name}, ${randStartB}, ${randEndB}, ${nameB}`);
+
+                let bebName;
+                if (Math.random() > .5) {
+                    bebName = nameA + nameB;
+                } else {
+                    bebName = nameB + nameA;
+                }
+                console.log(bebName);
+                //make sure is not too long
+                if(bebName.length > 30){
+                    //now using substr because num characters
+                    // let randIndex = Math.floor(Math.random() * bebName.length)
+                    bebName = bebName.substr(0, 30); // could do something more elegant but w/e
+                }
+                // console.log(bebName);
+                this.name = bebName.charAt(0).toUpperCase() + bebName.slice(1); //thanks to https://flaviocopes.com/how-to-uppercase-first-letter-javascript/ 
+                console.log(this.name);
+                //family tree
+                this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
                 //altruism target crossover
                 let parentAtarget, parentBtarget;
                 if(Math.random()< 0.75){ //b/c primary is "dominant" gene
@@ -69,7 +113,7 @@ class Critter {
                 //     lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
                 //     lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm(0, 1))
                 // ];
-                
+
                 //now lerping with intuitive HSL blending -- could use culori but i think this is fine since my use case is so limited
                 let hueLerp;
                 if(Math.abs(parentA.DNA.genes[0][0] - parentB.DNA.genes[0][0]) >= .5){ //makes sure always takes the shortest path around the hue ring
@@ -198,14 +242,14 @@ class Critter {
             // now doing HSL -- critter.color is a string like "hsl(169.66666666666666, 74.99999999999999, 52.94117647058824)" need to separate by delimitter(?) comma
             // should maybe add this as a function to Defaults
             let hslColor = [];
-            let colorString = critter.color.substr(4, critter.color.length); //cut the hsl( from beginning
+            let colorString = critter.color.substring(4, critter.color.length); //cut the hsl( from beginning
             let commaIndex = colorString.indexOf(",");
-            hslColor[0] = parseFloat(colorString.substr(0, commaIndex));
-            colorString = colorString.substr(commaIndex + 1, colorString.length);
+            hslColor[0] = parseFloat(colorString.substring(0, commaIndex)); //oh wait, should be using substringing not substr..... wow javascript
+            colorString = colorString.substring(commaIndex + 1, colorString.length);
             commaIndex = colorString.indexOf(",");
-            hslColor[1] = parseFloat(colorString.substr(0, commaIndex));
-            colorString = colorString.substr(commaIndex + 1, colorString.length);
-            hslColor[2] = parseFloat(colorString.substr(0, colorString.length - 1)); //just cutting off last )
+            hslColor[1] = parseFloat(colorString.substring(0, commaIndex));
+            colorString = colorString.substring(commaIndex + 1, colorString.length);
+            hslColor[2] = parseFloat(colorString.substring(0, colorString.length - 1)); //just cutting off last )
             let normalizedColor = [D.map(hslColor[0], 0, 360, 0, 1), D.map(hslColor[1], 0, 100, 0, 1), D.map(hslColor[2], 0, 100, 0, 1)];
             this.DNA.color = normalizedColor;
             this.color = normalizedColor;

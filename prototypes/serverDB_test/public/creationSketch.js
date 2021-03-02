@@ -159,16 +159,27 @@ let creationInstance = function(c) { //should change to c?
             .position(c.width / 16, 1.25 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
-            // .input(() => { //just for reset, nvm couldn't backspace all the way
-            //     if (nameInput.value() == ""){
-            //         nameInput.value("Critter Name");
-            //     }
-            // })
+            .input(() => { 
+                //tried reset, nvm couldn't backspace all the way
+                //limiting length
+                if (nameInput.value().length > 30){
+                    let newVal = nameInput.value().substr(0,30);
+                    nameInput.value(newVal);
+                }
+            })
         godInput = c.createInput(newCritter.ancestry.parents[0].name)
             .parent("creationSpan")
             .position(c.width / 16, 2.5 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
+            .input(() => { 
+                //tried reset, nvm couldn't backspace all the way
+                //limiting length
+                if (godInput.value().length > 30){ // is this racist? how long can usernames be?
+                    let newVal = godInput.value().substr(0,30);
+                    godInput.value(newVal);
+                }
+            })
         // primarySelectHolder = c.createSpan()
         //     .class("select-holder")
         //     .parent("creationSpan")
