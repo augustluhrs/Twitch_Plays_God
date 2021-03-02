@@ -252,11 +252,27 @@ let creationInstance = function(c) { //should change to c?
         critterDisplay.x = 8 * c.width / 16;
         critterDisplay.y = 3 * c.height / 9;
         // let defaultColor = c.color(newCritter.color[0], newCritter.color[1], newCritter.color[2])
-        colorPicker = c.createColorPicker(newCritter.color)
+        //need to get color now that it's being set as a string ohh wait can use string in color constructor! but not the way toString formats it?? that's so fucking dumb, or wait, just need to specify
+        c.push();
+        c.colorMode(c.HSL);
+        // let hslColor = [];
+        // let colorString = newCritter.color.substr(4, newCritter.color.length); //cut the hsl( from beginning
+        // let commaIndex = colorString.indexOf(",");
+        // hslColor[0] = parseFloat(colorString.substr(0, commaIndex));
+        // colorString = colorString.substr(commaIndex + 1, colorString.length);
+        // commaIndex = colorString.indexOf(",");
+        // hslColor[1] = parseFloat(colorString.substr(0, commaIndex));
+        // colorString = colorString.substr(commaIndex + 1, colorString.length);
+        // hslColor[2] = parseFloat(colorString.substr(0, colorString.length - 1)); //just cutting off last )
+        // let normalizedColor = [D.map(hslColor[0], 0, 360, 0, 1), D.map(hslColor[1], 0, 100, 0, 1), D.map(hslColor[2], 0, 100, 0, 1)];
+        // this.DNA.color = normalizedColor;
+        let hslColor = c.color(newCritter.colorPicker);
+        console.log(hslColor);
+        colorPicker = c.createColorPicker(hslColor) //issue now that this is a string....
             .position(7 * c.width / 16, .5 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .parent("creationSpan");
-
+        c.pop();
         //bottom middle
         //not sure if millis is the right rate for cooldown, seems to be 100 per second
         donationCooldownSlider = c.createSlider(1000, 360000, newCritter.donationRate, 1000)
@@ -497,7 +513,14 @@ let creationInstance = function(c) { //should change to c?
             newCritter.life = startingLifeSlider.value();
             newCritter.ancestry = {child: nameInput.value(), parents: [{name: godInput.value()}]};
             // color = colorPicker.color();
-            newCritter.color = colorPicker.value(); //hex now
+            // newCritter.color = colorPicker.value(); //hex now
+            //HSL switch
+            newCritter.color = colorPicker.color().toString("hsl");
+            newCritter.colorPicker = colorPicker.color().toString("#rrggbb");
+            // console.log(typeof newCritter.color);
+            console.log(newCritter.color);
+            console.log(newCritter.colorPicker);
+
             newCritter.maxSpeed = bodySlider.xVal;
             newCritter.r = bodySlider.yVal;
             newCritter.donationRate = donationCooldownSlider.value();
@@ -520,25 +543,3 @@ let creationInstance = function(c) { //should change to c?
         } 
     }
 };
-
-// let cancelCreate = () => {
-//     confirmationMenu.hide();
-// }
-
-
-/* -- old way before switching to instance mode
-let nameInput;
-
-function setupCreation (menu) {
-    nameInput = menu.createInput('critter name')
-        .position(creationMenu.w/2, creationMenu.h / 20)
-        .size(creationMenu.w/8, creationMenu.h/12)
-        .attribute("title", "type critter name here");
-}
-
-function displayCreation (menu) {
-    menu.clear();
-    menu.background(200, 255, 200, 230);
-    image(menu, width/2, height/2);
-}
-*/

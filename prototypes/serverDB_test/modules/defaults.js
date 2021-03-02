@@ -50,7 +50,7 @@ function rand_bm(min, max) { // (box-mueller)
     num *= max - min; // Stretch to fill range
     // console.log(`4 num: ${num}`)
     num += min; // offset to min
-    console.log(`5 num: ${num}`)
+    // console.log(`5 num: ${num}`)
     return num;
 }
 

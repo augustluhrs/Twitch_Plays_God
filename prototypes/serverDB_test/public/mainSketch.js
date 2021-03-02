@@ -28,6 +28,8 @@ let newCritter = {
     // color: [45, 225, 194],
     // color: p5.color(45, 225, 194),
     color: "#2DE1C2",
+    colorPicker: "#2DE1C2", //just for resetting colorpicker since needs specific string type...
+    // color: 
     r: 0.5,
     maxSpeed: 0.5,
     donationRate: 300000,
@@ -89,6 +91,7 @@ let mainInstance = (m) => {
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
                     ecosystemSketch.isReadyToSpawn = false;
+                    ecosystemSketch.monitorFunds(); //to make list pop back up
 
                     //ugh wrong place for these
                     // document.getElementById("orgList").style.display = "block";

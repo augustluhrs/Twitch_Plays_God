@@ -60,7 +60,7 @@ class Critter {
                 }
                 //crossover here now
                 //color is a mix
-                console.log(`color genes: ${this.DNA.genes[0]} BEFORE`)
+                // console.log(`color genes: ${this.DNA.genes[0]} BEFORE`)
 
                 this.DNA.genes[0] = [ //having to lerp each color individually
                     // lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], Math.random()),
@@ -70,7 +70,7 @@ class Critter {
                     lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
                     lerp(parentA.DNA.genes[0][2], parentB.DNA.genes[0][2], D.rand_bm(0, 1))
                 ];
-                console.log(`color genes: ${this.DNA.genes[0]}, A: ${parentA.DNA.genes[0]}, B: ${parentB.DNA.genes[0]}`)
+                // console.log(`color genes: ${this.DNA.genes[0]}, A: ${parentA.DNA.genes[0]}, B: ${parentB.DNA.genes[0]}`)
                 //for all genes but color, normal lerp
                 for (let i = 1; i < this.DNA.genes.length; i++) { 
                     // this.DNA.genes[i] = lerp(parentA.DNA.genes[i], parentB.DNA.genes[i], Math.random());
@@ -83,11 +83,11 @@ class Critter {
                         console.log(`MUTATION: ${i}`);
                         //color mutation
                         if (i == 0) {
-                            let randColor = [Math.random(), Math.random(), Math.random()];
-                            this.DNA.genes[0] = [ //having to lerp each color individually
-                                lerp(this.DNA.genes[0][0], randColor[0][0], Math.random() * 0.4),
-                                lerp(this.DNA.genes[0][1], randColor[0][1], Math.random() * 0.4),
-                                lerp(this.DNA.genes[0][2], randColor[0][2], Math.random() * 0.4)
+                            let randColor = [Math.random(), Math.random(), Math.random()]; //wow how long has that bug been here? 3/1
+                            this.DNA.genes[0] = [ //having to lerp each color individually -- reduced mutation max to 1/4 in any color direction so not too crazy
+                                lerp(this.DNA.genes[0][0], randColor[0], Math.random() * 0.25),
+                                lerp(this.DNA.genes[0][1], randColor[1], Math.random() * 0.25),
+                                lerp(this.DNA.genes[0][2], randColor[2], Math.random() * 0.25)
                             ];
                         } else {
                             // this.DNA.genes[i] += D.rand_bm(-1,1,1);; 
@@ -96,10 +96,10 @@ class Critter {
                         }
                     }
                 }
-                console.log(`dna before: ${this.DNA.color} and ${this.DNA.genes[0]}`)
+                // console.log(`dna before: ${this.DNA.color} and ${this.DNA.genes[0]}`)
 
                 this.DNA = new DNA(this.DNA); //hmm, this could be better
-                console.log(`dna after: ${this.DNA.color} and ${this.DNA.genes[0]}`)
+                // console.log(`dna after: ${this.DNA.color} and ${this.DNA.genes[0]}`)
                 this.life = inheritance;
             }
 
@@ -170,10 +170,22 @@ class Critter {
             this.life = critter.life;
             this.ancestry = critter.ancestry;
             //this.color = critter.color; //ugh hex.... how to convert...
-            let rgbColor = D.hexToRgb(critter.color);
+            // let rgbColor = D.hexToRgb(critter.color);
             // console.log(rgbColor);
-            let normalizedColor = [D.map(rgbColor.r, 0, 255, 0, 1), D.map(rgbColor.g, 0, 255, 0, 1), D.map(rgbColor.b, 0, 255, 0, 1)]
+            // let normalizedColor = [D.map(rgbColor.r, 0, 255, 0, 1), D.map(rgbColor.g, 0, 255, 0, 1), D.map(rgbColor.b, 0, 255, 0, 1)]
             // console.log(normalizedColor);
+            // now doing HSL -- critter.color is a string like "hsl(169.66666666666666, 74.99999999999999, 52.94117647058824)" need to separate by delimitter(?) comma
+            // should maybe add this as a function to Defaults
+            let hslColor = [];
+            let colorString = critter.color.substr(4, critter.color.length); //cut the hsl( from beginning
+            let commaIndex = colorString.indexOf(",");
+            hslColor[0] = parseFloat(colorString.substr(0, commaIndex));
+            colorString = colorString.substr(commaIndex + 1, colorString.length);
+            commaIndex = colorString.indexOf(",");
+            hslColor[1] = parseFloat(colorString.substr(0, commaIndex));
+            colorString = colorString.substr(commaIndex + 1, colorString.length);
+            hslColor[2] = parseFloat(colorString.substr(0, colorString.length - 1)); //just cutting off last )
+            let normalizedColor = [D.map(hslColor[0], 0, 360, 0, 1), D.map(hslColor[1], 0, 100, 0, 1), D.map(hslColor[2], 0, 100, 0, 1)];
             this.DNA.color = normalizedColor;
             this.color = normalizedColor;
             this.DNA.r = critter.r;

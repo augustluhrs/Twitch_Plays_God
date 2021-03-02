@@ -108,6 +108,7 @@ let ecosystemInstance = function(e) {
                 e.textAlign(e.CENTER, e.CENTER);
                 e.textSize(e.height / 10);
                 e.text("Click to Drop Critter into Ecosystem", e.width / 2 , e.height / 4)
+                e.colorMode(e.HSL);
                 e.fill(newCritter.color);
                 // e.noStroke();
                 e.ellipse(e.mouseX, e.mouseY, e.map(newCritter.r, 0, 1, 5, 50));
@@ -175,23 +176,32 @@ let ecosystemInstance = function(e) {
     }
 
     e.drawCritter = (critter) => {
+        //adding HSL color mode now
+        e.push();
+        e.colorMode(e.HSL, 360, 100, 100, 1);
         //for lifeForce aura
-        let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+        // let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+        let fadedColor = e.color(critter.color[0] * 360, critter.color[1]  * 100, critter.color[2]  * 100, 0.4); //alpha scale to 1 //hmm maybe not color issue?
+        // console.log(fadedColor);
         e.fill(fadedColor);
-        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 100, 0, critter.r / 2));
+        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 5, 0, critter.r / 2)); //ugh this was still set to earlier life range
         
-        //show ring if ready to mate
+        //show ring if ready to mate -- white HSL is 0, 0, 100
         e.noFill();
         if(critter.isReadyToMate){
-            e.stroke(255);
+            // e.stroke(255);
+            e.stroke(0, 0, 100);
         }
-        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 200, 0, critter.r / 2));
+        e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 10, 0, critter.r / 2));
     
         //base critter
-        let critCol = e.color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
+        // let critCol = e.color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
+        let critCol = e.color(critter.color[0] * 360, critter.color[1]  * 100, critter.color[2]  * 100);
+
         e.fill(critCol);
         e.noStroke();
         e.ellipse(critter.position.x, critter.position.y, critter.r); 
+        e.pop();
     }
 
     // let drawBaby = (critter) => {
@@ -279,40 +289,50 @@ let ecosystemInstance = function(e) {
     }
 
     e.displayInfoOverlay = (critter) => {
+        infoGraphics.push();
         infoGraphics.clear();
         infoGraphics.textAlign(e.CENTER);
         infoGraphics.noStroke();
         infoGraphics.imageMode(e.CENTER);
-        let critterColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255);
-        let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
+        e.colorMode(e.HSL);
+        infoGraphics.colorMode(infoGraphics.HSL); //diff?
+        let critterColor = e.color(critter.color[0] * 360, critter.color[1]  * 100, critter.color[2]  * 100);
+        let fadedColor = e.color(critter.color[0] * 360, critter.color[1]  * 100, critter.color[2]  * 100, .4);
+        // console.log(fadedColor);
+        // let critterColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255);
+        // let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
         // let backgroundColor = color((1 - critter.color[0]) * 255, (1 - critter.color[1])  * 255, (1 - critter.color[2])  * 255, 100);
         // infoGraphics.background(backgroundColor);
+        // infoGraphics.colorMode(e.RGB); //critter colors retain HSL but fills are still RGB? no apparently not? or was it error with the colormode in the first place?
+
+        infoGraphics.colorMode(e.RGB);
         infoGraphics.background(255, 100);
+        infoGraphics.colorMode(e.HSL);
     
         
         //name at top
         // infoGraphics.fill(critterColor);
-        infoGraphics.fill(0);
+        infoGraphics.fill(0, 0, 0);
         infoGraphics.textSize(e.overlay.textSize + 10);
         infoGraphics.text(critter.name, e.overlay.w / 2, e.overlay.h / 12);
     
         //critter display -- doubled radius of all for visibility
         //for lifeForce aura
         infoGraphics.fill(fadedColor);
-        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 100, 0, critter.r));
+        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 5, 0, critter.r));
         //show ring if ready to mate
         infoGraphics.noFill();
         if(critter.mateTimer <= 0 && critter.life >= critter.minLifeToReproduce){ //isReadyToMate
-            infoGraphics.stroke(255);
+            infoGraphics.stroke(0, 0, 100);
         }
-        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 200, 0, critter.r));
+        infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2 + e.map(critter.life, 0, 10, 0, critter.r));
         //base critter
         infoGraphics.fill(critterColor);
         infoGraphics.noStroke();
         infoGraphics.ellipse(e.overlay.w / 2, e.overlay.h / 5, critter.r * 2); 
     
         //critter stats
-        infoGraphics.fill(0);
+        infoGraphics.fill(0, 0, 0);
         infoGraphics.textAlign(e.LEFT, e.CENTER);
         infoGraphics.textSize(e.overlay.textSize);
         //life stats
@@ -340,14 +360,15 @@ let ecosystemInstance = function(e) {
             infoGraphics.image(godIcon, e.overlay.w / 2, 11 * e.overlay.h / 12, 80, 80);
         } else {
             infoGraphics.text(critter.ancestry.parents[0].name, e.overlay.w / 4, 10 * e.overlay.h / 12);
-            infoGraphics.fill(critter.ancestry.parents[0].color[0] * 255, critter.ancestry.parents[0].color[1] * 255, critter.ancestry.parents[0].color[2] * 255);
+            // infoGraphics.colorMode(e.HSL);
+            infoGraphics.fill(critter.ancestry.parents[0].color[0] * 360, critter.ancestry.parents[0].color[1] * 100, critter.ancestry.parents[0].color[2] * 100);
             infoGraphics.ellipse(e.overlay.w / 4, 11 * e.overlay.h / 12, critter.ancestry.parents[0].r);
             // infoGraphics.fill(critterColor);
-            infoGraphics.fill(0);
+            infoGraphics.fill(0, 0, 0); //this is HSL
             infoGraphics.text(critter.ancestry.parents[1].name, 3 * e.overlay.w / 4, 10 * e.overlay.h / 12);
-            infoGraphics.fill(critter.ancestry.parents[1].color[0] * 255, critter.ancestry.parents[1].color[1] * 255, critter.ancestry.parents[1].color[2] * 255);
+            infoGraphics.fill(critter.ancestry.parents[1].color[0] * 360, critter.ancestry.parents[1].color[1] * 100, critter.ancestry.parents[1].color[2] * 100);
             infoGraphics.ellipse(3 * e.overlay.w / 4, 11 * e.overlay.h / 12, critter.ancestry.parents[1].r);
-    
+            // infoGraphics.colorMode(e.RGB);
         }
     
         //make sure e.overlay is not off screen
@@ -358,6 +379,8 @@ let ecosystemInstance = function(e) {
     
         //draw e.overlay to canvas
         e.image(infoGraphics, e.overlay.position.x, e.overlay.position.y);
+        e.colorMode(e.RGB); //whyyyyy
+        infoGraphics.pop();
     }
 }
 
