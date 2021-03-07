@@ -61,11 +61,11 @@ class Critter {
                 // let randStartA = Math.floor(Math.random() * parentA.name.length);
                 // let randEndA = Math.floor(Math.random() * parentA.name.length + 1);
                 // let nameA = parentA.name.substring(randStartA, randEndA);
-                console.log(`${parentA.name}, ${randStartA}, ${randEndA}, ${nameA}`);
+                // console.log(`${parentA.name}, ${randStartA}, ${randEndA}, ${nameA}`);
                 // let randStartB = Math.floor(Math.random() * parentB.name.length);
                 // let randEndB = Math.floor(Math.random() * parentB.name.length + 1);
                 // let nameB = parentB.name.substring(randStartB, randEndB);
-                console.log(`${parentB.name}, ${randStartB}, ${randEndB}, ${nameB}`);
+                // console.log(`${parentB.name}, ${randStartB}, ${randEndB}, ${nameB}`);
 
                 let bebName;
                 if (Math.random() > .5) {
@@ -73,7 +73,7 @@ class Critter {
                 } else {
                     bebName = nameB + nameA;
                 }
-                console.log(bebName);
+                // console.log(bebName);
                 //make sure is not too long
                 if(bebName.length > 30){
                     //now using substr because num characters
@@ -82,7 +82,7 @@ class Critter {
                 }
                 // console.log(bebName);
                 this.name = bebName.charAt(0).toUpperCase() + bebName.slice(1); //thanks to https://flaviocopes.com/how-to-uppercase-first-letter-javascript/ 
-                console.log(this.name);
+                // console.log(this.name);
                 //family tree
                 this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
                 //altruism target crossover

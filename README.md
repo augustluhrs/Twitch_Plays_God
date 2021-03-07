@@ -25,7 +25,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 **Feb 2021 Update**
 Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
 
-- [ ] Critter Creation
+- [X] Critter Creation
     - [X] Instance Mode with Page DOM Positioning
     - [X] A) Name, God, Starting Life
     - [X] B) Critter Preview, Color Picker
@@ -41,25 +41,28 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] life in world update on critter life
     - [X] critter donation update
 - [ ] Critter misc unessential
-    - [ ] name crossover
+    - [X] name crossover and min/max
     - [ ] name abuse prevention
     - [ ] face?
     - [ ] hunger / food coma?
     - [ ] prevent food from having out of bounds coords
-    - [ ] ~~mutation rate option in creation~~
+    - [X] ~~mutation rate option in creation~~
     - [ ] donation animation
     - [ ] mate animation
     - [ ] eating animation
-    - [ ] update mate ring size
+    - [ ] emoji animation class
+    - [X] update mate ring size
     - [X] fix color lerp in offspring
     - [X] change colormode to HSL
-    - [ ] add a fix to the HSL lerp that blends naturally
+    - [X] add a fix to the HSL lerp that blends naturally
     - [X] test no mutation -- something weird happening in crossover
     - [X] fix crossover
     - [ ] update critter overlay
     - [ ] navigable family tree
     - [ ] change foodScale to poopSize and have body size be correlated
-    - [ ] ~~aggression? family? too much for this version...~~
+    - [X] ~~aggression? family? too much for this version...~~
+    - [ ] have minLife/cooldown/percentage correlate in some way? need to prevent viruses?
+    - [ ] population max limiter
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
     - [ ] Collapsable Donation List
@@ -86,7 +89,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
         - [ ] everything else
     - [X] creation menu defaults to last critter created
     - [ ] misc layout adjustments
-    - [ ] ~~confirmation pop up~~
+    - [X] ~~confirmation pop up~~
     - [X] change mode button "back to ecosystem"
     - [ ] disclaimer and legal info
     - [ ] foundations with links are verified, eventually send non-verified names to checker
@@ -94,15 +97,31 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
+    - [ ] community critter generation
+    - [ ] fertilization battle royale minigame
+    - [ ] ranked choice voting system
 - [ ] backend updates
     - [ ] change dbs -- one for static critter info (could have more stats too like time of death and total lifespan, ancestry details, etc.)
     - [ ] one for dynamic eco data
     - [ ] user gods db for stats
+    - [ ] funds db
+    - [ ] fix db update pausing whole thing -- why if async? test seaparating critter info / culling huge object
+    - [ ] separate server for db -- just sends info over when updating and requests info on start
+- [ ] god stuff
+    - [ ] user login on server
+    - [ ] user login client-side
+    - [ ] user donation leaderboard
+    - [ ] user community interaction leaderboard
+    - [ ] leaderboard filter by org
+    - [ ] user donation as percentage of each critter donation
 - [ ] Playtest (start day and week later followup)
     - [ ] host on glitch
     - [ ] get group
     - [ ] intitial feedback survey
     - [ ] week later feedback survey
+    - [ ] user log in
+    - [ ] initial playtest
+    - [ ] ethics playtest/check-in
 - [ ] Documentation
     - [ ] get media
     - [ ] update github with current project status and media
@@ -110,9 +129,30 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] create separate todo/changelog and update readme
     - [ ] design document with standards
     - [ ] prettier / ESLint?
-    - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
-    - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
+- [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
+- [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
 - [ ] needs some sort of new theming...
+
+DB breakdown:
+- Ecosystem Essentials:
+    - Supply (Food):
+        - amount
+        - pos
+    - Corpses
+        - pos
+        - r
+    - Critters (critter db has all static props like DNA, but eco has the mutable variables)
+        - pos
+        - id
+        - life
+        - timers
+- Critters
+    - everything static, and mutables get updated on backup (donations, timers, life)
+    - what happens if there's a crash and back-ups conflict? reset to last non-conflict?
+- Funds
+    - orgs, donations
+- Users
+    - name, id, 
 
 **Jan 2021 Update**
 - [X] ~~finish this list~~

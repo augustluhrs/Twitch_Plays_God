@@ -51,3 +51,7 @@ socket.on('clickInfo', (data) => {
         ecosystemSketch.isDisplayingInfo = true;
     }
 });
+
+// socket.on('refresh', () => {
+//     location.reload();
+// });

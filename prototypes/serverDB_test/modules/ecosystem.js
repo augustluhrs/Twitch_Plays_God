@@ -207,7 +207,7 @@ class Ecosystem {
         this.critterCount++;
         // this.critterID++;
         this.worldLife += 1;
-        backupDB();
+        backupDB(); 
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
@@ -284,7 +284,8 @@ class Ecosystem {
         });
 
         if (pairs.length != 0) {
-            backupDB();
+            backupDB(); // hmm async or no?
+            // console.log("async test");
         }
     }
 

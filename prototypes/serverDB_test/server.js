@@ -18,12 +18,24 @@ let server = require('http').createServer(app).listen(port, function(){
 app.use(express.static('public'));
 
 //nedb database stuff
-// const Datastore = require('nedb');
+const Datastore = require('nedb');
 // let db = new Datastore({filename: "databases/test.db", autoload: true});
-const {AsyncNedb} = require('nedb-async');
-let db = new AsyncNedb({filename: "databases/test.db", autoload: true});
-let backupDB = new AsyncNedb({filename: "databases/backups.db", autoload: true});
+let db = new Datastore({filename: "databases/test.db", autoload: true});
+let backupDB = new Datastore({filename: "databases/backups.db", autoload: true});
+let godsDB = new Datastore({filename: "databases/gods.db", autoload: true});
+let critterDB = new Datastore({filename: "databases/critters.db", autoload: true});
+let ecosystemDB = new Datastore({filename: "databases/ecosytem.db", autoload: true});
+let fundsDB = new Datastore({filename: "databases/funds.db", autoload: true});
+
+// const {AsyncNedb} = require('nedb-async');
+// let db = new AsyncNedb({filename: "databases/test.db", autoload: true});
+// let backupDB = new AsyncNedb({filename: "databases/backups.db", autoload: true});
 // let godsDB = new AsyncNedb({filename: "databases/gods.db", autoload: true});
+// let critterDB = new AsyncNedb({filename: "databases/critters.db", autoload: true});
+// let ecosystemDB = new AsyncNedb({filename: "databases/ecosytem.db", autoload: true});
+// let fundsDB = new AsyncNedb({filename: "databases/funds.db", autoload: true});
+
+
 
 
 //ecosystem
@@ -33,27 +45,48 @@ ecosystemSetup();
 
 async function ecosystemSetup(){
     console.log('setting up');
-    let docs = await db.asyncFind({type: "ecosystemUpdate"});
-    if (docs.length != 0) {
-        ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
-        // ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit, gods: docs[0].gods});
-    } else {
-        // ecosystem = new Ecosystem(300);
-        ecosystem = new Ecosystem(0);
-        let ecoLog = ecosystem.save();
-        db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
-            if(err){
-                console.log("db err: " + err);
-            }
-        });
-    }
+    // let docs = await db.asyncFind({type: "ecosystemUpdate"});
+    ecosystemDB.find({type: "ecosystemUpdate"}, (err, docs) => {
+        if (err) {console.log("eco setup err: " + err)};
+        if (docs.length != 0) {
+            ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
+        } else {
+            ecosystem = new Ecosystem(0);
+            let ecoLog = ecosystem.save();
+            ecosystemDB.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
+                if(err){
+                    console.log("db err: " + err);
+                }
+            });
+        }
+    });
+
+    // if (docs.length != 0) {
+    //     ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
+    //     // ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit, gods: docs[0].gods});
+    // } else {
+    //     // ecosystem = new Ecosystem(300);
+    //     ecosystem = new Ecosystem(0);
+    //     let ecoLog = ecosystem.save();
+    //     db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
+    //         if(err){
+    //             console.log("db err: " + err);
+    //         }
+    //     });
+    // }
 }
 
 global.backupDB = function(){
     let ecoLog = ecosystem.save();
-    db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-        .then(function(){console.log('db updated');})
-        .catch(function(err){console.log("Update err: " + err);});
+    ecosystemDB.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
+        if (err) {
+            console.log("Update err: " + err);
+        }
+        console.log('db updated');
+    });
+    // db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+    //     .then(function(){console.log('db updated');})
+    //     .catch(function(err){console.log("Update err: " + err);});
 }
 /*
     db.find({type: "ecosystemUpdate"}, function(err, docs) {
@@ -90,6 +123,7 @@ world.on('connection', function(socket){
     if(ecosystem != undefined){
         world.emit('fundsUpdate', ecosystem.conduit);
         world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife}); //toFixed...
+        // world.emit("refresh"); //just so reloads if server resets -- nvm it loops, only really need this on my end so w/e
     }
     
     //new event listeners
@@ -149,9 +183,16 @@ setInterval( () => {
     //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
     //do I need to save backups? hmm... maybe every hour?
     let ecoLog = ecosystem.save();
-    backupDB.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-        .then(function(){console.log('db backed up');})
-        .catch(function(err){console.log("backup err: " + err);});
+    backupDB.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
+        if (err) {
+            console.log("backup err: " + err);
+        }
+        console.log('backup db updated');
+    });
+
+    // backupDB.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
+    //     .then(function(){console.log('db backed up');})
+    //     .catch(function(err){console.log("backup err: " + err);});
 
     // db.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
     //     if(err){
