@@ -17,7 +17,7 @@ class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
     constructor(ecoSetup) {
         if(typeof ecoSetup === "number"){
-            console.log("setting up new ecosystem");
+            console.log("new ecosystem");
             this.width = D.worldSize.width;
             this.height = D.worldSize.height;
             // this.critterID = 0; //just for IDs
@@ -36,7 +36,7 @@ class Ecosystem {
                 this.worldLife += 1;
             }
         } else if (typeof ecoSetup === "object") {
-            console.log("setting up ecosystem from save");
+            console.log("ecosystem from save");
             this.width = D.worldSize.width;
             this.height = D.worldSize.height;
             this.critters = []; //the agents currently in the ecosystem    
@@ -44,25 +44,52 @@ class Ecosystem {
             this.supply = []; //fud
 
             // great, okay, so have to remake the stuff after db...
-            this.conduit = new Conduit(ecoSetup.conduit);
+            this.conduit = new Conduit(ecoSetup.donations);
             this.worldLife = 0;
             this.critterCount = 0;
             
-            for (let dbCritter of ecoSetup.ecoLog.critters){
-                let critter = new Critter("db", dbCritter);
-                this.critters.push(critter);
-                this.critterCount++;
-                this.worldLife += critter.life;
-            }
-            for (let dbFood of ecoSetup.ecoLog.supply) {
+            //this is the same after db update
+            for (let dbFood of ecoSetup.ecosystem.supply) {
                 let food = new Food(dbFood);
                 this.supply.push(food);
                 this.worldLife += food.amount;
             }
-            for (let dbCorpse of ecoSetup.ecoLog.corpses) {
+            for (let dbCorpse of ecoSetup.ecosystem.corpses) {
                 let corpse = new Corpse(dbCorpse);
                 this.corpses.push(corpse);
             }
+            for (let dbCritter of ecoSetup.ecosystem.critters) {
+                let critter = new Critter("db", dbCritter);
+                this.critters.push(critter);
+                this.critterCount++;
+                this.worldLife += critter.life;
+            }   
+            // //this is going to be really weird, going to have to frankenstein the critters together
+            // //first need to get all critters from ecosystem then grab corresponding info from critter db -- will erase any dead critters
+            // for (let ecoDBCritter of ecoSetup.ecosystem.critters){
+            //     let frankenCritter = {};
+            //     for (let key of Object.keys(ecoDBCritter)){
+            //         frankenCritter[key] = ecoDBCritter[key];
+            //     }
+            //     let noMatch = true;
+            //     for (let critDBCritter of ecoSetup.critters) {
+            //         if (ecoDBCritter.id == critDBCritter.id) {
+            //             for (let key of Object.keys(critDBCritter)){
+            //                 frankenCritter[key] = critDBCritter[key];
+            //             }
+            //             noMatch = false;
+            //         }
+            //     }
+
+            //     if(noMatch) {
+            //         console.log("no match: " + frankenCritter.id)
+            //     } else { //preventing error on clientside of having critters with no display stats
+            //         let critter = new Critter("db", frankenCritter);
+            //         this.critters.push(critter);
+            //         this.critterCount++;
+            //         this.worldLife += critter.life;
+            //     }
+            // }
         } else {
             console.log("ecosystem set up error: " + ecoSetup);
             console.log(typeof ecoSetup);
@@ -71,16 +98,6 @@ class Ecosystem {
         //doing this here so that funds and ecosystem will be ready from start -- nope...
         // world.emit('fundsUpdate', this.conduit);
         // world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife.toFixed(2)});
-    }
-
-    save() {
-        let ecoLog = {
-            critters: this.critters,
-            supply: this.supply,
-            corpses: this.corpses
-        }
-        console.log("ecosystem saved");
-        return ecoLog;
     }
 
     run() {
@@ -93,6 +110,9 @@ class Ecosystem {
             critters: [],
             corpses: []
         };
+
+        //for backup
+        let needsBackup = false;
     
         //show all the food + add to qtree
         this.supply.forEach( (food) => {
@@ -156,6 +176,7 @@ class Ecosystem {
                 // console.log("donation: " + JSON.stringify(funds.d1) + " " + JSON.stringify(funds.d2));
                 // this.deposit(funds.d1, funds.d2)
                 this.deposit(funds);
+                needsBackup = true;
             };
             //check for food and death
             let excretion = critter.excrete();
@@ -163,10 +184,12 @@ class Ecosystem {
                 if (excretion.death != null) {
                     // console.log("death: " + excretion.death.name);
                     this.die(excretion.death)
+                    needsBackup = true;
                 }
                 if (excretion.makeFood != null) {
                     // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
                     this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
+                    needsBackup = true;  
                 }
             }
             //update socket display positions
@@ -174,7 +197,6 @@ class Ecosystem {
         });
     
         //decay, show, and remove corpses
-        //does forEach get messed up if splicing? TODO check
         this.corpses.forEach( (corpse, index) => { //need third param, corpses?
             //decay then check for full decay
             if (corpse.decay()) { //absolution
@@ -183,6 +205,10 @@ class Ecosystem {
                 updates.corpses.push(corpse.display());
             }
         });
+
+        if(needsBackup) {
+            // backupEcosystem(); //now only doing this on interval in server
+        }
     
         return updates;
     }
@@ -197,7 +223,10 @@ class Ecosystem {
         this.worldLife += critter.life;
 
         //server update
-        backupDB();
+        // backupDB();
+        // backupCritters();
+        // addCritterToDB(critter);
+        backupEcosystem();
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
@@ -207,7 +236,10 @@ class Ecosystem {
         this.critterCount++;
         // this.critterID++;
         this.worldLife += 1;
-        backupDB(); 
+        // backupDB();
+        // backupCritters(); //need to backup eco now too or else might not exist on crash -- what was the point then?
+        // addCritterToDB(critter);
+        // backupEcosystem(); //now only doing this on interval in server
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
@@ -281,10 +313,13 @@ class Ecosystem {
             parents.A.offspring.push({name: newBaby.name})
             parents.B.offspring.push({name: newBaby.name})
             this.critters.push(newBaby);
+            // addCritterToDB(newBaby);
         });
 
         if (pairs.length != 0) {
-            backupDB(); // hmm async or no?
+            // backupCritters();
+           backupEcosystem();
+            // backupDB(); // hmm async or no?
             // console.log("async test");
         }
     }
@@ -311,12 +346,13 @@ class Ecosystem {
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
         // console.log(typeof this.worldLife);
         // console.log(`4: ${this.worldLife}`)
-
-
+        
+        backupDonations();
+        backupEcosystem();
         // this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
-    // good or bad?
+    // good or bad? bad
     ecosystemEmit(type, update){
         if(type == "stats"){
             world.emit("statsUpdate", update);
@@ -342,6 +378,46 @@ class Ecosystem {
         }
     }
 
+    save() { //old, no longer using
+        let ecoLog = {
+            critters: this.critters,
+            supply: this.supply,
+            corpses: this.corpses
+        }
+        console.log("ecosystem saved");
+        return ecoLog;
+    }
+
+    backupAll() { //le sigh
+        backupDonations(); 
+        backupEcosystem();
+        // backupCritters();
+    }
+
+    backupEcosystem(){ //all dynamic info
+        // let dynamicCritters = [];
+        // for (let critter of this.critters) {
+        //     let dynCritter = critter.stripToDynamic();
+        //     dynamicCritters.push(dynCritter);
+        // }
+        let ecoLog = {
+            supply: this.supply,
+            corpses: this.corpses,
+            // critters: dynamicCritters
+            critters: this.critters
+        }
+        return ecoLog;
+    }
+
+    //not using anymore
+    // backupCritters(){ //only need static info
+    //     let staticCritters = [];
+    //     for (let critter of this.critters){
+    //         let statCritter = critter.stripToStatic();
+    //         staticCritters.push(statCritter);
+    //     }
+    //     return staticCritters;
+    // }
 }
 
 module.exports = Ecosystem;

@@ -14,6 +14,7 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 ## Reading List
 - *The Selfish Gene* by Richard Dawkins
 - *Joyful Militancy* by carla bergman and Nick Montgomery
+- Epigenetic Trauma (podcast -- research further)
 
 ## References
 - [*Free Rice* by The World Food Programme](https://freerice.com/about) -- look into their AD practices
@@ -40,6 +41,8 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] update funds object in server with new targets
     - [X] life in world update on critter life
     - [X] critter donation update
+- [ ] Critter Creation pt. 2
+    - [ ] point buy system
 - [ ] Critter misc unessential
     - [X] name crossover and min/max
     - [ ] name abuse prevention
@@ -63,6 +66,9 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] ~~aggression? family? too much for this version...~~
     - [ ] have minLife/cooldown/percentage correlate in some way? need to prevent viruses?
     - [ ] population max limiter
+    - [ ] total time alive and TOD stats
+    - [ ] minLife negative bug
+    - [ ] saturation threshold so hue doesn't lerp if black/white
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
     - [ ] Collapsable Donation List
@@ -94,6 +100,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] disclaimer and legal info
     - [ ] foundations with links are verified, eventually send non-verified names to checker
     - [ ] look into "em" instead of px
+- [ ] basics page / tutorial / help
 - [ ] community effects
     - [ ] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle
@@ -101,12 +108,18 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] fertilization battle royale minigame
     - [ ] ranked choice voting system
 - [ ] backend updates
-    - [ ] change dbs -- one for static critter info (could have more stats too like time of death and total lifespan, ancestry details, etc.)
-    - [ ] one for dynamic eco data
-    - [ ] user gods db for stats
-    - [ ] funds db
-    - [ ] fix db update pausing whole thing -- why if async? test seaparating critter info / culling huge object
-    - [ ] separate server for db -- just sends info over when updating and requests info on start
+    - [X] change dbs -- one for static critter info (could have more stats too like time of death and total lifespan, ancestry details, etc.)
+    - [X] one for dynamic eco data
+    - [X] user gods db for stats
+    - [X] funds db
+    - [X] fix db update pausing whole thing -- why if async? test seaparating critter info / culling huge object
+    - [ ] separate server for db? -- just sends info over when updating and requests info on start
+    - [ ] ask matt stuff
+    - [ ] reformat backup function ping pong
+    - [ ] test speed if just inserting instead of updating whole thing
+    - [ ] fix callbacks to allow for existing donations log
+    - [ ] if still slow after inserting, just not going to update all the time...
+    - [ ] should solo insert donations too...
 - [ ] god stuff
     - [ ] user login on server
     - [ ] user login client-side
@@ -129,9 +142,17 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] create separate todo/changelog and update readme
     - [ ] design document with standards
     - [ ] prettier / ESLint?
+    - [ ] versions and log
+    - [ ] readme update and todo separation
 - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
 - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
 - [ ] needs some sort of new theming...
+
+
+Feedback questions:
+    - Giving
+        - Do you give to charity? Why/why not, if so, how much, to whom, why?
+        - How have your giving habits changed over time?
 
 DB breakdown:
 - Ecosystem Essentials:

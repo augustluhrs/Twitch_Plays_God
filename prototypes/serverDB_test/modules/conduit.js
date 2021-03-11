@@ -36,7 +36,7 @@ class Conduit{
         let targetB = donations[1].target;
         let donationA = donations[0].amount;
         let donationB = donations[1].amount;
-        // console.log([donationA, donationB]);
+        console.log(donations);
 
         //hate that i can't think of a better all-encompassing name for this object
         for (let org of this.donations) {
@@ -57,7 +57,7 @@ class Conduit{
         });
         // console.log("after");
         // console.log(this.donations);
-
+        // backupDonations();
         //update total Raised in ecosystem because then sends the update of worldLIfe too
         // console.log(`askdfljasdlfk ${donationA + donationB}`)
         return parseFloat((donationA + donationB).toFixed(2)); //ughhhh
@@ -100,43 +100,10 @@ class Conduit{
         let target = Object.keys(this.donations[r])[0];
         return target;
     }
+
+    backup() {
+        return this; // need to test if works TODO
+    }
 }
 
 module.exports = Conduit;
-
-
-
-// constructor(conduit) {
-    //     if(conduit != undefined){
-    //         this.placesToDonate = conduit.placesToDonate;
-    //         this.fundsRaised = conduit.fundsRaised;
-    //         this.totalRaised = conduit.totalRaised;
-    //     } else { //new conduit
-    //         // this.placesToDonate = ["foundation A", "non-profit B", "org C", "school D", "program E"];
-            // this.fundsRaised = {
-            //     "NAACP": 0,
-            //     "non-profit B": 0,
-            //     "org C": 0,
-            //     "school D": 0,
-            //     "program E": 0
-            // };
-            // this.totalRaised = 0;
-            // for (let target of Object.keys(this.fundsRaised)) {
-            //     this.placesToDonate.push(target);
-            // }
-    //     }  
-    // }
-
-    // makeDonation(target, donation) {
-    //     if (this.fundsRaised[target] != undefined) {
-    //         //new donation target
-    //         this.fundsRaised[target] = donation;
-    //         this.placesToDonate.push(target);
-    //     } else {
-    //         //update existing target
-    //         this.fundsRaised[target] += donation;
-    //     }
-
-    //     //sort for use by client side scroll
-        
-    // }

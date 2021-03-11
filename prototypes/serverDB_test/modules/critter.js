@@ -84,7 +84,10 @@ class Critter {
                 this.name = bebName.charAt(0).toUpperCase() + bebName.slice(1); //thanks to https://flaviocopes.com/how-to-uppercase-first-letter-javascript/ 
                 // console.log(this.name);
                 //family tree
-                this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
+                //UGHHH THIS WAS WHAT WAS FUCKING WITH THE DB SPEED
+                // this.ancestry = {child: this.name, parents:[{name: parentA.name, ancestry: parentA.ancestry, color: parentA.color, r: parentA.r},{name: parentB.name, ancestry: parentB.ancestry, color: parentB.color, r: parentB.r}]};
+                this.ancestry = {child: this.name, parents:[{name: parentA.name, color: parentA.color, r: parentA.r},{name: parentB.name, color: parentB.color, r: parentB.r}]};
+                
                 //altruism target crossover
                 let parentAtarget, parentBtarget;
                 if(Math.random()< 0.75){ //b/c primary is "dominant" gene
@@ -199,12 +202,17 @@ class Critter {
             this.boid = new Boid(this);
         } else if (source == "db") { //create from db
             this.id = critter.id;
+            //eco DB stuff
+            this.life = critter.life;
+            this.position = new Victor(critter.position.x, critter.position.y);
+            this.mateTimer = critter.mateTimer;
+            this.excretionTimer = critter.excretionTimer;
+            this.donationTimer = critter.donationTimer;
+            //critter DB stuff
             this.DNA = critter.DNA;
             this.offspring = critter.offspring;
             this.name = critter.name;
             this.donations = critter.donations;
-            this.position = new Victor(critter.position.x, critter.position.y);
-            this.life = critter.life;
             this.ancestry = critter.ancestry;
             this.color = critter.color;
             this.r = critter.r;
@@ -217,12 +225,9 @@ class Critter {
             this.minLifeToDonate = critter.minLifeToDonate;
             this.donationPercentage = critter.donationPercentage;
             this.donationRate = critter.donationRate;
-            this.mateTimer = critter.mateTimer;
-            this.excretionTimer = critter.excretionTimer;
-            this.donationTimer = critter.donationTimer;
             this.foodScale = critter.foodScale;
+            //made here
             this.boid = new Boid(this);
-            //gotta be a better way to organize the critters....
         } else if (source == "user"){
             //generating from client side creation menu -- wonky because client side uses normalized values, need to reorganize DNA
             this.id = D.generate_ID();
@@ -290,6 +295,8 @@ class Critter {
         } else {
             console.log("source error in critter creation");
         }
+        //testing inserting one at a time
+        // this.addToDB(); //nvm can't do this here because recreate on load
     }
 
     //all the non-display updates
@@ -380,6 +387,50 @@ class Critter {
         let pos = {x: this.position.x, y: this.position.y};
         return {position: pos, r: this.r, color: this.color, life: this.life, isReadyToMate: isReadyToMate, minLifeToReproduce: this.minLifeToReproduce};
     }
+
+    //for ecosystem DB
+    stripToDynamic() {
+        let dynCritter = {};
+        dynCritter.id = this.id;
+        dynCritter.life = this.life;
+        dynCritter.position = this.position; //fine?
+        dynCritter.mateTimer = this.mateTimer;
+        dynCritter.excretionTimer = this.excretionTimer;
+        dynCritter.donationTimer = this.donationTimer;
+        dynCritter.offspring = this.offspring;
+        dynCritter.donations = this.donations;
+        return dynCritter;
+    }
+
+    //for critter DB
+    stripToStatic() {
+        let statCritter = {};
+        statCritter.id = this.id;
+        statCritter.DNA = this.DNA;
+        // statCritter.offspring = this.offspring;
+        statCritter.name = this.name;
+        // statCritter.donations = this.donations;
+        statCritter.ancestry = this.ancestry;
+        statCritter.color = this.color;
+        statCritter.r = this.r;
+        statCritter.maxSpeed = this.maxSpeed;
+        statCritter.refractoryPeriod = this.refractoryPeriod;
+        statCritter.parentalSacrifice = this.parentalSacrifice;
+        statCritter.minLifeToReproduce = this.minLifeToReproduce;
+        statCritter.excretionRate = this.excretionRate;
+        statCritter.mutationRate = this.mutationRate;
+        statCritter.minLifeToDonate = this.minLifeToDonate;
+        statCritter.donationPercentage = this.donationPercentage;
+        statCritter.donationRate = this.donationRate;
+        statCritter.foodScale = this.foodScale;
+        return statCritter;
+    }
+
+    addToDB(){
+        let critterForDB = this.stripToStatic();
+        addCritterToDB(critterForDB);
+    }
 }
+
 
 module.exports = Critter;

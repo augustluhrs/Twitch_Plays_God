@@ -1,16 +1,29 @@
-// just for keeping user data... 
-// not really sure what it's for, just going to save it to db for now.
-// nvm this is too complicated for the playtest, i don't need all this just for each user to have a limited pool of money
+// just for keeping user funds for now
+
 class Gods {
     constructor (gods) {
         if (gods != undefined){
             this.gods = gods;
         } else {
-            this.gods = {};
+            this.gods = []; //array so can insert in db
         }
     }
 
-    addFunds
+    addGod (god) {
+        this.gods.push(god);
+    }
+
+    updateRecords (id, donation) {
+
+    }
+
+    login (username, password) {
+
+    }
+
+    backup () {
+        return this.gods;
+    }
 }
 
 module.exports = Gods;
