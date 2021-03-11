@@ -1,6 +1,8 @@
 # Twitch Plays God
 ***A virtual ecosystem guided by an online community where autonomous critters use real-world money to donate to non-profits and orgs.***
 
+![timelapse of ecosystem](assets/timelapse.gif)
+
 ## Contributing
 
 Want to help me make this thing? Feel free to add/suggest whatever! Currently looking for people who know about the following areas:
@@ -130,12 +132,13 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] user donation as percentage of each critter donation
 - [ ] Playtest (start day and week later followup)
     - [ ] host on glitch
-    - [ ] get group
+    - [X] get group
     - [ ] intitial feedback survey
     - [ ] week later feedback survey
     - [ ] user log in
     - [ ] initial playtest
     - [ ] ethics playtest/check-in
+    - [ ] reduce timers
 - [ ] Documentation
     - [ ] get media
     - [ ] update github with current project status and media
@@ -148,6 +151,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
 - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
 - [ ] needs some sort of new theming...
+- [ ] whats with the weird hyper speed (lerp to catch up?)
 
 
 Feedback questions:
