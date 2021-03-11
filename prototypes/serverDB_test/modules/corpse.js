@@ -1,9 +1,9 @@
 class Corpse {
-    constructor(pos,r) {
-        this.position = pos;
-        this.r = r;
+    constructor (corpse) {
+        this.position = corpse.position;
+        this.r = corpse.r;
         //not using random decay anymore
-        this.decayTimer = 1000;
+        this.decayTimer = corpse.decayTimer || 1000;
     }
     decay() {
         this.decayTimer -= 1;

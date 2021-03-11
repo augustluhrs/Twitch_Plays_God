@@ -96,7 +96,7 @@ class Boid {
         //TODO why forEach vs for/of?
         for (let neighbor of neighbors) {
             if (Math.hypot((self.position.x - neighbor.position.x), (self.position.y - neighbor.position.y)) <= (self.r / 2 + neighbor.r / 2) &&
-                self.mateTimer <= 0 && self.life >= self.minLifeToReproduce) {
+                self.mateTimer >= self.refractoryPeriod && self.life >= self.minLifeToReproduce) { //flipped timer to make it work like donation timer
                 //eligible to mate with them if they want (close enough, timer down, and has enough life)
                 mate = neighbor;    
                 // console.log(self.name + " likes " + mate.name);

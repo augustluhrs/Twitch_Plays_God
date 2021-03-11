@@ -2,12 +2,20 @@ const D = require("./defaults");
 // var d = new D();
 
 class Food {
-    constructor(amount, pos) {
-        this.amount = amount;
-        this.position = pos;
-        this.ripeRate = 100;
-        this.id = D.generate_ID();
-        // this.hasBeenEaten = false;
+    constructor(food, pos) {
+        if (typeof food === "number") {
+            this.amount = food;
+            this.position = pos;
+            this.ripeRate = 100;
+            this.id = D.generate_ID();
+            // this.hasBeenEaten = false;
+        } else { //create from db
+            this.amount = food.amount;
+            this.position = food.position;
+            this.ripeRate = food.ripeRate;
+            this.id = food.id;
+        }
+       
     }
 
     display() {

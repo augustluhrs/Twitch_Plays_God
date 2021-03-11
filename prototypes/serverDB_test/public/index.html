@@ -7,15 +7,32 @@
 <!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script> -->
 <!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script> -->
 <!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.sound.min.js"></script> -->
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- <script src="https://unpkg.com/p5.touchgui@0.5.2/lib/p5.touchgui.js"></script> -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
   </head>
   <body>
+    <div id='banner'></div>
+    <div id='ecosystemCanvas'>
+      <div id='orgList'></div>
+      <div id="creationCanvas"></div>
+      <!-- <div id="creationCanvas"></div> -->
+    </div>
+    <div id='credits'>
+      <a class="credits" target="_blank" href="https://icons8.com/icons/set/snail">Snail icon</a> by <a target="_blank" href="https://icons8.com">Icons8</a> <br>
+      <a class="credits" target="_blank" href="https://icons8.com/icons/set/rabbit">Rabbit icon</a> by <a target="_blank" href="https://icons8.com">Icons8</a> <br>
+      <a class="credits" target="_blank" href="https://icons8.com/icons/set/elephant">Elephant icon</a> by <a target="_blank" href="https://icons8.com">Icons8</a> <br>
+      <a class="credits" target="_blank" href="https://icons8.com/icons/set/leopard">Leopard icon</a> by <a target="_blank" href="https://icons8.com">Icons8</a> <br>
+      <a class="credits" target="_blank" href="https://icons8.com/icons/set/dog-pooping">Dog Pooping icon</a> by <a target="_blank" href="https://icons8.com">Icons8</a>
+    </div>
     <!-- <script src="../modules/corpse.js"></script>
     <script src="../modules/critter.js"></script>
     <script src="../modules/ecosystem.js"></script>
     <script src="../modules/food.js"></script> -->
     <script src="socketCommands.js"></script>
-    <script src="sketch.js"></script>
+    <script src="ecosystemSketch.js"></script>
+    <!-- <script src="critterOverlay.js"></script> -->
+    <script src="creationSketch.js"></script>
+    <script src="mainSketch.js"></script>
   </body>
 </html>
