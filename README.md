@@ -46,6 +46,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] Critter misc unessential
     - [X] name crossover and min/max
     - [ ] name abuse prevention
+    - [ ] name mutation
     - [ ] face?
     - [ ] hunger / food coma?
     - [ ] prevent food from having out of bounds coords
@@ -65,10 +66,10 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] change foodScale to poopSize and have body size be correlated
     - [X] ~~aggression? family? too much for this version...~~
     - [ ] have minLife/cooldown/percentage correlate in some way? need to prevent viruses?
-    - [ ] population max limiter
+    - [X] population max limiter
     - [ ] total time alive and TOD stats
-    - [ ] minLife negative bug
-    - [ ] saturation threshold so hue doesn't lerp if black/white
+    - [X] minLife negative bug -- needs constrain, did hacky min for now
+    - [X] saturation threshold so hue doesn't lerp if black/white
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
     - [ ] Collapsable Donation List
@@ -116,9 +117,9 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] separate server for db? -- just sends info over when updating and requests info on start
     - [ ] ask matt stuff
     - [ ] reformat backup function ping pong
-    - [ ] test speed if just inserting instead of updating whole thing
-    - [ ] fix callbacks to allow for existing donations log
-    - [ ] if still slow after inserting, just not going to update all the time...
+    - [X] test speed if just inserting instead of updating whole thing
+    - [X] fix callbacks to allow for existing donations log
+    - [X] if still slow after inserting, just not going to update all the time...
     - [ ] should solo insert donations too...
 - [ ] god stuff
     - [ ] user login on server

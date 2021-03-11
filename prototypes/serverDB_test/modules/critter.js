@@ -119,6 +119,13 @@ class Critter {
 
                 //now lerping with intuitive HSL blending -- could use culori but i think this is fine since my use case is so limited
                 let hueLerp;
+                //fixing issue where lerping between black/white (low sat) has weird hue
+                if(parentA.DNA.genes[0][1] < .1 && parentB.DNA.genes[0][1] > .1) {
+                    parentA.DNA.genes[0][0] = parentB.DNA.genes[0][0];
+                } else if (parentB.DNA.genes[0][1] < .1 && parentA.DNA.genes[0][1] > .1) {
+                    parentB.DNA.genes[0][0] = parentA.DNA.genes[0][0];
+                }
+                //now lerp hue across smallest path around ring
                 if(Math.abs(parentA.DNA.genes[0][0] - parentB.DNA.genes[0][0]) >= .5){ //makes sure always takes the shortest path around the hue ring
                     let smallerVal;
                     if(parentA.DNA.genes[0][0] > parentB.DNA.genes[0][0]){
@@ -133,6 +140,7 @@ class Critter {
                 } else {
                     hueLerp = lerp(parentA.DNA.genes[0][0], parentB.DNA.genes[0][0], D.rand_bm(0, 1))
                 }
+                
                 this.DNA.genes[0] = [ //lerping hue normally unless would need to cross over 0, sat and light lerping normally
                     hueLerp,
                     lerp(parentA.DNA.genes[0][1], parentB.DNA.genes[0][1], D.rand_bm(0, 1)),
@@ -186,10 +194,17 @@ class Critter {
             // this.donationRate = D.map(this.DNA.donationRate, 0, 1, 0, 2000); //twice as long as refractory
             this.donationRate = D.map(this.DNA.donationRate, 0, 1, 10000, 3600000);
             this.donationPercentage = this.DNA.donationPercentage;
+            //weird negative bug
             this.minLifeToDonate = D.map(this.DNA.minLifeToDonate, 0, 1, .01, 5);
+            if (this.minLifeToDonate < 0.01) {
+                this.minLifeToDonate = 0.01;
+            }
             this.refractoryPeriod = D.map(this.DNA.refractoryPeriod, 0, 1, 10000, 3600000);
             this.parentalSacrifice = this.DNA.parentalSacrifice;
             this.minLifeToReproduce = D.map(this.DNA.minLifeToReproduce, 0, 1, .01, 5);
+            if (this.minLifeToReproduce < 0.01) {
+                this.minLifeToReproduce = 0.01;
+            }
 
             //timers
             this.mateTimer = Math.floor(Math.random() * 1000 + 100);

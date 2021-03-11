@@ -166,7 +166,9 @@ class Ecosystem {
 
         //feed and fuck
         // this.checkForFood(); //now in run
-        this.checkForMates(mates);
+        if(this.critterCount <= 500) { // arbitrary pop threshold for now
+            this.checkForMates(mates);
+        }
 
         //check for donations/excretions/deaths and then display
         this.critters.forEach( (critter) => {
