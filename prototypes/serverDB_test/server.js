@@ -61,14 +61,14 @@ function init() {
 
 function godsSetup() {
     console.log("looking for gods");
-    godsDB.find({}, (err, docs) => {
+    godsDB.find({type: "godsUpdate"}, (err, docs) => {
         if (err) {
             console.log("god DB error: " + err);
         }
         if (docs.length != 0) {
             //existing users
             let existingGods = [];
-            for (let g of docs) {
+            for (let g of docs[0].gods) { //not doing individual insert yet
                 existingGods.push(g);
             }
             gods = new Gods(existingGods);
@@ -243,20 +243,30 @@ world.on('connection', function(socket){
     if(ecosystem != undefined){
         console.log("world has ecosystem")
         world.emit('fundsUpdate', ecosystem.conduit);
-        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife}); //toFixed...
+        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
         // world.emit("refresh"); //just so reloads if server resets -- nvm it loops, only really need this on my end so w/e
     }
     
     //new event listeners
     //new critter
-    socket.on("newCritter", (data) => {
+    socket.on("newCritter", (data, updates, callback) => {
         if(data == undefined){
             ecosystem.spawnRandomCritter();
         } else {
+            //update gods db funds
+            gods.subtractFunds(updates.username, updates.totalCost);
+            ecosystem.communityFunds += updates.communityFunds;
+            ecosystem.genesisFunds += updates.genesisFunds;
+
+            //create critter
             ecosystem.spawnCritterFromUser(data);
             console.log(`New Critter ${data.name} from ${data.ancestry.parents[0].name}`);
         }
+        callback({
+            funds: gods.checkFunds(updates.username)
+        })
     });
+
     //food sprinkle
     socket.on("newFood", (data) => {
         // console.log("food sprinkle at: " + JSON.stringify(data.position));
@@ -266,16 +276,44 @@ world.on('connection', function(socket){
 
     //critter info query
     socket.on("clickInfo", (data) => {
-        ecosystem.clickInfo(data.position, socket.id);
+        ecosystem.clickInfo(data.position, socket.id); //should just return and emit from here TODO
     });
 
-    //manual backup from console
+    socket.on("login", (data, callback) => {
+        let [loggedIn, god] = gods.login(data.username, data.password);
+        callback({
+            authenticated: loggedIn, god: god
+        });
+        if (loggedIn) {
+            console.log(`log in from ${god.username}`);
+        }
+    });
+
+    // socket.on("checkFunds", (data) => {
+    //     // console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
+    //     let funds = gods.checkFunds(data.username); 
+    //     socket.emit("userFundsUpdate", {funds: funds});
+    // });
+    
+
+    //secret console commands
     socket.on("backup", () => {
         backupEcosystem();
         backupGods();
         backupDonations();
         ecosystemDB.persistence.compactDatafile();
+    });
 
+    socket.on("addGod", (data) => {
+        console.log(`Adding God: ${data.username} -- ${data.password}`);
+        gods.addGod(data.username, data.password);
+        backupGods();
+    });
+
+    socket.on("addFunds", (data) => {
+        console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
+        gods.addFunds(data.username, data.amount); //ah wait, don't need to emit back because not user's client...
+        backupGods();
     });
 
     //listen for this client to disconnect

@@ -154,6 +154,16 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] whats with the weird hyper speed (lerp to catch up?)
 
 
+Before Playtest:
+- [ ] change default funds to 0
+- [ ] add users
+- [ ] add starting funds
+- [ ] start OBS and mic recording
+
+During Playtest:
+
+After Playtest:
+
 Feedback questions:
     - Giving
         - Do you give to charity? Why/why not, if so, how much, to whom, why?

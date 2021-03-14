@@ -18,6 +18,11 @@ socket.on('fundsUpdate', (conduit) => {
     ecosystemSketch.monitorFunds();
 });
 
+// socket.on('userFundsUpdate', (data) => { //need to rename stuff
+//     console.log("updating user funds")
+//     userData.funds = data.funds;
+// });
+
 // socket.on('fundsUpdate', (conduit) => {
 //     let fundsUpdate = conduit.fundsRaised;
 //     // console.log('funds: ');
@@ -35,11 +40,12 @@ socket.on('fundsUpdate', (conduit) => {
 
 socket.on('statsUpdate', (update) => {
     // console.log(typeof update.worldLife);
-    // console.log(update);
+    console.log(update);
     // console.log(update.critterCount);
     // console.log(update.worldLife);
     ecosystemSketch.stats.critterCount = update.critterCount;
     ecosystemSketch.stats.worldLife = update.worldLife;
+    ecosystemSketch.stats.communityFunds = update.communityFunds;
 });
 
 socket.on('clickInfo', (data) => {

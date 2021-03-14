@@ -571,6 +571,12 @@ let creationInstance = function(c) { //should change to c?
             //update funds in mainSketch
             // userData.funds -= newCritter.life; //nvm only if placed
 
+            //update the object that will be sent to server to update funds
+            updates.username = userData.username;
+            updates.totalCost = totalCost;
+            updates.communityFunds = editsTotal + equTax;
+            updates.genesisFunds = genTax;
+
             //close menu and go back to ecosystem to plop down
             mainSketch.modeButton.html('Abort Critter');
             c.select("#creationSpan").hide();
