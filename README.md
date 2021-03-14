@@ -43,8 +43,8 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] update funds object in server with new targets
     - [X] life in world update on critter life
     - [X] critter donation update
-- [ ] Critter Creation pt. 2
-    - [ ] point buy system
+- [X] Critter Creation pt. 2
+    - [X] point buy system
 - [ ] Critter misc unessential
     - [X] name crossover and min/max
     - [ ] name abuse prevention
@@ -67,7 +67,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] navigable family tree
     - [ ] change foodScale to poopSize and have body size be correlated
     - [X] ~~aggression? family? too much for this version...~~
-    - [ ] have minLife/cooldown/percentage correlate in some way? need to prevent viruses?
+    - [X] have minLife/cooldown/percentage correlate in some way? need to prevent viruses?
     - [X] population max limiter
     - [ ] total time alive and TOD stats
     - [X] minLife negative bug -- needs constrain, did hacky min for now
@@ -118,7 +118,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] fix db update pausing whole thing -- why if async? test seaparating critter info / culling huge object
     - [ ] separate server for db? -- just sends info over when updating and requests info on start
     - [ ] ask matt stuff
-    - [ ] reformat backup function ping pong
+    - [ ] reformat backup function ping pong (parameter instead)
     - [X] test speed if just inserting instead of updating whole thing
     - [X] fix callbacks to allow for existing donations log
     - [X] if still slow after inserting, just not going to update all the time...

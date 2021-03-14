@@ -15,6 +15,9 @@ let userData = {
     funds: 10.00
 }
 
+let edits = 0;
+let editsCost = 0.01;
+
 let newCritter = {
     // this.id = critter.id;
     // this.DNA = critter.DNA;
@@ -32,12 +35,14 @@ let newCritter = {
     // color: 
     r: 0.5,
     maxSpeed: 0.5,
-    donationRate: 300000,
-    donationPercentage: .5,
-    minLifeToDonate: .5,
-    refractoryPeriod: 300000,
-    parentalSacrifice: .5,
-    minLifeToReproduce: .5,
+    // donationRate: 300000,
+    donationRate: 16000,
+    donationPercentage: .8,
+    minLifeToDonate: .8,
+    // refractoryPeriod: 300000,
+    refractoryPeriod: 16000,
+    parentalSacrifice: .8,
+    minLifeToReproduce: .8,
     // this.excretionRate = critter.excretionRate;
     // this.mutationRate = critter.mutationRate;
     // this.mateTimer = critter.mateTimer;
