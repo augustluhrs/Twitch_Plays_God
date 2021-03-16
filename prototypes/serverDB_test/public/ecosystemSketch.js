@@ -41,6 +41,24 @@ let ecosystemInstance = function(e) {
         textSize: 25
     }
     e.isDisplayingInfo = false;
+
+    //acts of god stuff
+    e.actState = "";
+    e.timeLeft = 60;
+    e.eventButton;
+    e.godPanelDiv;
+    e.showGodPanel = false;
+    e.godPanel = {
+        x: -(3 * page.width / 16),
+        y: (page.height / 2) - .25 * page.height / 9,
+        width: 6 *  page.width / 16, 
+        height: 6 * page.height / 9,
+        rightEdge: 0, 
+        edgeMax: (6 *  page.width / 16) + (.25 * page.width / 16),
+        fadeSpeed: 30
+    }
+    // let godPanel;
+    
     
 
     //assets
@@ -64,6 +82,29 @@ let ecosystemInstance = function(e) {
         monitor.position.y = e.height - monitor.size.h
 
         infoGraphics = e.createGraphics(e.overlay.w, e.overlay.h);
+
+        //act of god event stuff
+        e.godPanelDiv = e.createDiv()
+            .id("godPanelDiv")
+            .parent('ecosystemCanvas')
+        e.eventButton = e.createButton('BE GOD')
+            .parent("godPanelDiv")
+            .class("button")
+            .id("eventButton")
+            .position(.75 * e.width / 16, 8.5 * e.height / 9)
+            .mousePressed(() => {
+                e.showGodPanel = !e.showGodPanel;
+                if (e.showGodPanel) { //bring out panel
+                    // e.panelFade("in", e.godPanel.x);
+                    e.godPanel.dir = "in";
+                    e.eventButton.html("HIDE PANEL");
+                } else { //hide panel
+                    e.eventButton.html("BE GOD");
+                    e.godPanel.dir = "out";
+                    // e.panelFade("out", e.godPanel.x);
+                }
+            });
+        
 
         //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
         let listWidth = e.width / 6 + "px";
@@ -100,6 +141,8 @@ let ecosystemInstance = function(e) {
             // e.monitorFunds(); //now only doing this when getting a funds update
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
+            e.displayTimerAndState();
+            e.drawGodPanel();
             if (e.isReadyToSpawn) {
                 // only shows after create Critter button pressed
                 notFirstClick++;
@@ -114,8 +157,13 @@ let ecosystemInstance = function(e) {
                 // e.noStroke();
                 e.ellipse(e.mouseX, e.mouseY, e.map(newCritter.r, 0, 1, 5, 50));
                 e.pop();
-            } else if(e.isDisplayingInfo) {
-                e.displayInfoOverlay(e.overlay.critter)
+            } else {
+                if(e.isDisplayingInfo) {
+                    e.displayInfoOverlay(e.overlay.critter);
+                }
+                // if(e.showGodPanel) {
+                //     e.drawGodPanel();
+                // }
             }
         } else {
             e.textSize(100);
@@ -133,7 +181,9 @@ let ecosystemInstance = function(e) {
                     //send server the critter info and funds updates, then update funds it sends back
                     newCritter.positionArray = [e.mouseX, e.mouseY];
                     socket.emit("newCritter", newCritter, updates, (response) => {
-                        userData.funds = parseFloat(response.funds.toFixed(2)); //not sure if still need these but don't want to risk it
+                        if (response.funds != undefined) { //just incase not logged in
+                            userData.funds = parseFloat(response.funds.toFixed(2)); //not sure if still need these but don't want to risk it
+                        }
                     }); 
                     
                     //update user data in server -- for now just mainSketch obj
@@ -145,6 +195,7 @@ let ecosystemInstance = function(e) {
                     e.isCreating = false;
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    e.godPanelDiv.show();
                     document.getElementById("orgList").style.display = "inherit"; //brings back org list, no idea what the style it's inheriting is
                     mainSketch.modeButton.html("Create New Critter");
                     notFirstClick = 0;
@@ -153,7 +204,7 @@ let ecosystemInstance = function(e) {
             //for checking critter info
             if (e.isDisplayingInfo) {
                 e.isDisplayingInfo = false;
-            } else {
+            } else if (!e.showGodPanel) {
                 socket.emit("clickInfo", {position: {x: e.mouseX, y: e.mouseY}});
             }
         }
@@ -295,6 +346,73 @@ let ecosystemInstance = function(e) {
         e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 4 * e.width / 5, e.height - 50); //need to make sure it's a float everytime I want to round?
     }
 
+    //god panel
+    e.drawGodPanel = () => {
+        e.push();
+        e.panelFade();
+        e.fill(247, 193, 187, 200); //baby pink, slight transparency
+        e.rect(e.godPanel.x, e.godPanel.y, e.godPanel.width, e.godPanel.height);
+        //depending on event, diff panel:
+        switch(e.actState){
+            case "voting":
+                break;
+            case "feast":
+                break;
+            case "famine":
+                break;
+            case "creation":
+                break;
+            case "meltdown":
+                break;
+            case "fire":
+                break;
+            case "flood":
+                break;
+            case "lightning":
+                break;
+            default:
+                console.log("something weird happening with panel state")
+        }
+        
+        
+        e.pop();
+    }
+
+    e.panelFade = () => {
+        let dir = e.godPanel.dir;
+        if (dir == "in") {
+            if (e.godPanel.rightEdge < e.godPanel.edgeMax){
+                e.godPanel.x += e.godPanel.fadeSpeed;
+                e.godPanel.rightEdge += e.godPanel.fadeSpeed;
+                // for (let child of godPanel.children) {
+                //     child.
+                // }
+                // e.panelFade("in", e.godPanel.rightEdge); //too fast
+            } else {
+                return;
+            }
+        } else {
+            if (e.godPanel.rightEdge > 0){
+                e.godPanel.x -= e.godPanel.fadeSpeed;
+                e.godPanel.rightEdge -= e.godPanel.fadeSpeed;
+                // e.panelFade("out", e.godPanel.rightEdge);
+            } else {
+                return;
+            }
+        }
+    }
+
+    e.displayTimerAndState = () => {
+        e.push();
+        e.textAlign(e.LEFT, e.CENTER);
+        e.fill(0);
+        e.text(`Act of God: ${e.actState}`, .25 * e.width / 16, e.height / 9);
+        e.text(`Next Event: ${e.timeLeft}`, .25 * e.width / 16, 8 * e.height / 9);
+        e.pop();
+    }
+
+    //click info overlay
+
     e.displayInfoOverlay = (critter) => {
         infoGraphics.push();
         infoGraphics.clear();
@@ -396,4 +514,6 @@ let ecosystemInstance = function(e) {
         e.colorMode(e.RGB); //whyyyyy
         infoGraphics.pop();
     }
+
+    
 }

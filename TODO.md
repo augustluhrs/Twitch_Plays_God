@@ -81,13 +81,28 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] disclaimer and legal info
     - [ ] foundations with links are verified, eventually send non-verified names to checker
     - [ ] look into "em" instead of px
+    - [ ] click username button to get your stats
+    - [ ] change all relative positions to 16:9
+    - [ ] turn donations list into fade panel too
 - [ ] basics page / tutorial / help
-- [ ] community effects
-    - [ ] brainstorm playtestable community effect prototypes
-    - [ ] food sprinkle
+- [ ] community effects / ACTS OF GOD
+    - [X] brainstorm playtestable community effect prototypes
+    - [ ] food sprinkle (feast)
+    - [ ] famine (all poop goes to community funds)
     - [ ] community critter generation
+    - [ ] radioactive waste (area that increases mutation rate)
+    - [ ] fire (area that reduces life -- goes to funds or else will draw in)
+    - [ ] flood (all critters lose health)
+    - [ ] lightning strike (one critter instantly dies)
+    - [X] ~~ranked choice voting system~~ Condorcet-Lite Voting
+    - [X] timer for rounds
+    - [X] current state in top left
+    - [ ] last state effects
+    - [ ] participation button / submit votes button
+    - [ ] send votes to server
+    - [X] god panel fades in
+    - [ ] test manipulating the flocking sliders as a choice
     - [ ] fertilization battle royale minigame
-    - [ ] ranked choice voting system
 - [ ] backend updates
     - [X] change dbs -- one for static critter info (could have more stats too like time of death and total lifespan, ancestry details, etc.)
     - [X] one for dynamic eco data
@@ -98,12 +113,12 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] ask matt stuff
     - [ ] reformat backup function ping pong (parameter instead)
     - [X] test speed if just inserting instead of updating whole thing
-    - [X] fix callbacks to allow for existing donations log
+    - [X] fix callbacks to allow for existing donations log (had to redo)
     - [X] if still slow after inserting, just not going to update all the time...
     - [ ] should solo insert donations too...
 - [ ] god stuff
-    - [ ] user login on server
-    - [ ] user login client-side
+    - [X] user login on server
+    - [X] user login client-side
     - [ ] user donation leaderboard
     - [ ] user community interaction leaderboard
     - [ ] leaderboard filter by org
@@ -116,7 +131,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] user log in
     - [ ] initial playtest
     - [ ] ethics playtest/check-in
-    - [ ] reduce timers
+    - [X] reduce timers
 - [ ] Documentation
     - [ ] get media
     - [ ] update github with current project status and media
@@ -137,6 +152,7 @@ Before Playtest:
 - [ ] add users
 - [ ] add starting funds
 - [ ] start OBS and mic recording
+- [ ] clear DBs
 
 During Playtest:
 

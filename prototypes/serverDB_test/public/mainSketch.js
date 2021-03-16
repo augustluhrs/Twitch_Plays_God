@@ -99,6 +99,7 @@ let mainInstance = (m) => {
                     creationSketch = new p5(creationInstance, 'creationCanvas');
                     m.modeButton.html("Back To The World")
                     document.getElementById("orgList").style.display = "none";
+                    ecosystemSketch.godPanelDiv.hide();
 
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
@@ -106,6 +107,8 @@ let mainInstance = (m) => {
                     m.modeButton.html("Create New Critter")
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    ecosystemSketch.godPanelDiv.show();
+
                     ecosystemSketch.isReadyToSpawn = false;
                     ecosystemSketch.monitorFunds(); //to make list pop back up
 

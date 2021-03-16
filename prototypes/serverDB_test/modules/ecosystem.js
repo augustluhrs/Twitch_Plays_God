@@ -54,8 +54,8 @@ class Ecosystem {
             this.critterCount = 0;
 
             //community funds
-            this.communityFunds = 0;
-            this.genesisFunds = 0;
+            this.communityFunds = ecoSetup.ecosystem.communityFunds;
+            this.genesisFunds = ecoSetup.ecosystem.genesisFunds;
 
             
             //this is the same after db update

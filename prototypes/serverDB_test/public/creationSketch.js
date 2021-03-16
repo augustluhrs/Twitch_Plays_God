@@ -595,7 +595,7 @@ let creationInstance = function(c) { //should change to c?
         totalTicks += c.abs(sliderDefaults.matingCooldown - matingCooldownSlider.value()) / sliderDefaults.cooldownTick;
         totalTicks += c.abs(sliderDefaults.matingPercentage - matingPercentageSlider.value()) / sliderDefaults.tick;
         totalTicks += c.abs(sliderDefaults.matingMinLife - matingMinLifeSlider.value()) / sliderDefaults.tick;
-        console.log(totalTicks);
+        // console.log(totalTicks);
         edits = totalTicks;
 
         if(totalTicks < 10) {
