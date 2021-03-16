@@ -3,6 +3,7 @@
 ### Short Term Goals
 
 **Feb 2021 Update** -- Cont. into March
+
 Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
 
 - [X] Critter Creation
