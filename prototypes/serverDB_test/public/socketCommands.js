@@ -47,6 +47,11 @@ socket.on('timer', (data) => {
 socket.on('currentAct', (data) => {
     console.log("current act: " + data.actState);
     ecosystemSketch.actState = data.actState;
+    if (data.actState != "voting"){
+        for (let rank of ecosystemSketch.ranks) {
+            rank.hide();
+        }
+    }
 });
 
 // socket.on('refresh', () => {

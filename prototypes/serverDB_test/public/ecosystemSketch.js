@@ -49,23 +49,29 @@ let ecosystemInstance = function(e) {
     e.godPanelDiv;
     e.showGodPanel = false;
     e.godPanel = {
-        x: -(3 * page.width / 16),
+        x: -(2.5 * page.width / 16),
         y: (page.height / 2) - .25 * page.height / 9,
-        width: 6 *  page.width / 16, 
+        width: 5 *  page.width / 16, 
         height: 6 * page.height / 9,
         rightEdge: 0, 
-        edgeMax: (6 *  page.width / 16) + (.25 * page.width / 16),
+        edgeMax: (5 *  page.width / 16) + (.25 * page.width / 16),
         fadeSpeed: 30
     }
     // let godPanel;
-    
+    //voting
+    e.helpIcon;
+    e.isShowingVotingHelp = false;
+    e.ranks = [];
+    // let rank1, rank2, rank3, rank4, rank5, rank6, rank7;
+    e.particiationCheckbox;
     
 
     //assets
     let godIcon;
     e.preload = () => {
-        monitor.shape = e.loadImage("assets/rounded_rectangle.png");
+        // monitor.shape = e.loadImage("assets/rounded_rectangle.png");
         godIcon = e.loadImage("assets/godIcon.jpg"); 
+        // questionIcon = e.loadImage("assets/question.png");
     }
 
     e.setup = () => {
@@ -98,13 +104,63 @@ let ecosystemInstance = function(e) {
                     // e.panelFade("in", e.godPanel.x);
                     e.godPanel.dir = "in";
                     e.eventButton.html("HIDE PANEL");
+                    for (let d of e.ranks) {
+                        d.hide();
+                    }
                 } else { //hide panel
                     e.eventButton.html("BE GOD");
                     e.godPanel.dir = "out";
                     // e.panelFade("out", e.godPanel.x);
+                    if (e.actState == "voting") {
+                        for (let d of e.ranks) {
+                            d.show();
+                        }
+                    }
                 }
             });
+
+        //voting event
+        e.particiationCheckbox = e.createCheckbox('Participating in Next Act of God', false)
+            .position(e.godPanel.x + 4 * e.godPanel.width / 4 , page.height / 8 + (e.godPanel.y - e.godPanel.height / 2) + 3 * e.godPanel.height / 30);
+        e.particiationCheckbox.hide();
+        for(let i = 0; i < 7; i++){
+            let newRankDropdown = e.createSelect();
+            //will be undefined for some reason if we do this here
+                // .id(`rank${i}`)
+                // .parent('godPanelDiv')
+                // .class('whitebox')
+                // .size(2 * e.godPanel.width / 4, e.godPanel.height / 14)
+                // .position(e.godPanel.x + e.godPanel.width, (e.godPanel.y - e.godPanel.height / 2) + (8 + (2*i)) * e.godPanel.height / 30)
+                // .changed(e.rankingChange)
+                // .option("none")
+            // console.log(newRankDropdown)
+            e.ranks.push(newRankDropdown);
+        }
+        for (let [i, dropdown] of e.ranks.entries()) {
+            dropdown.id(`rank${i}`)
+                .parent('godPanelDiv')
+                .class('whitebox')
+                .size(2 * e.godPanel.width / 4, e.godPanel.height / 21)
+                //ugh forgot this is to page not canvas
+                .position(e.godPanel.x + 3 * e.godPanel.width / 4 , (e.godPanel.y - e.godPanel.height / 2) + (11 + (3*i)) * e.godPanel.height / 30)
+                .changed(e.rankingChange)
+                .option("none");
+                // .hide();
+            dropdown.hide();
+        }
         
+        e.helpIcon = e.createImg("assets/question.png", "help icon")
+            .parent("godPanelDiv")
+            .position(e.godPanel.x + 4 * e.godPanel.width / 3, e.godPanel.y + 3.5 * e.godPanel.height / 6)
+            .mouseOver(() => {
+                e.isShowingVotingHelp = true;
+                // console.log('on')
+            })
+            .mouseOut(() => {
+                e.isShowingVotingHelp = false;
+                // console.log('off')
+            });
+        e.helpIcon.hide();
 
         //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
         let listWidth = e.width / 6 + "px";
@@ -142,7 +198,9 @@ let ecosystemInstance = function(e) {
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
             e.displayTimerAndState();
+            // if(e.showGodPanel){ //need this for fade to work right
             e.drawGodPanel();
+            // }
             if (e.isReadyToSpawn) {
                 // only shows after create Critter button pressed
                 notFirstClick++;
@@ -355,6 +413,23 @@ let ecosystemInstance = function(e) {
         //depending on event, diff panel:
         switch(e.actState){
             case "voting":
+                //draw the rankings, participation checkbox, and help tooltip
+                // e.image(helpIcon, e.godPanel.x, e.godPanel.y + 2 * e.godPanel.height / 6);
+                for (let [i, rank] of e.ranks.entries()) {
+                    // rank.show();
+                    e.push();
+                    e.fill(21, 96, 100);
+                    e.textAlign(e.CENTER, e.CENTER);
+                    e.text(i+1, e.godPanel.x - 3 * e.godPanel.width / 8 , (e.godPanel.y - e.godPanel.height / 2) + (6 + (3*i)) * e.godPanel.height / 30);
+                    e.pop();
+                }
+                
+                if(e.isShowingVotingHelp){
+                    e.push();
+                    e.fill(238, 232, 44);
+                    e.rect(e.godPanel.rightEdge + e.godPanel.width / 9, e.godPanel.y, 3 * page.width / 16, 4 * page.height / 9);
+                    e.pop();
+                }
                 break;
             case "feast":
                 break;
@@ -389,9 +464,20 @@ let ecosystemInstance = function(e) {
                 // }
                 // e.panelFade("in", e.godPanel.rightEdge); //too fast
             } else {
+                //at end of fade
+                e.particiationCheckbox.show();
+                for (let dropdown of e.ranks){
+                    dropdown.show();
+                }
+                e.helpIcon.show();
                 return;
             }
         } else {
+            e.particiationCheckbox.hide();
+            for (let dropdown of e.ranks){
+                dropdown.hide();
+            }
+            e.helpIcon.hide();
             if (e.godPanel.rightEdge > 0){
                 e.godPanel.x -= e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge -= e.godPanel.fadeSpeed;
@@ -409,6 +495,10 @@ let ecosystemInstance = function(e) {
         e.text(`Act of God: ${e.actState}`, .25 * e.width / 16, e.height / 9);
         e.text(`Next Event: ${e.timeLeft}`, .25 * e.width / 16, 8 * e.height / 9);
         e.pop();
+    }
+
+    e.rankingChange = () => {
+        console.log('rank change');
     }
 
     //click info overlay

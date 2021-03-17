@@ -348,7 +348,7 @@ setInterval( () => {
     }
     //trigger next event
     if (timeLeft <= -3 && lastState != actState){ //now waiting 3 seconds for all "voting" event messages
-        setupNextRound();
+        // setupNextRound();
     }
 }, 500);
 
