@@ -51,7 +51,20 @@ socket.on('currentAct', (data) => {
         for (let rank of ecosystemSketch.ranks) {
             rank.hide();
         }
+    } else {
+        //when start of new voting round, turn off participation by default
+        if (ecosystemSketch.participationCheckbox != undefined) { //event happens before setup
+            ecosystemSketch.participationCheckbox.value(false);
+        }
     }
+});
+
+socket.on('getVotes', (data) => {
+    // if (ecosystemSketch.participationCheckbox.checked()){
+    //only send votes if participating -- nvm, need to reset user array in server
+    let [isParticipating, votes] = ecosystemSketch.sendVotes();
+    socket.emit("voting", {isParticipating: isParticipating, rankings: votes});
+    // }
 });
 
 // socket.on('refresh', () => {

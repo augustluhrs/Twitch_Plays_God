@@ -63,6 +63,7 @@ let timerStart = Date.now();
 // let timerVoting = 60; //60 seconds
 let actState = "voting";
 let lastState = "";
+let hasAskedForVotes = false;
 
 /*
     ~ * ~ * ~ * MAIN FUNCTION
@@ -235,6 +236,10 @@ world.on('connection', function(socket){
             ecosystem.communityFunds += updates.communityFunds;
             ecosystem.genesisFunds += updates.genesisFunds;
 
+            //add orgs to donations conduit so they'll show even if no donations yet
+            // ecosystem.conduit.makeDonation(data.donations);
+            //nvm, already a checkTargets function, just going to emit a fundsupdate from there
+
             //create critter
             ecosystem.spawnCritterFromUser(data);
             console.log(`New Critter ${data.name} from ${data.ancestry.parents[0].name}`);
@@ -270,7 +275,7 @@ world.on('connection', function(socket){
     socket.on("voting", (data) => { //will send automatically if checked at 0, so timer needs to end past 0 to wait for these
         for (let user of users) {
             if (user.id == socket.id){
-                user.isParticipating = true;
+                user.isParticipating = data.isParticipating;
                 user.rankings = data.rankings;
             }
         }
@@ -347,8 +352,12 @@ setInterval( () => {
         io.emit("timer", {timeLeft: timeLeft});
     }
     //trigger next event
+    if (timeLeft <= 0 && !hasAskedForVotes){ //prob a better way of doing this -- could do it clientside off timer, but want to make sure only happens once from server
+        io.emit("getVotes");
+        hasAskedForVotes = true;
+    }
     if (timeLeft <= -3 && lastState != actState){ //now waiting 3 seconds for all "voting" event messages
-        // setupNextRound();
+        setupNextRound();
     }
 }, 500);
 
@@ -362,6 +371,7 @@ function setupNextRound(){
     } else {
         //reset after round is over
         actState = "voting";
+        hasAskedForVotes = false;
     }
     timerStart = Date.now();
     io.emit("currentAct", {actState: actState});
@@ -411,14 +421,19 @@ function condorcetTabulation(){
         flood: 0,
         lightning: 0
     }
+    // let [winner, totals] = countVotes(votes, round, voteTotals);
     let winner = countVotes(votes, round, voteTotals);
+    // console.log(`winner: ${winner}, totals: ${totals}`)
+    console.log("winner: " + winner);
     return winner;
 }
 
 function countVotes(votes, round, voteTotals){ //recursive function that runs until majority or default winner
+    // console.log(`round: ${round}, totalsSoFar: ${JSON.stringify(voteTotals)}`);
     let isLastRound = true; //to make sure will end even if no majority
     for (let vote of votes) { //each array of rankings
-        if (vote[round] != undefined) { //to account for diff num of rankings
+        // if (vote[round] != undefined) { //to account for diff num of rankings
+        if (vote[round] != "none") { //nvm will always have 7, need to check against "none"
             voteTotals[vote[round]] += 1;
             isLastRound = false;
         }
@@ -427,13 +442,17 @@ function countVotes(votes, round, voteTotals){ //recursive function that runs un
     let sortedVotes = Object.entries(voteTotals).sort( (a, b) => { //array of array of key value pairs
         return b[1] - a[1]; //because value of pair is second element in array
     });
-
+    // console.log(JSON.stringify(sortedVotes));
     if (sortedVotes[0][1] > votes.length / 2 || isLastRound) {//majority or no more votes
         // if no more votes to count, just send one with most votes (yes, if tie, it's arbitrary)
+        // return [sortedVotes[0][0], voteTotals];
+        // console.log("ending tabulation");
+        // console.log(sortedVotes[0][0]);
         return sortedVotes[0][0];
     } else {
         round++;
-        countVotes(votes, round, voteTotals);
+        return countVotes(votes, round, voteTotals); //okay i didn't understand recursion, this needs a return too
+        // return [null, null]; //????
     }
     //  else if (!isLastRound) {
     //     round++;

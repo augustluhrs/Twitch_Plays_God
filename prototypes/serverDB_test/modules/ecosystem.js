@@ -228,8 +228,9 @@ class Ecosystem {
     spawnCritterFromUser(critter) {
         //create critter and check Conduit
         this.critters.push(new Critter("user", critter));
-        this.conduit.checkNewCritterTargets(critter.donations) //other donation stuff happens in .deposit()
-
+        if (this.conduit.checkNewCritterTargets(critter.donations)){ //other donation stuff happens in .deposit()
+            world.emit("fundsUpdate", this.conduit); //just if new orgs to add to creation menu
+        }
         //update stats
         this.critterCount++;
         this.worldLife += critter.life;

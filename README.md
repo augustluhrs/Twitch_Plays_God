@@ -35,6 +35,8 @@ Want to help me make this thing? Feel free to add/suggest whatever! Currently lo
 ## Voting Design
 I chose to implement a simplified Concordet method as opposed to my initial belief that Instant Runoff (Ranked-Choice) Voting was the most democratic. RCV has a significant flaw in that the preferences of more extreme voters are given more weight, so in my Concordet-lite voting system, if there isn't a majority after everyone's first choice is considered, *all* second choices are tallied, not just those whose first choice was the least popular. 
 
+I'll defintely consider and test the option for the community to vote on their own voting system also, big fan of how Twitch Plays Pokemon did the anarchy/democracy system.
+
 Check out these two videos for more interesting voting system analyses:
 
 [Four Voting Systems: TED-Ed](https://www.youtube.com/watch?v=PaxVCsnox_4)

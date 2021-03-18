@@ -55,15 +55,15 @@ let ecosystemInstance = function(e) {
         height: 6 * page.height / 9,
         rightEdge: 0, 
         edgeMax: (5 *  page.width / 16) + (.25 * page.width / 16),
-        fadeSpeed: 30
+        fadeSpeed: 40
     }
     // let godPanel;
     //voting
     e.helpIcon;
     e.isShowingVotingHelp = false;
     e.ranks = [];
-    // let rank1, rank2, rank3, rank4, rank5, rank6, rank7;
-    e.particiationCheckbox;
+    e.participationCheckbox;
+    e.acts = ["feast", "famine", "creation", "meltdown", "fire", "flood", "lightning"];
     
 
     //assets
@@ -120,9 +120,10 @@ let ecosystemInstance = function(e) {
             });
 
         //voting event
-        e.particiationCheckbox = e.createCheckbox('Participating in Next Act of God', false)
+        e.participationCheckbox = e.createCheckbox('Participating in Next Act of God', false)
+            .id("participationCheckbox")
             .position(e.godPanel.x + 4 * e.godPanel.width / 4 , page.height / 8 + (e.godPanel.y - e.godPanel.height / 2) + 3 * e.godPanel.height / 30);
-        e.particiationCheckbox.hide();
+        e.participationCheckbox.hide();
         for(let i = 0; i < 7; i++){
             let newRankDropdown = e.createSelect();
             //will be undefined for some reason if we do this here
@@ -146,12 +147,16 @@ let ecosystemInstance = function(e) {
                 .changed(e.rankingChange)
                 .option("none");
                 // .hide();
+            for (let act of e.acts){
+                dropdown.option(act);
+            }
+            dropdown.selected("none");
             dropdown.hide();
         }
         
         e.helpIcon = e.createImg("assets/question.png", "help icon")
             .parent("godPanelDiv")
-            .position(e.godPanel.x + 4 * e.godPanel.width / 3, e.godPanel.y + 3.5 * e.godPanel.height / 6)
+            .position(e.godPanel.x + 4 * e.godPanel.width / 3, e.godPanel.y + 3.7 * e.godPanel.height / 7)
             .mouseOver(() => {
                 e.isShowingVotingHelp = true;
                 // console.log('on')
@@ -465,7 +470,7 @@ let ecosystemInstance = function(e) {
                 // e.panelFade("in", e.godPanel.rightEdge); //too fast
             } else {
                 //at end of fade
-                e.particiationCheckbox.show();
+                e.participationCheckbox.show();
                 for (let dropdown of e.ranks){
                     dropdown.show();
                 }
@@ -473,7 +478,7 @@ let ecosystemInstance = function(e) {
                 return;
             }
         } else {
-            e.particiationCheckbox.hide();
+            e.participationCheckbox.hide();
             for (let dropdown of e.ranks){
                 dropdown.hide();
             }
@@ -497,8 +502,27 @@ let ecosystemInstance = function(e) {
         e.pop();
     }
 
-    e.rankingChange = () => {
-        console.log('rank change');
+    e.rankingChange = (elem) => { //nice! it contains a reference to the element that called it!!
+        //if other dropdowns have the most recently selected option, reset them
+        let updatedDropdown = e.select(`#${elem.srcElement.id}`);
+        for (let dropdown of e.ranks){
+            if (dropdown.elt.id != updatedDropdown.elt.id && 
+                dropdown.value() == updatedDropdown.value()){
+                    dropdown.selected("none");
+                }
+        }
+        //make sure auto participates if changes
+        e.participationCheckbox.checked(true);
+        // console.log(e.participationCheckbox.checked());
+    }
+
+    e.sendVotes = () => {
+        let votes = [];
+        for (let dropdown of e.ranks) {
+            votes.push(dropdown.selected());
+        }
+        console.log("sending votes: " + votes);
+        return [e.participationCheckbox.checked(), votes]; //send votes even if not participating
     }
 
     //click info overlay
