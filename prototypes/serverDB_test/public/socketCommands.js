@@ -44,17 +44,27 @@ socket.on('timer', (data) => {
     ecosystemSketch.timeLeft = data.timeLeft;
 });
 
-socket.on('currentAct', (data) => {
+socket.on('currentAct', (data) => { //this is real messy but gotta run with it for now
     console.log("current act: " + data.actState);
     ecosystemSketch.actState = data.actState;
-    if (data.actState != "voting"){
-        for (let rank of ecosystemSketch.ranks) {
-            rank.hide();
+    if(ecosystemSketch.hasSetup){ //to prevent undefined errors
+        if (data.actState != "voting"){
+            ecosystemSketch.participationCheckbox.hide();
+            for (let rank of ecosystemSketch.ranks) {
+                rank.hide();
+            }
+            ecosystemSketch.helpIcon.hide();
+        } else {
+            //when start of new voting round, turn off participation by default
+            // if (ecosystemSketch.participationCheckbox != undefined) { //event happens before setup
+                // ecosystemSketch.participationCheckbox.show();
+            ecosystemSketch.participationCheckbox.checked(false);
+            // }
         }
-    } else {
-        //when start of new voting round, turn off participation by default
-        if (ecosystemSketch.participationCheckbox != undefined) { //event happens before setup
-            ecosystemSketch.participationCheckbox.value(false);
+        if (data.actState == "feast") {
+            ecosystemSketch.isFeast = true;
+        } else {
+            ecosystemSketch.isFeast = false;
         }
     }
 });
@@ -66,6 +76,10 @@ socket.on('getVotes', (data) => {
     socket.emit("voting", {isParticipating: isParticipating, rankings: votes});
     // }
 });
+
+socket.on("feastMovement", (data) => {
+    ecosystemSketch.allIcons.feastIcons = data;
+})
 
 // socket.on('refresh', () => {
 //     location.reload();
