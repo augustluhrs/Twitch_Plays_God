@@ -256,9 +256,18 @@ class Ecosystem {
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
     }
 
-    makeFood(amount, pos) {
-        this.supply.push(new Food(amount, pos));
-        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
+    makeFood(source, amount, pos) {
+        if (source == "communityFunds") {
+            if(this.communityFunds > amount) {
+                this.supply.push(new Food(amount, pos));
+                this.worldLife += amount;
+                this.communityFunds -= amount;
+                world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
+            } else {
+                console.log("not enough community funds to sprinkle");
+            }
+            
+        }
     }
 
     //critter dies, splice from critters and add corpse

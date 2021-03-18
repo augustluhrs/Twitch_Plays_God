@@ -48,7 +48,9 @@ let donationsDB = new Datastore({filename: "databases/donations.db", autoload: t
 const Gods = require("./modules/gods");
 let gods;
 let users = []; //need to track who's participating in the events
-
+let userIcons = {
+    feastIcons: [],
+}
 //ecosystem
 const Ecosystem = require("./modules/ecosystem");
 let ecosystem;
@@ -250,11 +252,11 @@ world.on('connection', function(socket){
     });
 
     //food sprinkle
-    socket.on("newFood", (data) => {
-        // console.log("food sprinkle at: " + JSON.stringify(data.position));
-        ecosystem.worldLife += 100;
-        ecosystem.makeFood(100, data.position);
-    });
+    // socket.on("newFood", (data) => {
+    //     // console.log("food sprinkle at: " + JSON.stringify(data.position));
+    //     ecosystem.worldLife += 100;
+    //     ecosystem.makeFood(100, data.position);
+    // });
 
     //critter info query
     socket.on("clickInfo", (data) => {
@@ -279,7 +281,30 @@ world.on('connection', function(socket){
                 user.rankings = data.rankings;
             }
         }
-    })
+    });
+
+    socket.on("feastMovement", (data) => {
+        let isNewUser = true;
+        for (let user of userIcons.feastIcons) {
+            if (user.id == socket.id) {
+                isNewUser = false;
+                user.icon = data.icon;
+                user.mouseX = data.mouseX;
+                user.mouseY = data.mouseY;
+            }
+        }
+        if (isNewUser) {
+            userIcons.feastIcons.push({id: socket.id, mouseX: data.mouseX, mouseY: data.mouseY, icon: data.icon})
+        }
+    });
+
+    socket.on("foodSprinkle", (data) => {
+        // if (data.source == "communityFunds") {
+            //defaults to 0.01 since just during feast for now
+            let amount = 0.01;
+            ecosystem.makeFood(data.source, amount, data.position);
+        // }
+    });
 
 
     // socket.on("checkFunds", (data) => {
@@ -333,6 +358,11 @@ setInterval( () => {
     if (ecosystem != undefined){ //taxing?
         let updates = ecosystem.run();
         world.emit("update", updates);
+
+        //for event specific updates that need to happen frequently
+        if (actState == "feast") {
+            world.emit("feastMovement", userIcons.feastIcons);
+        }
     }
 }, 10); //TODO is there a better way of doing this?
 
@@ -367,7 +397,13 @@ function setupNextRound(){
     if (actState == "voting") {
         //figure out what the state is, send to clients, then reset timer
         actState = condorcetTabulation(); //check ranked preferences of gods
-        actOfGod(actState);
+        
+        if (actState == "voting") { //no winner, reset voting round
+            lastState = "repeatVoting"; //just so will trigger again
+            hasAskedForVotes = false;
+        } else {
+            actOfGod(actState);
+        }
     } else {
         //reset after round is over
         actState = "voting";
@@ -382,6 +418,8 @@ function actOfGod(act){
 
     switch(act) {
         case "feast":
+            //reset the feast icons so no ghost displays
+            userIcons.feastIcons = [];
             break;
         case "famine":
             break;
@@ -421,11 +459,16 @@ function condorcetTabulation(){
         flood: 0,
         lightning: 0
     }
-    // let [winner, totals] = countVotes(votes, round, voteTotals);
-    let winner = countVotes(votes, round, voteTotals);
-    // console.log(`winner: ${winner}, totals: ${totals}`)
-    console.log("winner: " + winner);
-    return winner;
+    if (votes.length != 0){
+        let [winner, totals] = countVotes(votes, round, voteTotals);
+        console.log(`winner: ${winner}, totals: ${JSON.stringify(totals)}`)
+        // console.log("winner: " + winner);
+        return winner;
+    } else {
+        //no votes, new voting round
+        let winner = "voting";
+        return winner;
+    }
 }
 
 function countVotes(votes, round, voteTotals){ //recursive function that runs until majority or default winner
@@ -445,10 +488,10 @@ function countVotes(votes, round, voteTotals){ //recursive function that runs un
     // console.log(JSON.stringify(sortedVotes));
     if (sortedVotes[0][1] > votes.length / 2 || isLastRound) {//majority or no more votes
         // if no more votes to count, just send one with most votes (yes, if tie, it's arbitrary)
-        // return [sortedVotes[0][0], voteTotals];
+        return [sortedVotes[0][0], voteTotals];
         // console.log("ending tabulation");
         // console.log(sortedVotes[0][0]);
-        return sortedVotes[0][0];
+        // return sortedVotes[0][0];
     } else {
         round++;
         return countVotes(votes, round, voteTotals); //okay i didn't understand recursion, this needs a return too

@@ -3,6 +3,7 @@
 let ecosystemInstance = function(e) {
     //have to add e. to variables we want to access globally
     e.ecosystem; //undefined at first so server set up works
+    e.hasSetup = false;
 
     let monitor = {
         position: {x: 0, y: 0},
@@ -64,7 +65,13 @@ let ecosystemInstance = function(e) {
     e.ranks = [];
     e.participationCheckbox;
     e.acts = ["feast", "famine", "creation", "meltdown", "fire", "flood", "lightning"];
-    
+    //feast
+    e.isFeast = false;
+    e.feastIcons = ["🍉", "🍑", "🥥", "🥑", "🌽", "🥔", "🧀", "🍗", "🥩", "🍕", "🌭", "🍙", "🧁", "🍩", "🌶️", "🥦", "🍄"];
+    e.feastIcon;
+    e.allIcons = {
+        feastIcons: [],
+    }
 
     //assets
     let godIcon;
@@ -167,6 +174,10 @@ let ecosystemInstance = function(e) {
             });
         e.helpIcon.hide();
 
+        //feast
+        e.feastIcon = e.feastIcons[Math.floor(Math.random() * e.feastIcons.length)];
+        console.log(`my feast icon: ${e.feastIcon}`);
+
         //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
         let listWidth = e.width / 6 + "px";
         let listHeight = e.height / 3 + "px";
@@ -194,6 +205,7 @@ let ecosystemInstance = function(e) {
         //     .parent("orgList")
         //     .class("orgDivs")
         // }
+        e.hasSetup = true;
     }
 
     e.draw = () => {
@@ -263,6 +275,14 @@ let ecosystemInstance = function(e) {
                     mainSketch.modeButton.html("Create New Critter");
                     notFirstClick = 0;
                 }
+        } else if (e.isFeast) {
+            if(e.mouseX >= 10 &&
+                e.mouseX <= e.width - 10 &&
+                e.mouseY >= 10 &&
+                e.mouseY <= e.height - 10) {
+                    socket.emit("foodSprinkle", {source: "communityFunds", position: {x: e.mouseX, y: e.mouseY}});
+                }
+            
         } else { 
             //for checking critter info
             if (e.isDisplayingInfo) {
@@ -414,10 +434,12 @@ let ecosystemInstance = function(e) {
         e.push();
         e.panelFade();
         e.fill(247, 193, 187, 200); //baby pink, slight transparency
-        e.rect(e.godPanel.x, e.godPanel.y, e.godPanel.width, e.godPanel.height);
-        //depending on event, diff panel:
+        // e.rect(e.godPanel.x, e.godPanel.y, e.godPanel.width, e.godPanel.height);
+        // depending on event, diff panel:
         switch(e.actState){
             case "voting":
+                e.rect(e.godPanel.x, e.godPanel.y, e.godPanel.width, e.godPanel.height);
+
                 //draw the rankings, participation checkbox, and help tooltip
                 // e.image(helpIcon, e.godPanel.x, e.godPanel.y + 2 * e.godPanel.height / 6);
                 for (let [i, rank] of e.ranks.entries()) {
@@ -437,6 +459,19 @@ let ecosystemInstance = function(e) {
                 }
                 break;
             case "feast":
+                //send server mouse info and feast icon
+                socket.emit("feastMovement", {mouseX: e.mouseX, mouseY: e.mouseY, icon: e.feastIcon});
+                //draw smaller god panel with event message
+                e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);
+                e.push();
+                e.fill(21, 96, 100);
+                e.textAlign(e.CENTER, e.CENTER);
+                e.text("click to sprinkle food", e.godPanel.x, 2 * e.godPanel.y / 3);
+                e.pop();
+                //draw all users' icons
+                for (let icon of e.allIcons.feastIcons) {
+                    e.text(icon.icon, icon.mouseX, icon.mouseY);
+                }
                 break;
             case "famine":
                 break;
@@ -464,17 +499,15 @@ let ecosystemInstance = function(e) {
             if (e.godPanel.rightEdge < e.godPanel.edgeMax){
                 e.godPanel.x += e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge += e.godPanel.fadeSpeed;
-                // for (let child of godPanel.children) {
-                //     child.
-                // }
-                // e.panelFade("in", e.godPanel.rightEdge); //too fast
             } else {
                 //at end of fade
-                e.participationCheckbox.show();
-                for (let dropdown of e.ranks){
-                    dropdown.show();
+                if(e.actState == "voting"){
+                    e.participationCheckbox.show();
+                    for (let dropdown of e.ranks){
+                        dropdown.show();
+                    }
+                    e.helpIcon.show();
                 }
-                e.helpIcon.show();
                 return;
             }
         } else {
@@ -486,7 +519,6 @@ let ecosystemInstance = function(e) {
             if (e.godPanel.rightEdge > 0){
                 e.godPanel.x -= e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge -= e.godPanel.fadeSpeed;
-                // e.panelFade("out", e.godPanel.rightEdge);
             } else {
                 return;
             }
