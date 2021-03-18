@@ -22,7 +22,8 @@ let ecosystemInstance = function(e) {
     
     e.stats = {
         critterCount: 0,
-        worldLife: 0
+        worldLife: 0,
+        communityFunds: 0
     }
     
     //buttons
@@ -40,13 +41,37 @@ let ecosystemInstance = function(e) {
         textSize: 25
     }
     e.isDisplayingInfo = false;
+
+    //acts of god stuff
+    e.actState = "";
+    e.timeLeft = 60;
+    e.eventButton;
+    e.godPanelDiv;
+    e.showGodPanel = false;
+    e.godPanel = {
+        x: -(2.5 * page.width / 16),
+        y: (page.height / 2) - .25 * page.height / 9,
+        width: 5 *  page.width / 16, 
+        height: 6 * page.height / 9,
+        rightEdge: 0, 
+        edgeMax: (5 *  page.width / 16) + (.25 * page.width / 16),
+        fadeSpeed: 40
+    }
+    // let godPanel;
+    //voting
+    e.helpIcon;
+    e.isShowingVotingHelp = false;
+    e.ranks = [];
+    e.participationCheckbox;
+    e.acts = ["feast", "famine", "creation", "meltdown", "fire", "flood", "lightning"];
     
 
     //assets
     let godIcon;
     e.preload = () => {
-        monitor.shape = e.loadImage("assets/rounded_rectangle.png");
+        // monitor.shape = e.loadImage("assets/rounded_rectangle.png");
         godIcon = e.loadImage("assets/godIcon.jpg"); 
+        // questionIcon = e.loadImage("assets/question.png");
     }
 
     e.setup = () => {
@@ -63,6 +88,84 @@ let ecosystemInstance = function(e) {
         monitor.position.y = e.height - monitor.size.h
 
         infoGraphics = e.createGraphics(e.overlay.w, e.overlay.h);
+
+        //act of god event stuff
+        e.godPanelDiv = e.createDiv()
+            .id("godPanelDiv")
+            .parent('ecosystemCanvas')
+        e.eventButton = e.createButton('BE GOD')
+            .parent("godPanelDiv")
+            .class("button")
+            .id("eventButton")
+            .position(.75 * e.width / 16, 8.5 * e.height / 9)
+            .mousePressed(() => {
+                e.showGodPanel = !e.showGodPanel;
+                if (e.showGodPanel) { //bring out panel
+                    // e.panelFade("in", e.godPanel.x);
+                    e.godPanel.dir = "in";
+                    e.eventButton.html("HIDE PANEL");
+                    for (let d of e.ranks) {
+                        d.hide();
+                    }
+                } else { //hide panel
+                    e.eventButton.html("BE GOD");
+                    e.godPanel.dir = "out";
+                    // e.panelFade("out", e.godPanel.x);
+                    if (e.actState == "voting") {
+                        for (let d of e.ranks) {
+                            d.show();
+                        }
+                    }
+                }
+            });
+
+        //voting event
+        e.participationCheckbox = e.createCheckbox('Participating in Next Act of God', false)
+            .id("participationCheckbox")
+            .position(e.godPanel.x + 4 * e.godPanel.width / 4 , page.height / 8 + (e.godPanel.y - e.godPanel.height / 2) + 3 * e.godPanel.height / 30);
+        e.participationCheckbox.hide();
+        for(let i = 0; i < 7; i++){
+            let newRankDropdown = e.createSelect();
+            //will be undefined for some reason if we do this here
+                // .id(`rank${i}`)
+                // .parent('godPanelDiv')
+                // .class('whitebox')
+                // .size(2 * e.godPanel.width / 4, e.godPanel.height / 14)
+                // .position(e.godPanel.x + e.godPanel.width, (e.godPanel.y - e.godPanel.height / 2) + (8 + (2*i)) * e.godPanel.height / 30)
+                // .changed(e.rankingChange)
+                // .option("none")
+            // console.log(newRankDropdown)
+            e.ranks.push(newRankDropdown);
+        }
+        for (let [i, dropdown] of e.ranks.entries()) {
+            dropdown.id(`rank${i}`)
+                .parent('godPanelDiv')
+                .class('whitebox')
+                .size(2 * e.godPanel.width / 4, e.godPanel.height / 21)
+                //ugh forgot this is to page not canvas
+                .position(e.godPanel.x + 3 * e.godPanel.width / 4 , (e.godPanel.y - e.godPanel.height / 2) + (11 + (3*i)) * e.godPanel.height / 30)
+                .changed(e.rankingChange)
+                .option("none");
+                // .hide();
+            for (let act of e.acts){
+                dropdown.option(act);
+            }
+            dropdown.selected("none");
+            dropdown.hide();
+        }
+        
+        e.helpIcon = e.createImg("assets/question.png", "help icon")
+            .parent("godPanelDiv")
+            .position(e.godPanel.x + 4 * e.godPanel.width / 3, e.godPanel.y + 3.7 * e.godPanel.height / 7)
+            .mouseOver(() => {
+                e.isShowingVotingHelp = true;
+                // console.log('on')
+            })
+            .mouseOut(() => {
+                e.isShowingVotingHelp = false;
+                // console.log('off')
+            });
+        e.helpIcon.hide();
 
         //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
         let listWidth = e.width / 6 + "px";
@@ -99,6 +202,10 @@ let ecosystemInstance = function(e) {
             // e.monitorFunds(); //now only doing this when getting a funds update
             e.drawEcosystem(); //switching order so panel doesn't cover up
             e.displayStats();
+            e.displayTimerAndState();
+            // if(e.showGodPanel){ //need this for fade to work right
+            e.drawGodPanel();
+            // }
             if (e.isReadyToSpawn) {
                 // only shows after create Critter button pressed
                 notFirstClick++;
@@ -113,8 +220,13 @@ let ecosystemInstance = function(e) {
                 // e.noStroke();
                 e.ellipse(e.mouseX, e.mouseY, e.map(newCritter.r, 0, 1, 5, 50));
                 e.pop();
-            } else if(e.isDisplayingInfo) {
-                e.displayInfoOverlay(e.overlay.critter)
+            } else {
+                if(e.isDisplayingInfo) {
+                    e.displayInfoOverlay(e.overlay.critter);
+                }
+                // if(e.showGodPanel) {
+                //     e.drawGodPanel();
+                // }
             }
         } else {
             e.textSize(100);
@@ -129,19 +241,24 @@ let ecosystemInstance = function(e) {
                 e.mouseX <= e.width - 10 &&
                 e.mouseY >= 10 &&
                 e.mouseY <= e.height - 10) {
-                    //send server the critter info
+                    //send server the critter info and funds updates, then update funds it sends back
                     newCritter.positionArray = [e.mouseX, e.mouseY];
-                    socket.emit("newCritter", newCritter);
+                    socket.emit("newCritter", newCritter, updates, (response) => {
+                        if (response.funds != undefined) { //just incase not logged in
+                            userData.funds = parseFloat(response.funds.toFixed(2)); //not sure if still need these but don't want to risk it
+                        }
+                    }); 
+                    
                     //update user data in server -- for now just mainSketch obj
-                    userData.funds -= parseFloat(newCritter.life.toFixed(2));
-                    userData.funds = parseFloat(userData.funds.toFixed(2)); // i fucking hate this issue
-
+                    // userData.funds -= parseFloat(newCritter.life.toFixed(2));
+                    // userData.funds = parseFloat(userData.funds.toFixed(2)); // i fucking hate this issue
 
                     //reset
                     e.isReadyToSpawn = false;
                     e.isCreating = false;
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    e.godPanelDiv.show();
                     document.getElementById("orgList").style.display = "inherit"; //brings back org list, no idea what the style it's inheriting is
                     mainSketch.modeButton.html("Create New Critter");
                     notFirstClick = 0;
@@ -150,7 +267,7 @@ let ecosystemInstance = function(e) {
             //for checking critter info
             if (e.isDisplayingInfo) {
                 e.isDisplayingInfo = false;
-            } else {
+            } else if (!e.showGodPanel) {
                 socket.emit("clickInfo", {position: {x: e.mouseX, y: e.mouseY}});
             }
         }
@@ -285,11 +402,130 @@ let ecosystemInstance = function(e) {
 
     e.displayStats = () => {
         e.fill(0);
-        e.textSize(40);
-        e.text(`My Funds: $${userData.funds}`, e.width / 4, e.height - 50);
-        e.text("Critter Count: " + e.stats.critterCount, e.width/2, e.height - 50);
-        e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 3 * e.width/4, e.height - 50); //need to make sure it's a float everytime I want to round?
+        e.textSize(32);
+        e.text(`Community Funds: $${parseFloat(e.stats.communityFunds).toFixed(2)}`, e.width/5, e.height - 50);
+        e.text(`My Funds: $${parseFloat(userData.funds).toFixed(2)}`, 2 * e.width / 5, e.height - 50);
+        e.text("Critter Count: " + e.stats.critterCount, 3 * e.width / 5, e.height - 50);
+        e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 4 * e.width / 5, e.height - 50); //need to make sure it's a float everytime I want to round?
     }
+
+    //god panel
+    e.drawGodPanel = () => {
+        e.push();
+        e.panelFade();
+        e.fill(247, 193, 187, 200); //baby pink, slight transparency
+        e.rect(e.godPanel.x, e.godPanel.y, e.godPanel.width, e.godPanel.height);
+        //depending on event, diff panel:
+        switch(e.actState){
+            case "voting":
+                //draw the rankings, participation checkbox, and help tooltip
+                // e.image(helpIcon, e.godPanel.x, e.godPanel.y + 2 * e.godPanel.height / 6);
+                for (let [i, rank] of e.ranks.entries()) {
+                    // rank.show();
+                    e.push();
+                    e.fill(21, 96, 100);
+                    e.textAlign(e.CENTER, e.CENTER);
+                    e.text(i+1, e.godPanel.x - 3 * e.godPanel.width / 8 , (e.godPanel.y - e.godPanel.height / 2) + (6 + (3*i)) * e.godPanel.height / 30);
+                    e.pop();
+                }
+                
+                if(e.isShowingVotingHelp){
+                    e.push();
+                    e.fill(238, 232, 44);
+                    e.rect(e.godPanel.rightEdge + e.godPanel.width / 9, e.godPanel.y, 3 * page.width / 16, 4 * page.height / 9);
+                    e.pop();
+                }
+                break;
+            case "feast":
+                break;
+            case "famine":
+                break;
+            case "creation":
+                break;
+            case "meltdown":
+                break;
+            case "fire":
+                break;
+            case "flood":
+                break;
+            case "lightning":
+                break;
+            default:
+                console.log("something weird happening with panel state")
+        }
+        
+        
+        e.pop();
+    }
+
+    e.panelFade = () => {
+        let dir = e.godPanel.dir;
+        if (dir == "in") {
+            if (e.godPanel.rightEdge < e.godPanel.edgeMax){
+                e.godPanel.x += e.godPanel.fadeSpeed;
+                e.godPanel.rightEdge += e.godPanel.fadeSpeed;
+                // for (let child of godPanel.children) {
+                //     child.
+                // }
+                // e.panelFade("in", e.godPanel.rightEdge); //too fast
+            } else {
+                //at end of fade
+                e.participationCheckbox.show();
+                for (let dropdown of e.ranks){
+                    dropdown.show();
+                }
+                e.helpIcon.show();
+                return;
+            }
+        } else {
+            e.participationCheckbox.hide();
+            for (let dropdown of e.ranks){
+                dropdown.hide();
+            }
+            e.helpIcon.hide();
+            if (e.godPanel.rightEdge > 0){
+                e.godPanel.x -= e.godPanel.fadeSpeed;
+                e.godPanel.rightEdge -= e.godPanel.fadeSpeed;
+                // e.panelFade("out", e.godPanel.rightEdge);
+            } else {
+                return;
+            }
+        }
+    }
+
+    e.displayTimerAndState = () => {
+        e.push();
+        e.textAlign(e.LEFT, e.CENTER);
+        e.fill(0);
+        e.text(`Act of God: ${e.actState}`, .25 * e.width / 16, e.height / 9);
+        e.text(`Next Event: ${e.timeLeft}`, .25 * e.width / 16, 8 * e.height / 9);
+        e.pop();
+    }
+
+    e.rankingChange = (elem) => { //nice! it contains a reference to the element that called it!!
+        //if other dropdowns have the most recently selected option, reset them
+        let updatedDropdown = e.select(`#${elem.srcElement.id}`);
+        for (let dropdown of e.ranks){
+            if (dropdown.elt.id != updatedDropdown.elt.id && 
+                dropdown.value() == updatedDropdown.value()){
+                    dropdown.selected("none");
+                }
+        }
+        //make sure auto participates if changes
+        e.participationCheckbox.checked(true);
+        // console.log(e.participationCheckbox.checked());
+    }
+
+    e.sendVotes = () => {
+        let votes = [];
+        for (let dropdown of e.ranks) {
+            votes.push(dropdown.selected());
+        }
+        console.log("sending votes: " + votes);
+        return [e.participationCheckbox.checked(), votes]; //send votes even if not participating
+    }
+
+    //click info overlay
 
     e.displayInfoOverlay = (critter) => {
         infoGraphics.push();
@@ -392,213 +628,6 @@ let ecosystemInstance = function(e) {
         e.colorMode(e.RGB); //whyyyyy
         infoGraphics.pop();
     }
-}
 
-/*
-let canvas;
-let ecosystem; //undefined at first so server set up works
-// let ecosystem = {
-//     corpses: [],
-//     supply: [],
-//     critters: []
-// };
-
-//ui box
-let monitor = {
-    position: {x: 0, y: 0},
-    size: {w: 0, h: 0},
-    shape: null,
-    overlay: 0
-}; //position, size, shape, overlay
-
-let funds = {
-    sorted: []
-};
-
-let stats = {
-    critterCount: 0,
-    worldLife: 0
-}
-
-//buttons
-let newCritterButt;
-let foodSprinkleToggle;
-let isFoodSprinkleOn = true;
-let creationButt;
-let isCreating = false;
-
-//click Info overlay
-let infoGraphics;
-let overlay = {
-    w: 400,
-    h: 800,
-    position: {x: 0,y: 0},
-    critter: {},
-    textSize: 25
-}
-let isDisplayingInfo = false;
-
-//critter creation menu
-let creation;
-let creationMenu = {
-    w: 1500,
-    h: 800,
-    textSize: 40
-}
-
-
-//assets
-let godIcon;
-function preload(){
-    monitor.shape = loadImage("assets/rounded_rectangle.png");
-    godIcon = loadImage("assets/godIcon.jpg"); 
-}
-
-function setup() {
-    //how to get d.width/height?
-    canvas = createCanvas(1920,1080);
-    // createCanvas(3840,2160);
     
-    ellipseMode(CENTER);
-    rectMode(CENTER);
-    imageMode(CENTER);
-    textAlign(CENTER);
-    noStroke();
-
-    monitor.size.w = width/8;
-    monitor.size.h = height/3;
-    monitor.position.x = width - monitor.size.w
-    monitor.position.y = height - monitor.size.h
-
-    newCritterButt = createButton("Random Critter")
-        .position(width/4, height - 50)
-        .size(100, 50)
-        .mousePressed( () => {
-            socket.emit("newCritter");
-            console.log("newRandoCritter");
-        });
-    foodSprinkleToggle = createButton("Food Sprinkle")
-        .position(width/4 - width/8, height - 50)
-        .size(100, 50)
-        .mousePressed( () => {
-            isFoodSprinkleOn = !isFoodSprinkleOn;
-            console.log("foodSprinkle toggled to: " + isFoodSprinkleOn);
-            if (isFoodSprinkleOn) {
-                foodSprinkleToggle.elt.style.backgroundColor = 'gold';
-                // foodSprinkleToggle.attribute('backgroundColor', 'gold');
-            } else {
-                foodSprinkleToggle.elt.style.backgroundColor= 'grey';
-            }
-        });
-    foodSprinkleToggle.elt.style.backgroundColor = 'gold';
-    creationButt = createButton("Create New Critter")
-        .position(width/4 + width/8, height - 50)
-        .size(100, 50)
-        .mousePressed( () => {
-            isCreating = !isCreating;
-        });
-
-
-    //for the overlays
-    infoGraphics = createGraphics(overlay.w, overlay.h);
-    creation = createGraphics(creationMenu.w, creationMenu.h);
-    // setupCreation(creation);
 }
-
-function draw() {
-    background(200, 240, 255);
-    if(ecosystem != undefined){
-        monitorFunds();
-        drawEcosystem(); //switching order so panel doesn't cover up
-        displayStats();
-        if (isCreating) {
-            displayCreation(creation);
-        } else if(isDisplayingInfo) {
-            displayInfoOverlay(overlay.critter)
-        }
-    } else {
-        textSize(100);
-        text("waiting for server to set up", width/2, height/2);
-    }
-}
-
-function mousePressed(){
-    if (isCreating) {
-        //if creating, no interaction off menu
-    } else if (mouseX > 50 && mouseX < width - 50 &&
-        mouseY > 50 && mouseY < height - 50 && isFoodSprinkleOn){ 
-            //for food sprinkle
-            console.log("food sprinkle");
-            socket.emit("newFood", {position: {x: mouseX, y: mouseY}});
-    } else { 
-        //for checking critter info
-        if (isDisplayingInfo) {
-            isDisplayingInfo = false;
-        } else {
-            socket.emit("clickInfo", {position: {x: mouseX, y: mouseY}});
-        }
-    }
-}
-
-function drawEcosystem(){
-    //draw the corpses
-    ecosystem.corpses.forEach( (corpse) => { //x,y,r,fade
-        fill(255,255,255,corpse.fade);
-        ellipse(corpse.position.x, corpse.position.y, corpse.r); 
-    });    
-
-    //draw the food
-    ecosystem.supply.forEach( (food) => { //x,y,fade
-        fill(0, food.fade);
-        rect(food.position.x, food.position.y, 5);
-    });
-
-    //draw the critters
-    ecosystem.critters.forEach( (critter) => { //position,r,color,life,isReadyToMate
-        drawCritter(critter);
-    });
-}
-
-function drawCritter(critter) {
-    //for lifeForce aura
-    let fadedColor = color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
-    fill(fadedColor);
-    ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 100, 0, critter.r / 2));
-    
-    //show ring if ready to mate
-    noFill();
-    if(critter.isReadyToMate){
-        stroke(255);
-    }
-    ellipse(critter.position.x, critter.position.y, critter.r + map(critter.life, 0, 200, 0, critter.r / 2));
-
-    //base critter
-    let critCol = color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
-    fill(critCol);
-    noStroke();
-    ellipse(critter.position.x, critter.position.y, critter.r); 
-}
-
-function monitorFunds(){
-    //draw the shape background -- need to make this transparent somehow
-    fill(0);
-    textAlign(LEFT, CENTER);
-
-    image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
-    let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
-    let sectionSize = monitor.size.h / (funds.sorted.length + 1); //fence postttt
-    textSize(sectionSize * 0.7);
-    funds.sorted.forEach( (fund) => {
-        text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
-        monitorOffset.y += sectionSize; //better to use index?
-    });
-    text("Total Donated: $" + funds.total.toFixed(2), monitorOffset.x, monitorOffset.y);
-}
-
-function displayStats(){
-    fill(0);
-    textSize(40);
-    text("Critter Count: " + stats.critterCount, width/2, height - 50);
-    text("Life in World: $" + (stats.worldLife / 100).toFixed(2), 3 * width/4, height - 50); //can't "toFixed" b/c starts as 0??
-}
-*/

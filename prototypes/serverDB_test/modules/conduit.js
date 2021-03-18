@@ -1,6 +1,8 @@
 //working title for all the donation input/output & funds checking, etc.
 //will be an object that is loaded from the db and interacts with the db throughout
 
+const { worldSize } = require("./defaults");
+
 class Conduit{
     constructor(conduit) {
         if(conduit != undefined){
@@ -92,6 +94,11 @@ class Conduit{
                 link: null
             })     
         }  
+        if (newOrgA || newOrgB) {
+           return true; //so ecosystem can emit fundsUpdate
+        } else {
+            return false;
+        }
     }
 
     //only for spawning random critters

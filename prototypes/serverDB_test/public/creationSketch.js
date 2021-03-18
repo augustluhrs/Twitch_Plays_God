@@ -37,6 +37,18 @@ let creationInstance = function(c) { //should change to c?
     let colorPicker;
     
     //bottom middle
+    // let edits = 0;
+    // let editsCost = 0.01;
+    let sliderDefaults = {
+        donationCooldown: 16000,
+        donationPercentage: .8,
+        donationMinLife: .8,
+        matingCooldown: 16000,
+        matingPercentage: .8,
+        matingMinLife: .8,
+        cooldownTick: 1000,
+        tick: .05
+    }
     let donationCooldownSlider, donationPercentageSlider, donationMinLifeSlider;
     let matingCooldownSlider, matingPercentageSlider, matingMinLifeSlider;
 
@@ -108,9 +120,9 @@ let creationInstance = function(c) { //should change to c?
             c.noStroke();
             c.textSize(fontSmall);
             c.textAlign(c.LEFT, c.CENTER);
-            c.text("Poops Rarely", this.xCenter - this.w / 2, this.yCenter + 4 * this.h / 5);
+            c.text("Poops A Little", this.xCenter - this.w / 2, this.yCenter + 4 * this.h / 5);
             c.textAlign(c.RIGHT, c.CENTER);
-            c.text("Poops Often", this.xCenter + this.w / 2, this.yCenter + 4 * this.h / 5);
+            c.text("Poops A Lot", this.xCenter + this.w / 2, this.yCenter + 4 * this.h / 5);
         }
     };
 
@@ -254,7 +266,7 @@ let creationInstance = function(c) { //should change to c?
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
-        startingLifeSlider = c.createSlider(.01, userData.funds, newCritter.life, .01)
+        startingLifeSlider = c.createSlider(.05, userData.funds, newCritter.life, .05)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("creationSpan");
@@ -286,30 +298,43 @@ let creationInstance = function(c) { //should change to c?
         c.pop();
         //bottom middle
         //not sure if millis is the right rate for cooldown, seems to be 100 per second
-        donationCooldownSlider = c.createSlider(1000, 360000, newCritter.donationRate, 1000)
+        //for virus prevention, using new tick system like point buy. 20 per slider, starting at 75%, and only like 3.3 mins for max cooldown for playtest
+        // donationCooldownSlider = c.createSlider(1000, 360000, newCritter.donationRate, 1000)
+        donationCooldownSlider = c.createSlider(1000, 20000, newCritter.donationRate, 1000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 5.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        donationPercentageSlider = c.createSlider(.01, 1, newCritter.donationPercentage, .01)
+            .input(checkEdits);
+        // donationPercentageSlider = c.createSlider(.01, 1, newCritter.donationPercentage, .01)
+        donationPercentageSlider = c.createSlider(.05, 1, newCritter.donationPercentage, .05)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 5.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        donationMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToDonate, .01)
+            .input(checkEdits);
+        // donationMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToDonate, .01)
+        donationMinLifeSlider = c.createSlider(.05, 1, newCritter.minLifeToDonate, .05)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 6.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingCooldownSlider = c.createSlider(1000, 360000, newCritter.refractoryPeriod, 1000)
+            .input(checkEdits);
+        // matingCooldownSlider = c.createSlider(1000, 360000, newCritter.refractoryPeriod, 1000)
+        matingCooldownSlider = c.createSlider(1000, 20000, newCritter.refractoryPeriod, 1000)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 7.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingPercentageSlider = c.createSlider(.01, 1, newCritter.parentalSacrifice, .01)
+            .input(checkEdits);
+        // matingPercentageSlider = c.createSlider(.01, 1, newCritter.parentalSacrifice, .01)
+        matingPercentageSlider = c.createSlider(.05, 1, newCritter.parentalSacrifice, .05)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 7.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
-        matingMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToReproduce, .01)
+            .input(checkEdits);
+        // matingMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToReproduce, .01)
+        matingMinLifeSlider = c.createSlider(.05, 1, newCritter.minLifeToReproduce, .05)
             .parent("creationSpan")
             .position(7.75 * c.width / 16, 8.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
+            .input(checkEdits);
 
         //top right
         bodySlider.xCenter = 13.5 * c.width / 16;
@@ -378,6 +403,7 @@ let creationInstance = function(c) { //should change to c?
         drawCritter(6.5 * c.width / 16, 7.75 * c.height / 9, true, false);
 
         c.textSize(fontSmall);
+        c.text(`CRISPR Gene Edits: ${c.floor(edits)} @ $${editsCost.toFixed(2)}`, 7.75 * c.width / 16, 4.25 * c.height / 9);
         c.text(`Donation Cooldown: ${donationCooldownSlider.value() / 100} seconds`, 7.75 * c.width / 16, 5 * c.height / 9);
         c.text(`Donation Percentage: ${donationPercentageSlider.value() * 100}%`, 7.75 * c.width / 16, 5.5 * c.height / 9);
         c.text(`Minimum Life Needed: $${donationMinLifeSlider.value()}`, 7.75 * c.width / 16, 6 * c.height / 9);
@@ -393,19 +419,20 @@ let creationInstance = function(c) { //should change to c?
         c.noStroke();
         c.textSize(fontSmall);
         c.textAlign(c.RIGHT, c.BOTTOM); //kind of doing this backwards...
-        c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 13.25 * c.width / 16, 7 * c.height / 9);
+        c.text(`Critter Starting Life:\nCRISPR Cost:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 13.25 * c.width / 16, 7 * c.height / 9);
         // c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 11 * c.width / 16, 5.5 * c.height / 9, 12.75 * c.width / 16, 7 * c.height / 9);
         c.textAlign(c.LEFT, c.BOTTOM);
         // let startLife = startingLifeSlider.value().toFixed(2);
         startLife = startingLifeSlider.value();
+        editsTotal = edits * editsCost;
         equTax = startLife * .1;
         if(equTax < .1){equTax = .1};
         // equTax = equTax.toFixed(2);
         // genTax = 0.05;
-        totalCost = (startLife + equTax + genTax).toFixed(2);
+        totalCost = (startLife + editsTotal + equTax + genTax).toFixed(2);
         fundsAfter = userData.funds.toFixed(2) - parseFloat(totalCost).toFixed(2); //no idea why toFixed isn't working as expected
         fundsAfter = fundsAfter.toFixed(2);
-        c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${totalCost}\n\n$${userData.funds.toFixed(2)}\n$${fundsAfter}`, 13.75 * c.width / 16, 7 * c.height / 9);
+        c.text(`$${startLife.toFixed(2)}\n$${(editsTotal).toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${totalCost}\n\n$${userData.funds.toFixed(2)}\n$${fundsAfter}`, 13.75 * c.width / 16, 7 * c.height / 9);
         // c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.75 * c.width / 16, 7 * c.height / 9);
         if(fundsAfter < 0) {
             creationButton.style("background-color", "red");
@@ -544,6 +571,12 @@ let creationInstance = function(c) { //should change to c?
             //update funds in mainSketch
             // userData.funds -= newCritter.life; //nvm only if placed
 
+            //update the object that will be sent to server to update funds
+            updates.username = userData.username;
+            updates.totalCost = totalCost;
+            updates.communityFunds = editsTotal + equTax;
+            updates.genesisFunds = genTax;
+
             //close menu and go back to ecosystem to plop down
             mainSketch.modeButton.html('Abort Critter');
             c.select("#creationSpan").hide();
@@ -552,5 +585,49 @@ let creationInstance = function(c) { //should change to c?
             // document.getElementById("creationSpan").remove();
             // document.getElementById("defaultCanvas2").remove();
         } 
+    }
+
+    function checkEdits(){ //go through each slider and compare distance to default to get num edits spent
+        let totalTicks = 0;
+        totalTicks += c.abs(sliderDefaults.donationCooldown - donationCooldownSlider.value()) / sliderDefaults.cooldownTick;
+        totalTicks += c.abs(sliderDefaults.donationPercentage - donationPercentageSlider.value()) / sliderDefaults.tick;
+        totalTicks += c.abs(sliderDefaults.donationMinLife - donationMinLifeSlider.value()) / sliderDefaults.tick;
+        totalTicks += c.abs(sliderDefaults.matingCooldown - matingCooldownSlider.value()) / sliderDefaults.cooldownTick;
+        totalTicks += c.abs(sliderDefaults.matingPercentage - matingPercentageSlider.value()) / sliderDefaults.tick;
+        totalTicks += c.abs(sliderDefaults.matingMinLife - matingMinLifeSlider.value()) / sliderDefaults.tick;
+        // console.log(totalTicks);
+        edits = totalTicks;
+
+        if(totalTicks < 10) {
+            editsCost = 0.01;
+        } else if (totalTicks < 20) {
+            editsCost = 0.02;
+        } else if (totalTicks < 30) {
+            editsCost = 0.03;
+        } else if (totalTicks < 40) {
+            editsCost = 0.04;
+        } else if (totalTicks < 50) {
+            editsCost = 0.05;
+        } else if (totalTicks < 60) {
+            editsCost = 0.06;
+        } else if (totalTicks < 70) {
+            editsCost = 0.07;
+        } else if (totalTicks < 80) {
+            editsCost = 0.08;
+        } else if (totalTicks < 90) {
+            editsCost = 0.09;
+        } else {
+            editsCost = 0.1;
+        }
+
+        // if(totalTicks < 20) {
+        //     editsCost = 0.01;
+        // } else if (totalTicks < 40) {
+        //     editsCost = 0.05;
+        // } else if (totalTicks < 60) {
+        //     editsCost = 0.1;
+        // } else {
+        //     editsCost = 0.2;
+        // }
     }
 };

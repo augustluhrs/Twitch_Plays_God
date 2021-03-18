@@ -6,6 +6,14 @@
  * 
  */
 
+
+/*
+    ~ * ~ * ~ * VARIABLES
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ * 
+*/
+
 //create server
 let port = process.env.PORT || 8080;
 let express = require('express');
@@ -20,10 +28,10 @@ app.use(express.static('public'));
 //nedb database stuff
 const Datastore = require('nedb');
 // let db = new Datastore({filename: "databases/test.db", autoload: true});
-let db = new Datastore({filename: "databases/test.db", autoload: true});
-let backupDB = new Datastore({filename: "databases/backups.db", autoload: true});
+// let db = new Datastore({filename: "databases/test.db", autoload: true});
+// let backupDB = new Datastore({filename: "databases/backups.db", autoload: true});
 let godsDB = new Datastore({filename: "databases/gods.db", autoload: true});
-let crittersDB = new Datastore({filename: "databases/critters.db", autoload: true});
+// let crittersDB = new Datastore({filename: "databases/critters.db", autoload: true});
 let ecosystemDB = new Datastore({filename: "databases/ecosystem.db", autoload: true});
 let donationsDB = new Datastore({filename: "databases/donations.db", autoload: true});
 //because different types, could use same db, but want to isolate for testing for now, plus maybe small speed bump?
@@ -36,10 +44,10 @@ let donationsDB = new Datastore({filename: "databases/donations.db", autoload: t
 // let ecosystemDB = new AsyncNedb({filename: "databases/ecosytem.db", autoload: true});
 // let fundsDB = new AsyncNedb({filename: "databases/funds.db", autoload: true});
 
-
 //gods
 const Gods = require("./modules/gods");
 let gods;
+let users = []; //need to track who's participating in the events
 
 //ecosystem
 const Ecosystem = require("./modules/ecosystem");
@@ -47,7 +55,22 @@ let ecosystem;
 // ecosystemSetup();
 
 //donations
-let donations;
+let donations = undefined;
+
+//acts of god timer and state
+let timerStart = Date.now();
+// let timerCurrent = 0;
+// let timerVoting = 60; //60 seconds
+let actState = "voting";
+let lastState = "";
+let hasAskedForVotes = false;
+
+/*
+    ~ * ~ * ~ * MAIN FUNCTION
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ * set up the gods, donations, and ecosystem from their respective DBs. 
+    ~ * ~ * ~ * the main update loop is in the setInterval at the bottom
+*/
 
 //main
 init();
@@ -55,20 +78,19 @@ function init() {
     godsSetup();
     donationsSetup(); 
     // ecosystemSetup(); //now in donationSetup
-    
     // ecosystem.backupAll();
 }
 
 function godsSetup() {
     console.log("looking for gods");
-    godsDB.find({}, (err, docs) => {
+    godsDB.find({type: "godsUpdate"}, (err, docs) => {
         if (err) {
             console.log("god DB error: " + err);
         }
         if (docs.length != 0) {
             //existing users
             let existingGods = [];
-            for (let g of docs) {
+            for (let g of docs[0].gods) { //not doing individual insert yet
                 existingGods.push(g);
             }
             gods = new Gods(existingGods);
@@ -81,55 +103,24 @@ function godsSetup() {
 
 async function ecosystemSetup(){
     console.log('setting up ecosystem');
-    //have to separate for new dbs, should try out nedb-promises, but callback hell fine for now
-    //ugh so can't keep donation log if ecosystem db erased because won't look for it if eco not there...
     ecosystemDB.find({type: "ecosystemUpdate"}, (ecoErr, ecoDocs) => {
         if (ecoErr) {console.log("eco setup err: " + ecoErr)};
         if (ecoDocs.length != 0) { //entering callback hell because need conduit db and critter db
             ecosystem = new Ecosystem({ecosystem: ecoDocs[0].ecosystem, donations: donations});
             ecosystem.backupAll();
-            // donationsDB.find({type: "donationsUpdate"}, (donErr, donDocs) => {
-            //     if (donErr) {console.log("donations setup err: " + donErr)};
-            //     if (donDocs.length != 0) {
-            //         // crittersDB.find({type: "crittersUpdate"}, (critErr, critDocs) => {
-            //         crittersDB.find({type: "allCritters"}, (critErr, critDocs) => {
-            //             if (critErr) {console.log("critters setup err: " + critErr)};
-            //             if (critDocs.length != 0) {
-            //                 ecosystem = new Ecosystem({ecosystem: ecoDocs[0].ecosystem, donations: donDocs[0].donations, critters: critDocs[0].critters});
-            //                 ecosystem.backupAll();
-            //             } else {
-            //                 console.log ('weird critter setup err');
-            //             }
-            //         });
-            //     } else {
-            //         console.log ('weird donations setup err');
-            //     }
-            // });
-            // ecosystem = new Ecosystem({ecoLog: ecoDocs[0].ecoLog});
-        } else { //new eco, which means no critters anyway
-            ecosystem = new Ecosystem(0); 
+        } else { //new eco, which means no critters anyway, but should keep track of donations
+            // ecosystem = new Ecosystem(0); //want to set up empty but still have donations so need empty eco obj
+            let blankEco = {
+                supply: [],
+                corpses: [],
+                critters: [],
+                communityFunds: 0,
+                genesisFunds: 0
+            }
+            ecosystem = new Ecosystem({ecosystem: blankEco, donations: donations}); //donations will stay undefined if not found, so conduit constructor still works
             ecosystem.backupAll();
         }
     });
-
-
-
-    // // let docs = await db.asyncFind({type: "ecosystemUpdate"});
-    // ecosystemDB.find({type: "ecosystemUpdate"}, (err, docs) => {
-    //     if (err) {console.log("eco setup err: " + err)};
-    //     if (docs.length != 0) {
-    //         ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
-    //     } else {
-    //         ecosystem = new Ecosystem(0);
-    //         let ecoLog = ecosystem.save();
-    //         ecosystemDB.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
-    //             if(err){
-    //                 console.log("db err: " + err);
-    //             }
-    //         });
-    //     }
-    // });
-
 }
 
 function donationsSetup () {
@@ -145,7 +136,14 @@ function donationsSetup () {
         }
     });
 }
-//database stuff -- the ping pong is bad design, should reformat eventually to just sending the update as an argument
+
+/*
+    ~ * ~ * ~ * DATABASE FUNCTIONS
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ * database stuff
+    ~ * ~ * ~ * the ping pong is bad design, should reformat eventually to just sending the update as an argument
+*/
+
 global.backupEcosystem = function(){ //ecosystem
     let ecoLog = ecosystem.backupEcosystem();
     ecosystemDB.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecosystem: ecoLog}, {upsert: true}, (err) => {
@@ -155,15 +153,17 @@ global.backupEcosystem = function(){ //ecosystem
         console.log('ecosystem db updated');
     });
 }
-global.backupCritters = function(){ //critters
-    let currentCritters = ecosystem.backupCritters(); //right now not keeping track of any dead critters
-    crittersDB.update({type: "crittersUpdate"}, {type: "crittersUpdate", time: Date.now(), critters: currentCritters}, {upsert: true}, (err) => {
-        if (err) {
-            console.log("critter update err: " + err);
-        }
-        console.log('critters db updated');
-    });
-}
+
+// global.backupCritters = function(){ //critters
+//     let currentCritters = ecosystem.backupCritters(); //right now not keeping track of any dead critters
+//     crittersDB.update({type: "crittersUpdate"}, {type: "crittersUpdate", time: Date.now(), critters: currentCritters}, {upsert: true}, (err) => {
+//         if (err) {
+//             console.log("critter update err: " + err);
+//         }
+//         console.log('critters db updated');
+//     });
+// }
+
 global.backupGods = function(){ //user database 
     let currentGods = gods.backup();
     godsDB.update({type: "godsUpdate"}, {type: "godsUpdate", time: Date.now(), gods: currentGods}, {upsert: true}, (err) => {
@@ -183,50 +183,25 @@ global.backupDonations = function(){ //donation database
     });
 }
 
-global.addCritterToDB = function(critter){ //critters
-    crittersDB.update({id: critter.id, critter: critter}, {id: critter.id, critter: critter}, {upsert: true}, (err) => {
-        if (err) {
-            console.log("critter solo add err: " + err);
-        }
-    });
-    crittersDB.update({type: "allCritters"}, {$push: {critters: critter}}, {upsert: true}, (err) => {
-        if (err) {
-            console.log("critter to allCritters add err: " + err);
-        }
-    });
-    console.log('critter added to db');
-}
-
-// global.backupDB = function(){
-//     let ecoLog = ecosystem.save();
-//     ecosystemDB.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
+// global.addCritterToDB = function(critter){ //critters
+//     crittersDB.update({id: critter.id, critter: critter}, {id: critter.id, critter: critter}, {upsert: true}, (err) => {
 //         if (err) {
-//             console.log("Update err: " + err);
+//             console.log("critter solo add err: " + err);
 //         }
-//         console.log('db updated');
 //     });
-//     // db.asyncUpdate({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-//     //     .then(function(){console.log('db updated');})
-//     //     .catch(function(err){console.log("Update err: " + err);});
+//     crittersDB.update({type: "allCritters"}, {$push: {critters: critter}}, {upsert: true}, (err) => {
+//         if (err) {
+//             console.log("critter to allCritters add err: " + err);
+//         }
+//     });
+//     console.log('critter added to db');
 // }
+
 /*
-    db.find({type: "ecosystemUpdate"}, function(err, docs) {
-        if (err) {console.log("set up err: " + err);}
-        console.log(JSON.stringify(docs));
-        if (docs.length != 0) {
-            // ecosystem.load(docs[0].ecoLog);
-            ecosystem = new Ecosystem({ecoLog: docs[0].ecoLog, conduit: docs[0].conduit});
-        } else {
-            ecosystem = new Ecosystem(8);
-            let ecoLog = ecosystem.save();
-            db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
-                if(err){
-                    console.log("db err: " + err);
-                }
-                // console.log('ecosystem saved');
-            });
-        }
-    });
+    ~ * ~ * ~ * SOCKET STUFF
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ *  
+    ~ * ~ * ~ * 
 */
 
 //create socket connection
@@ -239,24 +214,41 @@ global.world = io.of('/') //lol global...
 //listen for anyone connecting to default namespace
 world.on('connection', function(socket){
     console.log('world: ' + socket.id);
+    //add user to user array;
+    users.push({id: socket.id, isParticipating: false, rankings: []});
     //removing these so only updates when server is ready... wait no, can't b/c then sketch doesn't have certain variables...
-    if(ecosystem != undefined){
+    if(ecosystem != undefined){ //give it current status of everything
         console.log("world has ecosystem")
         world.emit('fundsUpdate', ecosystem.conduit);
-        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife}); //toFixed...
+        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
         // world.emit("refresh"); //just so reloads if server resets -- nvm it loops, only really need this on my end so w/e
+        world.emit("currentAct", {actState: actState});
     }
     
     //new event listeners
     //new critter
-    socket.on("newCritter", (data) => {
+    socket.on("newCritter", (data, updates, callback) => {
         if(data == undefined){
             ecosystem.spawnRandomCritter();
         } else {
+            //update gods db funds
+            gods.subtractFunds(updates.username, updates.totalCost);
+            ecosystem.communityFunds += updates.communityFunds;
+            ecosystem.genesisFunds += updates.genesisFunds;
+
+            //add orgs to donations conduit so they'll show even if no donations yet
+            // ecosystem.conduit.makeDonation(data.donations);
+            //nvm, already a checkTargets function, just going to emit a fundsupdate from there
+
+            //create critter
             ecosystem.spawnCritterFromUser(data);
             console.log(`New Critter ${data.name} from ${data.ancestry.parents[0].name}`);
         }
+        callback({
+            funds: gods.checkFunds(updates.username)
+        })
     });
+
     //food sprinkle
     socket.on("newFood", (data) => {
         // console.log("food sprinkle at: " + JSON.stringify(data.position));
@@ -266,23 +258,75 @@ world.on('connection', function(socket){
 
     //critter info query
     socket.on("clickInfo", (data) => {
-        ecosystem.clickInfo(data.position, socket.id);
+        ecosystem.clickInfo(data.position, socket.id); //should just return and emit from here TODO
     });
 
-    //manual backup from console
+    socket.on("login", (data, callback) => {
+        let [loggedIn, god] = gods.login(data.username, data.password);
+        callback({
+            authenticated: loggedIn, god: god
+        });
+        if (loggedIn) {
+            console.log(`log in from ${god.username}`);
+        }
+    });
+
+    //act of god event messages
+    socket.on("voting", (data) => { //will send automatically if checked at 0, so timer needs to end past 0 to wait for these
+        for (let user of users) {
+            if (user.id == socket.id){
+                user.isParticipating = data.isParticipating;
+                user.rankings = data.rankings;
+            }
+        }
+    })
+
+
+    // socket.on("checkFunds", (data) => {
+    //     // console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
+    //     let funds = gods.checkFunds(data.username); 
+    //     socket.emit("userFundsUpdate", {funds: funds});
+    // });
+    
+
+    //secret console commands
     socket.on("backup", () => {
         backupEcosystem();
         backupGods();
         backupDonations();
         ecosystemDB.persistence.compactDatafile();
+    });
 
+    socket.on("addGod", (data) => {
+        console.log(`Adding God: ${data.username} -- ${data.password}`);
+        gods.addGod(data.username, data.password);
+        backupGods();
+    });
+
+    socket.on("addFunds", (data) => {
+        console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
+        gods.addFunds(data.username, data.amount); //ah wait, don't need to emit back because not user's client...
+        backupGods();
     });
 
     //listen for this client to disconnect
     socket.on('disconnect', function(){
         console.log('input client disconnected: ' + socket.id);
+        //remove from users array
+        for (let [i, user] of users.entries()){
+            if (user.id == socket.id) {
+                users.splice(i, 1);
+            }
+        }
     });
 });
+
+/*
+    ~ * ~ * ~ * TIMER EVENTS
+    ~ * ~ * ~ * 
+    ~ * ~ * ~ * main update loop and ecosystem backup
+    ~ * ~ * ~ * 
+*/
 
 //main run
 setInterval( () => {
@@ -298,42 +342,131 @@ setInterval( () => {
     ecosystemDB.persistence.compactDatafile();
 }, 60000)
 
-//save to db
+//timer for acts of god
 setInterval( () => {
-    //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
-    //do I need to save backups? hmm... maybe every hour?
-    // global.backupDB();
-    backupEcosystem();
-    // db.update({type: "ecosystemUpdate"}, {type: "ecosystemUpdate", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
-    //     if(err){
-    //         console.log("db err: " + err);
-    //     }
-    //     console.log('db updated');
-    // });
-}, 300000); //how fast?  also prob need to save on exit? or does it matter? deterministic?
+    let delta = Date.now() - timerStart; //need to reset start or just use modulo? -- should reset to also trigger event
+    // let timeLeft = 60 - (Math.floor(delta / 1000) % 60);
+    let timeLeft = 60 - Math.floor(delta / 1000);
+    // console.log(timeLeft)
+    if (timeLeft >= 0) {
+        io.emit("timer", {timeLeft: timeLeft});
+    }
+    //trigger next event
+    if (timeLeft <= 0 && !hasAskedForVotes){ //prob a better way of doing this -- could do it clientside off timer, but want to make sure only happens once from server
+        io.emit("getVotes");
+        hasAskedForVotes = true;
+    }
+    if (timeLeft <= -3 && lastState != actState){ //now waiting 3 seconds for all "voting" event messages
+        setupNextRound();
+    }
+}, 500);
 
+//acts of god event per round
+function setupNextRound(){
+    lastState = actState; //to only call event once per round
+    if (actState == "voting") {
+        //figure out what the state is, send to clients, then reset timer
+        actState = condorcetTabulation(); //check ranked preferences of gods
+        actOfGod(actState);
+    } else {
+        //reset after round is over
+        actState = "voting";
+        hasAskedForVotes = false;
+    }
+    timerStart = Date.now();
+    io.emit("currentAct", {actState: actState});
+}
+
+function actOfGod(act){
+    console.log(`act of god: ${act}`);
+
+    switch(act) {
+        case "feast":
+            break;
+        case "famine":
+            break;
+        case "creation":
+            break;
+        case "meltdown":
+            break;
+        case "fire":
+            break;
+        case "flood":
+            break;
+        case "lightning":
+            break;
+        default:
+            console.log('error at actOfGod: ' + act);
+    }
+}
+
+function condorcetTabulation(){
+    //first, get all participating clients' rankings -- damn i need to keep a user array.
+    // io.emit("collectVotes")
+    //only check the rankings of those who clicked the participating button
+    let votes = [];
+    for (let user of users) {
+        if (user.isParticipating) {
+            votes.push(user.rankings);
+        }
+    }
+    //go through each first choice, if majority, then emit winner, else, go through again with r+1 votes
+    let round = 0;
+    let voteTotals = {
+        feast: 0,
+        famine: 0,
+        creation: 0,
+        meltdown: 0,
+        fire: 0,
+        flood: 0,
+        lightning: 0
+    }
+    // let [winner, totals] = countVotes(votes, round, voteTotals);
+    let winner = countVotes(votes, round, voteTotals);
+    // console.log(`winner: ${winner}, totals: ${totals}`)
+    console.log("winner: " + winner);
+    return winner;
+}
+
+function countVotes(votes, round, voteTotals){ //recursive function that runs until majority or default winner
+    // console.log(`round: ${round}, totalsSoFar: ${JSON.stringify(voteTotals)}`);
+    let isLastRound = true; //to make sure will end even if no majority
+    for (let vote of votes) { //each array of rankings
+        // if (vote[round] != undefined) { //to account for diff num of rankings
+        if (vote[round] != "none") { //nvm will always have 7, need to check against "none"
+            voteTotals[vote[round]] += 1;
+            isLastRound = false;
+        }
+    }
+
+    let sortedVotes = Object.entries(voteTotals).sort( (a, b) => { //array of array of key value pairs
+        return b[1] - a[1]; //because value of pair is second element in array
+    });
+    // console.log(JSON.stringify(sortedVotes));
+    if (sortedVotes[0][1] > votes.length / 2 || isLastRound) {//majority or no more votes
+        // if no more votes to count, just send one with most votes (yes, if tie, it's arbitrary)
+        // return [sortedVotes[0][0], voteTotals];
+        // console.log("ending tabulation");
+        // console.log(sortedVotes[0][0]);
+        return sortedVotes[0][0];
+    } else {
+        round++;
+        return countVotes(votes, round, voteTotals); //okay i didn't understand recursion, this needs a return too
+        // return [null, null]; //????
+    }
+    //  else if (!isLastRound) {
+    //     round++;
+    //     countVotes(votes, round, voteTotals);
+    // } else { //no more votes to count, just send one with most votes (yes, if tie, it's arbitrary)
+    //     return sortedVotes[0][0];
+    // }
+}
+
+//save to db
 // setInterval( () => {
-//     //fine to just have one doc for the whole ecosystem? or do i need to make one doc per critter/food? hmm
-//     //do I need to save backups? hmm... maybe every hour?
-//     let ecoLog = ecosystem.save();
-//     backupDB.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, (err) => {
-//         if (err) {
-//             console.log("backup err: " + err);
-//         }
-//         console.log('backup db updated');
-//     });
-
-//     // backupDB.asyncUpdate({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true})
-//     //     .then(function(){console.log('db backed up');})
-//     //     .catch(function(err){console.log("backup err: " + err);});
-
-//     // db.update({type: "ecosystemBackup"}, {type: "ecosystemBackup", time: Date.now(), ecoLog: ecoLog, conduit: ecosystem.conduit}, {upsert: true}, function(err) {
-//     //     if(err){
-//     //         console.log("db err: " + err);
-//     //     }
-//     //     console.log('db updated');
-//     // });
-// }, 3601000); //just to offset from main save
+//     // global.backupDB();
+//     backupEcosystem();
+// }, 300000); //how fast?  also prob need to save on exit? or does it matter? deterministic?
 
 
 //for exiting

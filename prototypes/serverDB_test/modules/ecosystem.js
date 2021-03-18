@@ -28,6 +28,11 @@ class Ecosystem {
             this.conduit = new Conduit();
             this.worldLife = 0;
             this.critterCount = 0;
+
+            //community funds
+            this.communityFunds = 0;
+            this.genesisFunds = 0;
+
             //create initial population -- need "new"?
             for (let i = 0; i < ecoSetup; i++) {
                 this.critters.push(new Critter("ecosystem", D.generate_ID(), {god: "August", primary: this.conduit.getRandomTarget(), secondary: this.conduit.getRandomTarget()}));
@@ -47,6 +52,11 @@ class Ecosystem {
             this.conduit = new Conduit(ecoSetup.donations);
             this.worldLife = 0;
             this.critterCount = 0;
+
+            //community funds
+            this.communityFunds = ecoSetup.ecosystem.communityFunds;
+            this.genesisFunds = ecoSetup.ecosystem.genesisFunds;
+
             
             //this is the same after db update
             for (let dbFood of ecoSetup.ecosystem.supply) {
@@ -218,8 +228,9 @@ class Ecosystem {
     spawnCritterFromUser(critter) {
         //create critter and check Conduit
         this.critters.push(new Critter("user", critter));
-        this.conduit.checkNewCritterTargets(critter.donations) //other donation stuff happens in .deposit()
-
+        if (this.conduit.checkNewCritterTargets(critter.donations)){ //other donation stuff happens in .deposit()
+            world.emit("fundsUpdate", this.conduit); //just if new orgs to add to creation menu
+        }
         //update stats
         this.critterCount++;
         this.worldLife += critter.life;
@@ -229,7 +240,7 @@ class Ecosystem {
         // backupCritters();
         // addCritterToDB(critter);
         backupEcosystem();
-        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife , communityFunds: this.communityFunds});
     }
 
     spawnRandomCritter() {
@@ -242,12 +253,12 @@ class Ecosystem {
         // backupCritters(); //need to backup eco now too or else might not exist on crash -- what was the point then?
         // addCritterToDB(critter);
         // backupEcosystem(); //now only doing this on interval in server
-        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
     }
 
     makeFood(amount, pos) {
         this.supply.push(new Food(amount, pos));
-        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
     }
 
     //critter dies, splice from critters and add corpse
@@ -260,7 +271,7 @@ class Ecosystem {
             }
         });
         this.critterCount--;
-        this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
+        this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
     }
     /* //now using graze method in flocking.js for quadtree usage
     checkForFood() {
@@ -308,7 +319,7 @@ class Ecosystem {
             //make da bebe
             // this.critterID++; //not using anymore right? will keep just in case
             this.critterCount++;
-            this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
+            this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
             let newBaby = new Critter("ecosystem", D.generate_ID(), {parentA: parents.A, parentB: parents.B, inheritance: inheritance});
             // console.log("new baby at: " + JSON.stringify(newBaby.position));
             console.log(`new baby: ${newBaby.name}`);
@@ -345,7 +356,7 @@ class Ecosystem {
         world.emit('fundsUpdate', this.conduit);
         // console.log(typeof this.worldLife);
         // console.log(`3: ${this.worldLife}`)
-        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife});
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
         // console.log(typeof this.worldLife);
         // console.log(`4: ${this.worldLife}`)
         
@@ -376,7 +387,7 @@ class Ecosystem {
         // world.broadcast.to(client).emit('clickInfo', foundCritter);
         if(foundCritter.length != 0){
             world.emit('clickInfo', {position: position, critter: foundCritter[0].data, client: client}); //hmmm i need to learn more about sockets... TODO
-
+            //TODO emit from server, this is dumb
         }
     }
 
@@ -406,7 +417,9 @@ class Ecosystem {
             supply: this.supply,
             corpses: this.corpses,
             // critters: dynamicCritters
-            critters: this.critters
+            critters: this.critters,
+            communityFunds: this.communityFunds,
+            genesisFunds: this.genesisFunds
         }
         return ecoLog;
     }

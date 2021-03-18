@@ -11,8 +11,21 @@ let page = { //later should just find screen size and make relative for DOM
 }
 let creationSketch;
 
+let isLoggedIn = false;
 let userData = {
-    funds: 10.00
+    funds: 10.00 //gets overwritten if logged in, but stays for testing
+}
+
+let loginButton, usernameInput, passwordInput;
+
+let edits = 0;
+let editsCost = 0.01;
+
+let updates = { //for updating funds on critter creation
+    username: "",
+    totalCost: 0,
+    communityFunds: 0,
+    genesisFunds: 0
 }
 
 let newCritter = {
@@ -32,12 +45,14 @@ let newCritter = {
     // color: 
     r: 0.5,
     maxSpeed: 0.5,
-    donationRate: 300000,
-    donationPercentage: .5,
-    minLifeToDonate: .5,
-    refractoryPeriod: 300000,
-    parentalSacrifice: .5,
-    minLifeToReproduce: .5,
+    // donationRate: 300000,
+    donationRate: 16000,
+    donationPercentage: .8,
+    minLifeToDonate: .8,
+    // refractoryPeriod: 300000,
+    refractoryPeriod: 16000,
+    parentalSacrifice: .8,
+    minLifeToReproduce: .8,
     // this.excretionRate = critter.excretionRate;
     // this.mutationRate = critter.mutationRate;
     // this.mateTimer = critter.mateTimer;
@@ -51,6 +66,7 @@ let mainInstance = (m) => {
     let title = "TWITCH PLAYS GOD";
     let modeSpan;
     m.modeButton = null;
+    // m.loginButton = null;
     // let isCreating = false;
     // let credits;
 
@@ -83,6 +99,7 @@ let mainInstance = (m) => {
                     creationSketch = new p5(creationInstance, 'creationCanvas');
                     m.modeButton.html("Back To The World")
                     document.getElementById("orgList").style.display = "none";
+                    ecosystemSketch.godPanelDiv.hide();
 
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
@@ -90,6 +107,8 @@ let mainInstance = (m) => {
                     m.modeButton.html("Create New Critter")
                     document.getElementById("defaultCanvas2").remove();
                     document.getElementById("creationSpan").remove();
+                    ecosystemSketch.godPanelDiv.show();
+
                     ecosystemSketch.isReadyToSpawn = false;
                     ecosystemSketch.monitorFunds(); //to make list pop back up
 
@@ -109,11 +128,54 @@ let mainInstance = (m) => {
                     // }
                 }
             })
+        loginSpan = m.createSpan()
+            .id("loginSpan")
+            .position(3 * m.width / 4, 2 * m.height / 3)
+            .size(m.width / 4, m.height / 4);
+        usernameInput = m.createInput("username")
+            .id("usernameInput")
+            .position(8 * m.width / 10, m.height / 8)
+            .size(m.width / 10, m.height / 6);
+        passwordInput = m.createInput("password")
+            .id("passwordInput")
+            .position(8 * m.width / 10, 3 * m.height / 8)
+            .size(m.width / 10, m.height / 6);
+        // usernameInput.hide();
+        // passwordInput.hide();
+        loginButton = m.createButton("LOG IN")
+            .parent('loginSpan')
+            .class("button")
+            .id("loginButton")
+            .center()
+            .mousePressed(login)
     }
 
     // m.draw = () => {
 
     // }
+
+    async function login () { 
+        //using socket acknowledgement
+        socket.emit('login', {username: usernameInput.value(), password: passwordInput.value()}, (response) => {
+            userData.authenticated = response.authenticated;
+            if (userData.authenticated) { //when they sign in
+                //clear ui
+                userData.isLoggedIn = true;
+                usernameInput.hide();
+                passwordInput.hide();
+                console.log('log in successful')
+
+                //update records -- so can click this again to update funds if added
+                userData.id = response.god.id;
+                userData.username = response.god.username;
+                userData.funds = response.god.funds;
+                loginButton.html(userData.username);
+            } else {
+                console.log('log in failed: ' + response);
+                loginButton.html('TRY AGAIN')
+            }
+        }) 
+    }
 }
 
 //kind of a weird layout, but this is where the magic happens:

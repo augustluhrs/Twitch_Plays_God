@@ -18,28 +18,15 @@ socket.on('fundsUpdate', (conduit) => {
     ecosystemSketch.monitorFunds();
 });
 
-// socket.on('fundsUpdate', (conduit) => {
-//     let fundsUpdate = conduit.fundsRaised;
-//     // console.log('funds: ');
-//     // console.log(conduit);
-//     let total = conduit.totalRaised;
-//     //make an array from funds and sort
-//     //TODO (toFixed "pattern")
-//     let sorted = Object.keys(fundsUpdate).map((key) => [key, fundsUpdate[key].toFixed(2)]); //two decimal places
-//     sorted.sort((a, b) => {return b[1] - a[1]});
-//     // console.log(sorted);
-
-//     ecosystemSketch.funds.sorted = sorted;
-//     ecosystemSketch.funds.total = total;
+// socket.on('userFundsUpdate', (data) => { //need to rename stuff
+//     console.log("updating user funds")
+//     userData.funds = data.funds;
 // });
 
 socket.on('statsUpdate', (update) => {
-    // console.log(typeof update.worldLife);
-    // console.log(update);
-    // console.log(update.critterCount);
-    // console.log(update.worldLife);
     ecosystemSketch.stats.critterCount = update.critterCount;
     ecosystemSketch.stats.worldLife = update.worldLife;
+    ecosystemSketch.stats.communityFunds = update.communityFunds;
 });
 
 socket.on('clickInfo', (data) => {
@@ -50,6 +37,34 @@ socket.on('clickInfo', (data) => {
         ecosystemSketch.overlay.critter = data.critter;
         ecosystemSketch.isDisplayingInfo = true;
     }
+});
+
+socket.on('timer', (data) => {
+    // console.log(data)
+    ecosystemSketch.timeLeft = data.timeLeft;
+});
+
+socket.on('currentAct', (data) => {
+    console.log("current act: " + data.actState);
+    ecosystemSketch.actState = data.actState;
+    if (data.actState != "voting"){
+        for (let rank of ecosystemSketch.ranks) {
+            rank.hide();
+        }
+    } else {
+        //when start of new voting round, turn off participation by default
+        if (ecosystemSketch.participationCheckbox != undefined) { //event happens before setup
+            ecosystemSketch.participationCheckbox.value(false);
+        }
+    }
+});
+
+socket.on('getVotes', (data) => {
+    // if (ecosystemSketch.participationCheckbox.checked()){
+    //only send votes if participating -- nvm, need to reset user array in server
+    let [isParticipating, votes] = ecosystemSketch.sendVotes();
+    socket.emit("voting", {isParticipating: isParticipating, rankings: votes});
+    // }
 });
 
 // socket.on('refresh', () => {
