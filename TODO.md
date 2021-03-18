@@ -88,8 +88,17 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] community effects / ACTS OF GOD
     - [X] brainstorm playtestable community effect prototypes
     - [ ] food sprinkle (feast)
+        - [ ] foodSprinkle clientside toggle
+        - [ ] see where other clients are
+        - [ ] change to 0.01
+        - [ ] message + change panel
     - [ ] famine (all poop goes to community funds)
+        - [ ] visual effect
+        - [ ] panel and message
+        - [ ] all poop goes straight to community funds
     - [ ] community critter generation
+        - [ ] same critter menu
+        - [ ] panel and message
     - [ ] radioactive waste (area that increases mutation rate)
     - [ ] fire (area that reduces life -- goes to funds or else will draw in)
     - [ ] flood (all critters lose health)
@@ -98,8 +107,8 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] timer for rounds
     - [X] current state in top left
     - [ ] last state effects
-    - [ ] participation button / submit votes button
-    - [ ] send votes to server
+    - [X] participation button / submit votes button
+    - [X] send votes to server
     - [X] god panel fades in
     - [ ] test manipulating the flocking sliders as a choice
     - [ ] fertilization battle royale minigame

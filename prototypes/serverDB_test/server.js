@@ -207,7 +207,9 @@ global.backupDonations = function(){ //donation database
 */
 
 //create socket connection
-let io = require('socket.io').listen(server)
+// let io = require('socket.io').listen(server) //outdated??? why did i have a weird version of socketio?
+let io = require('socket.io')(server)
+
 
 //clients
 // var world = io.of('/')

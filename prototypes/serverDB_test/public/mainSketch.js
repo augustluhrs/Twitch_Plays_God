@@ -171,7 +171,7 @@ let mainInstance = (m) => {
                 userData.funds = response.god.funds;
                 loginButton.html(userData.username);
             } else {
-                console.log('log in failed: ' + response);
+                console.log('log in failed: ' + JSON.stringify(response));
                 loginButton.html('TRY AGAIN')
             }
         }) 
