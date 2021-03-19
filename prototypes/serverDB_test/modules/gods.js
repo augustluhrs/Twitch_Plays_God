@@ -49,7 +49,7 @@ class Gods {
         }
     }
     //eventually could combine these two
-    updateDonation (id, donation) {
+    updateDonation (username, donation) {
 
     }
 

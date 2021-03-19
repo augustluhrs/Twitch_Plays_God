@@ -4,7 +4,7 @@
 
 **Feb 2021 Update** -- Cont. into March
 
-Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
+Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas?
 
 - [X] Critter Creation
     - [X] Instance Mode with Page DOM Positioning
@@ -52,7 +52,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] saturation threshold so hue doesn't lerp if black/white
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
-    - [ ] Collapsable Donation List
+    - [X] Collapsable Donation List
     - [X] hide scrollbar
     - [X] hide donations list on menu click and if fundsUpdate
     - [ ] no overlap between critter overlay and funds monitor... keep left or hide?
@@ -84,22 +84,34 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] click username button to get your stats
     - [ ] change all relative positions to 16:9
     - [ ] turn donations list into fade panel too
+    - [ ] fix ecosystemCanvas css not having top offset
+    - [ ] fix otherOrg inputs show/hide bugs
 - [ ] basics page / tutorial / help
 - [ ] community effects / ACTS OF GOD
     - [X] brainstorm playtestable community effect prototypes
-    - [ ] food sprinkle (feast)
-    - [ ] famine (all poop goes to community funds)
-    - [ ] community critter generation
+    - [X] food sprinkle (feast)
+        - [X] foodSprinkle clientside toggle
+        - [X] see where other clients are
+        - [X] change to 0.01
+        - [X] message + change panel
+    - [X] famine (all poop goes to community funds)
+        - [X] visual effect
+        - [X] panel and message
+        - [X] all poop goes straight to community funds
+    - [X] community critter generation
+        - [X] same critter menu
+        - [X] panel and message
+        - [X] frankencritter
     - [ ] radioactive waste (area that increases mutation rate)
     - [ ] fire (area that reduces life -- goes to funds or else will draw in)
-    - [ ] flood (all critters lose health)
+    - [X] flood (all critters lose health)
     - [ ] lightning strike (one critter instantly dies)
     - [X] ~~ranked choice voting system~~ Condorcet-Lite Voting
     - [X] timer for rounds
     - [X] current state in top left
     - [ ] last state effects
-    - [ ] participation button / submit votes button
-    - [ ] send votes to server
+    - [X] participation button / submit votes button
+    - [X] send votes to server
     - [X] god panel fades in
     - [ ] test manipulating the flocking sliders as a choice
     - [ ] fertilization battle royale minigame
@@ -124,23 +136,22 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] leaderboard filter by org
     - [ ] user donation as percentage of each critter donation
 - [ ] Playtest (start day and week later followup)
-    - [ ] host on glitch
+    - [X] host on glitch
     - [X] get group
     - [ ] intitial feedback survey
     - [ ] week later feedback survey
-    - [ ] user log in
+    - [X] user log in
     - [ ] initial playtest
     - [ ] ethics playtest/check-in
     - [X] reduce timers
 - [ ] Documentation
     - [ ] get media
-    - [ ] update github with current project status and media
+    - [X] update github with current project status and media
     - [ ] add to website
-    - [ ] create separate todo/changelog and update readme
+    - [X] create separate todo/changelog and update readme
     - [ ] design document with standards
     - [ ] prettier / ESLint?
     - [ ] versions and log
-    - [ ] readme update and todo separation
 - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
 - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
 - [ ] needs some sort of new theming...

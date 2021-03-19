@@ -16,6 +16,12 @@ let boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.wo
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
     constructor(ecoSetup) {
+        //for acts of god
+        this.isFamine = false;
+        this.isFlood = false;
+        this.isFire = false;
+        this.isMeltdown = false;
+        //setup based on whether existing or new
         if(typeof ecoSetup === "number"){
             console.log("new ecosystem");
             this.width = D.worldSize.width;
@@ -199,9 +205,14 @@ class Ecosystem {
                     needsBackup = true;
                 }
                 if (excretion.makeFood != null) {
-                    // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
-                    this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
-                    needsBackup = true;  
+                    if(!this.isFamine){
+                        // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
+                        this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
+                        needsBackup = true;
+                    } else { //during famine poop goes straight to community funds
+                        this.communityFunds += excretion.makeFood.amount;
+                        this.worldLife -= excretion.makeFood.amount;
+                    }  
                 }
             }
             //update socket display positions
@@ -229,6 +240,7 @@ class Ecosystem {
         //create critter and check Conduit
         this.critters.push(new Critter("user", critter));
         if (this.conduit.checkNewCritterTargets(critter.donations)){ //other donation stuff happens in .deposit()
+            // this.conduit.sortTargets();
             world.emit("fundsUpdate", this.conduit); //just if new orgs to add to creation menu
         }
         //update stats
@@ -239,6 +251,104 @@ class Ecosystem {
         // backupDB();
         // backupCritters();
         // addCritterToDB(critter);
+        backupEcosystem(); //comment if getting too slow
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife , communityFunds: this.communityFunds});
+    }
+
+    spawnCritterFromSeeds(seedCritters) {
+        //need to generate critter based on random selections of qualities from the seeds
+        //going with frankenstein vs two parent method for now
+        let frankenCritter = {};
+        if (seedCritters.length >= 2) {
+            for (let property of Object.keys(seedCritters[0])){ //just using properties as template
+                // console.log(property);
+                if (property == "name"){
+                    let parentA = {};
+                    let parentB = {};
+                    while (parentA.name == undefined || parentA.name == parentB.name) {
+                        parentA = seedCritters[Math.floor(Math.random() * seedCritters.length)];
+                        parentB = seedCritters[Math.floor(Math.random() * seedCritters.length)];
+                    }
+                    let randStartA, randEndA, randStartB, randEndB;
+                    let nameA = "";
+                    let nameB = "";
+                    if (parentA.name.length < 2){
+                        nameA = parentA.name;
+                    } else {
+                        while(nameA.length < 2){
+                            randStartA = Math.floor(Math.random() * parentA.name.length);
+                            randEndA = Math.floor(Math.random() * parentA.name.length + 1);
+                            nameA = parentA.name.substring(randStartA, randEndA);
+                        }
+                    }
+                    if (parentB.name.length < 2){
+                        nameB = parentB.name;
+                    } else {
+                        while(nameB.length < 2) {
+                            randStartB = Math.floor(Math.random() * parentB.name.length);
+                            randEndB = Math.floor(Math.random() * parentB.name.length + 1);
+                            nameB = parentB.name.substring(randStartB, randEndB);
+                        }
+                    }
+                    let bebName;
+                    if (Math.random() > .5) {
+                        bebName = nameA + nameB;
+                    } else {
+                        bebName = nameB + nameA;
+                    }
+                    //make sure is not too long
+                    if(bebName.length > 30){
+                        //now using substr because num characters
+                        bebName = bebName.substr(0, 30); // could do something more elegant but w/e
+                    }
+                    // console.log(bebName);
+                    frankenCritter.name = bebName.charAt(0).toUpperCase() + bebName.slice(1);
+                } else if (property == "donations") {
+                    let parentA = {};
+                    let parentB = {};
+                    while (parentA.name == undefined || parentA.name == parentB.name) {
+                        parentA = seedCritters[Math.floor(Math.random() * seedCritters.length)];
+                        parentB = seedCritters[Math.floor(Math.random() * seedCritters.length)];
+                    }
+                    let pADonation, pBDonation; //so still chance of secondary target
+                    if (Math.random() > .25) {
+                        pADonation = parentA.donations[0];
+                    } else {
+                        pADonation = parentA.donations[1];
+                    }
+                    if (Math.random() > .25) {
+                        pBDonation = parentB.donations[0];
+                    } else {
+                        pBDonation = parentB.donations[1];
+                    }
+                    frankenCritter.donations = [pADonation, pBDonation];
+               } else if (property == "position") {
+                    frankenCritter.position = [this.width / 2, this.height / 2];
+               } else if (property == "ancestry") {
+                   frankenCritter.ancestry = {child: frankenCritter.name, parents: [{name: "The Universe"}]};
+               } else if (property == "colorPicker"){
+                   //nothing
+               } else {
+                   //rest can be done just by picking randomly
+                   frankenCritter[property] = seedCritters[Math.floor(Math.random() * seedCritters.length)][property];
+               }
+            }
+        } else { //only one person participated, so they get a full fidelity copy
+            frankenCritter = seedCritters[0];
+        }
+        //create critter and check Conduit
+        this.critters.push(new Critter("user", frankenCritter));
+        if (this.conduit.checkNewCritterTargets(frankenCritter.donations)){ //other donation stuff happens in .deposit()
+            world.emit("fundsUpdate", this.conduit); //just if new orgs to add to creation menu
+        }
+
+        //update stats
+        this.critterCount++;
+        this.worldLife += frankenCritter.life;
+        this.communityFunds -= frankenCritter.life + 0.05; //update community funds -- genesis TODO
+        this.genesisFunds += 0.05;
+
+        //server update
         backupEcosystem();
         world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife , communityFunds: this.communityFunds});
     }
@@ -372,6 +482,19 @@ class Ecosystem {
         backupDonations();
         backupEcosystem();
         // this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
+    }
+
+    //act of god stuff
+    drownCritters() {
+        for (let critter of this.critters) {
+            critter.life -= 0.01;
+            this.communityFunds += 0.01;
+            if (critter.life <= 0) { //not sure how it would be less but...
+                ecosystem.die(critter);
+                console.log(`${critter.name} died in the flood`);
+            }
+        }
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
     }
 
     // good or bad? bad

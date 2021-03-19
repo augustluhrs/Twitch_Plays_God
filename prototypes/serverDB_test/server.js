@@ -61,11 +61,13 @@ let donations = undefined;
 
 //acts of god timer and state
 let timerStart = Date.now();
+let lastTimer = Date.now();
 // let timerCurrent = 0;
 // let timerVoting = 60; //60 seconds
 let actState = "voting";
 let lastState = "";
 let hasAskedForVotes = false;
+let seedCritters = [];
 
 /*
     ~ * ~ * ~ * MAIN FUNCTION
@@ -207,7 +209,9 @@ global.backupDonations = function(){ //donation database
 */
 
 //create socket connection
-let io = require('socket.io').listen(server)
+// let io = require('socket.io').listen(server) //outdated??? why did i have a weird version of socketio?
+let io = require('socket.io')(server)
+
 
 //clients
 // var world = io.of('/')
@@ -221,10 +225,11 @@ world.on('connection', function(socket){
     //removing these so only updates when server is ready... wait no, can't b/c then sketch doesn't have certain variables...
     if(ecosystem != undefined){ //give it current status of everything
         console.log("world has ecosystem")
-        world.emit('fundsUpdate', ecosystem.conduit);
-        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
+        //WHY WAS THIS UPDATING EVERYONE
+        socket.emit('fundsUpdate', ecosystem.conduit);
+        socket.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
         // world.emit("refresh"); //just so reloads if server resets -- nvm it loops, only really need this on my end so w/e
-        world.emit("currentAct", {actState: actState});
+        socket.emit("currentAct", {actState: actState});
     }
     
     //new event listeners
@@ -306,6 +311,10 @@ world.on('connection', function(socket){
         // }
     });
 
+    socket.on("plantSeedCritter", (data) => {
+        seedCritters.push(data.critter);
+    });
+
 
     // socket.on("checkFunds", (data) => {
     //     // console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
@@ -332,6 +341,11 @@ world.on('connection', function(socket){
         console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
         gods.addFunds(data.username, data.amount); //ah wait, don't need to emit back because not user's client...
         backupGods();
+    });
+
+    socket.on("addCommunityFunds", (data) => {
+        console.log(`Adding Community Funds: ${data.amount}`);
+        ecosystem.communityFunds += data.amount;
     });
 
     //listen for this client to disconnect
@@ -380,11 +394,18 @@ setInterval( () => {
     // console.log(timeLeft)
     if (timeLeft >= 0) {
         io.emit("timer", {timeLeft: timeLeft});
+        //for acts that need something to happen at intervals
+        if (actState == "flood" && lastTimer != timeLeft) { //really trying to make sure it only happens once a second
+            //man i really hope this doesn't mess with the critter run loop....
+            ecosystem.drownCritters();
+            lastTimer = timeLeft;
+        }
     }
     //trigger next event
     if (timeLeft <= 0 && !hasAskedForVotes){ //prob a better way of doing this -- could do it clientside off timer, but want to make sure only happens once from server
-        io.emit("getVotes");
-        hasAskedForVotes = true;
+        //might be weird to do this here... we have actOfGod() which is at the start of the round, we need one at end
+        console.log(actState);
+        endRound();
     }
     if (timeLeft <= -3 && lastState != actState){ //now waiting 3 seconds for all "voting" event messages
         setupNextRound();
@@ -392,7 +413,29 @@ setInterval( () => {
 }, 500);
 
 //acts of god event per round
-function setupNextRound(){
+function endRound(){ //things that happen at the end of round
+    hasAskedForVotes = true; //just to prevent it running a bunch
+    if (actState == "voting") {
+        io.emit("getVotes");
+        // hasAskedForVotes = true;
+    }
+    if (actState == "famine") {
+        ecosystem.isFamine = false;
+    }
+    if(actState == "creation"){
+        seedCritters = [];
+        io.emit("getSeedCritters");
+    }
+}
+function setupNextRound(){ //things that happen at the beginning of a round
+    //this is maybe not the right place for this but its gotta happen at very end
+    if (actState == "creation") {
+        if (seedCritters.length != 0){
+            console.log('spawning critter from community seeds')
+            ecosystem.spawnCritterFromSeeds(seedCritters);
+        }
+    }
+
     lastState = actState; //to only call event once per round
     if (actState == "voting") {
         //figure out what the state is, send to clients, then reset timer
@@ -402,6 +445,7 @@ function setupNextRound(){
             lastState = "repeatVoting"; //just so will trigger again
             hasAskedForVotes = false;
         } else {
+            hasAskedForVotes = false; //this is so dumb
             actOfGod(actState);
         }
     } else {
@@ -413,7 +457,7 @@ function setupNextRound(){
     io.emit("currentAct", {actState: actState});
 }
 
-function actOfGod(act){
+function actOfGod(act){ //things that happen... when? at the very beginning of a round? this is redundant i think
     console.log(`act of god: ${act}`);
 
     switch(act) {
@@ -422,6 +466,7 @@ function actOfGod(act){
             userIcons.feastIcons = [];
             break;
         case "famine":
+            ecosystem.isFamine = true;
             break;
         case "creation":
             break;

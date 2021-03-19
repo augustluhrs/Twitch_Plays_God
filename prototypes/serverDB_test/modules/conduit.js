@@ -8,6 +8,7 @@ class Conduit{
         if(conduit != undefined){
             this.donations = conduit.donations;
             this.totalRaised = conduit.totalRaised;
+            this.sortedTargets = conduit.sortedTargets;
         } else { //new conduit -- defaults to four targets
             this.donations = [ //array so can sort
                 //maybe eventually will need other class to generate these objects
@@ -26,9 +27,79 @@ class Conduit{
                 {   target: "PETA",
                     funds : 0,
                     link : "https://www.peta.org/"
-                }
+                },
+                {   target: "Planned Parenthood",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "ACLU",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Southern Poverty Law Center",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Doctors Without Borders",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "American Red Cross",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "World Wildlife Fund",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Greenpeace",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Justice LA",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Neta",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Ali Forney Center",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Texas Civil Rights Project",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "St. Jude Children's Hospital",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Trevor Project",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Okizu",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "End Violence Against Women International",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "World Food Programme",
+                    funds : 0,
+                    link : ""
+                },
+                {   target: "Native American Rights Fund",
+                    funds : 0,
+                    link : ""
+                },
             ]
             this.totalRaised = 0;
+            this.sortedTargets = [];
+            this.sortTargets();
         }  
     }
     //updates after socket message -- in ecosystem
@@ -95,7 +166,8 @@ class Conduit{
             })     
         }  
         if (newOrgA || newOrgB) {
-           return true; //so ecosystem can emit fundsUpdate
+            this.sortTargets();
+            return true; //so ecosystem can emit fundsUpdate
         } else {
             return false;
         }
@@ -106,6 +178,15 @@ class Conduit{
         let r = Math.floor(Math.random() * this.donations.length);
         let target = Object.keys(this.donations[r])[0];
         return target;
+    }
+
+    sortTargets(){
+        console.log('sorting targets')
+        let targets = [];
+            for (let org of this.donations) {
+                targets.push(org.target);
+            }
+        this.sortedTargets = targets.sort();
     }
 
     backup() {
