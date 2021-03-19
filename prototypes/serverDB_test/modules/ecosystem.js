@@ -483,6 +483,19 @@ class Ecosystem {
         // this.ecosystemEmit("stats", {critterCount: this.critterCount, worldLife: this.worldLife});
     }
 
+    //act of god stuff
+    drownCritters() {
+        for (let critter of this.critters) {
+            critter.life -= 0.01;
+            this.communityFunds += 0.01;
+            if (critter.life <= 0) { //not sure how it would be less but...
+                ecosystem.die(critter);
+                console.log(`${critter.name} died in the flood`);
+            }
+        }
+        world.emit("statsUpdate", {critterCount: this.critterCount, worldLife: this.worldLife, communityFunds: this.communityFunds});
+    }
+
     // good or bad? bad
     ecosystemEmit(type, update){
         if(type == "stats"){

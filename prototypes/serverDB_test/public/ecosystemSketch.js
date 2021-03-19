@@ -462,14 +462,14 @@ let ecosystemInstance = function(e) {
                 }
                 break;
             case "famine":
-                
+                //panel info
                 e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);
                 e.push();
                 e.fill(21, 96, 100);
                 e.textAlign(e.CENTER, e.CENTER);
                 e.text("all poop goes straight to\ncommunity funds", e.godPanel.x, 2 * e.godPanel.y / 3);
                 e.pop();
-                //display visual
+                //display visual -- based on https://editor.p5js.org/p5/sketches/3D:_sine_cosine_in_3D
                 e.push();
                 e.translate(e.width/2, e.height/2)
                 e.rotate(e.frameCount * 0.01);
@@ -504,6 +504,36 @@ let ecosystemInstance = function(e) {
             case "fire":
                 break;
             case "flood":
+                //panel info
+                e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);
+                e.push();
+                e.fill(21, 96, 100);
+                e.textAlign(e.CENTER, e.CENTER);
+                e.text("the world is washed clean", e.godPanel.x, 2 * e.godPanel.y / 3);
+                e.pop();
+                //act visuals -- based on https://editor.p5js.org/takawo/sketches/73OxurP9W
+                e.push();
+                const noiseScale = 800;
+                let waveHeight = e.width / 8;
+                e.colorMode(e.HSB, 360, 100, 100, 100);
+                e.blendMode(e.DIFFERENCE);
+                for (let h = e.height; h > 0; h -= e.height / 18) {
+                    e.push();
+                    e.translate(0, h);
+                    e.fill(220, 80, 100, 10);
+                    e.noStroke();
+                    e.beginShape();
+                    for (let x = 0; x < e.width; x += 5) {
+                      let n = e.noise(x / noiseScale, h*10 / noiseScale, e.frameCount / noiseScale * 5);
+                      let y = e.map(n, 0, 1, -waveHeight, waveHeight);
+                      e.vertex(x, y);
+                    }
+                    e.vertex(e.width, e.height);
+                    e.vertex(0, e.height);
+                    e.endShape(e.CLOSE);
+                    e.pop();
+                }
+                e.pop();
                 break;
             case "lightning":
                 break;

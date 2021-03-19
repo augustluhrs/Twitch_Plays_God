@@ -61,6 +61,7 @@ let donations = undefined;
 
 //acts of god timer and state
 let timerStart = Date.now();
+let lastTimer = Date.now();
 // let timerCurrent = 0;
 // let timerVoting = 60; //60 seconds
 let actState = "voting";
@@ -388,8 +389,10 @@ setInterval( () => {
     if (timeLeft >= 0) {
         io.emit("timer", {timeLeft: timeLeft});
         //for acts that need something to happen at intervals
-        if (actState == "flood") {
-
+        if (actState == "flood" && lastTimer != timeLeft) { //really trying to make sure it only happens once a second
+            //man i really hope this doesn't mess with the critter run loop....
+            ecosystem.drownCritters();
+            lastTimer = timeLeft;
         }
     }
     //trigger next event
