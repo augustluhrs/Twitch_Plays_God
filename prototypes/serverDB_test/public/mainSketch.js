@@ -10,6 +10,7 @@ let page = { //later should just find screen size and make relative for DOM
     height: 1080
 }
 let creationSketch;
+let communityCreationSketch;
 
 let isLoggedIn = false;
 let userData = {
@@ -29,13 +30,9 @@ let updates = { //for updating funds on critter creation
 }
 
 let newCritter = {
-    // this.id = critter.id;
-    // this.DNA = critter.DNA;
-    // this.offspring = critter.offspring;
     name: "Critter Name",
     donations: [{target: "NAACP", total: 0},{target: "Critical Role Foundation", total: 0}],
     positionArray: [0,0],
-    // this.position = new Victor(critter.position.x, critter.position.y);
     life: .8,
     ancestry: {child: this.name, parents: [{name: "Your Name"}]},
     // color: [45, 225, 194],
@@ -53,13 +50,29 @@ let newCritter = {
     refractoryPeriod: 16000,
     parentalSacrifice: .8,
     minLifeToReproduce: .8,
-    // this.excretionRate = critter.excretionRate;
-    // this.mutationRate = critter.mutationRate;
-    // this.mateTimer = critter.mateTimer;
-    // this.excretionTimer = critter.excretionTimer;
-    // this.donationTimer = critter.donationTimer;
-    // this.foodScale = critter.foodScale;
-    // this.boid = new Boid(this);
+}
+
+let communityCritter = {
+    name: "Critter Name",
+    donations: [{target: "NAACP", total: 0},{target: "Critical Role Foundation", total: 0}],
+    positionArray: [0,0],
+    life: .8,
+    ancestry: {child: this.name, parents: [{name: "The Universe"}]},
+    // color: [45, 225, 194],
+    // color: p5.color(45, 225, 194),
+    color: "#2DE1C2",
+    colorPicker: "#2DE1C2", //just for resetting colorpicker since needs specific string type...
+    // color: 
+    r: 0.5,
+    maxSpeed: 0.5,
+    // donationRate: 300000,
+    donationRate: 16000,
+    donationPercentage: .8,
+    minLifeToDonate: .8,
+    // refractoryPeriod: 300000,
+    refractoryPeriod: 16000,
+    parentalSacrifice: .8,
+    minLifeToReproduce: .8,
 }
 
 let mainInstance = (m) => {
@@ -96,7 +109,12 @@ let mainInstance = (m) => {
                 // isCreating = !isCreating;
                 ecosystemSketch.isCreating = !ecosystemSketch.isCreating;
                 if(ecosystemSketch.isCreating){
-                    creationSketch = new p5(creationInstance, 'creationCanvas');
+                    if (creationSketch == undefined) {
+                        creationSketch = new p5(creationInstance, 'creationCanvas');
+                    } else {
+                        m.select(`#creationCanvas`).show();
+                    }
+
                     m.modeButton.html("Back To The World")
                     document.getElementById("orgList").style.display = "none";
                     ecosystemSketch.godPanelDiv.hide();
@@ -105,8 +123,11 @@ let mainInstance = (m) => {
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
                 } else {
                     m.modeButton.html("Create New Critter")
-                    document.getElementById("defaultCanvas2").remove();
-                    document.getElementById("creationSpan").remove();
+                    // document.getElementById("defaultCanvas2").remove();
+                    // document.getElementById("creationSpan").remove();
+                    m.select(`#creationCanvas`).hide();
+                    // m.select(`#creationSpan`).hide();
+
                     ecosystemSketch.godPanelDiv.show();
 
                     ecosystemSketch.isReadyToSpawn = false;
@@ -127,7 +148,8 @@ let mainInstance = (m) => {
                     //     child.remove();
                     // }
                 }
-            })
+            });
+        m.modeButton.hide();
         loginSpan = m.createSpan()
             .id("loginSpan")
             .position(3 * m.width / 4, 2 * m.height / 3)
@@ -170,6 +192,12 @@ let mainInstance = (m) => {
                 userData.username = response.god.username;
                 userData.funds = response.god.funds;
                 loginButton.html(userData.username);
+
+                //update name in critter creation
+                newCritter.ancestry.parents[0].name = userData.username;
+
+                //show create critter button so they can't create until they've logged in
+                m.modeButton.show();
             } else {
                 console.log('log in failed: ' + JSON.stringify(response));
                 loginButton.html('TRY AGAIN')

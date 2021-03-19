@@ -1,6 +1,6 @@
-//for the critter creation menu
+//for the critter creation menu -- copied for community creation
 
-let creationInstance = function(c) { //should change to c?
+let communityCreationInstance = function(c) { //should change to c?
     //all normal coords are p5 canvas coords,
     //but all DOM elements are page coords, which are the same as the canvas coords but with Y + 135
     let pageOffset = page.height / 8; //wait no idea whats happening... is it something with the pos of the parents???
@@ -128,6 +128,7 @@ let creationInstance = function(c) { //should change to c?
 
     //bottom right
     let creationButton;
+    let cancelButton;
     let startLife, equTax, totalCost, fundsAfter;
     let genTax = 0.05;
 
@@ -158,16 +159,16 @@ let creationInstance = function(c) { //should change to c?
 
         //creating container so easy to remove when getting rid of creation screen
         c.createSpan()
-            .id("creationSpan")
-            .parent("creationCanvas");
+            .id("communityCreationSpan")
+            .parent("communityCreationCanvas");
             // .size(c.width, c.height);
         // c.createSpan()
         //     .id("confirmationSpan")
         //     .parent("creationCanvas");
 
         //top left && bottom left
-        nameInput = c.createInput(newCritter.name)
-            .parent("creationSpan")
+        nameInput = c.createInput(communityCritter.name)
+            .parent("communityCreationSpan")
             .position(c.width / 16, 1.25 * c.height / 9)
             .size(2 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
@@ -179,28 +180,28 @@ let creationInstance = function(c) { //should change to c?
                     nameInput.value(newVal);
                 }
             })
-        godInput = c.createInput(newCritter.ancestry.parents[0].name)
-            .parent("creationSpan")
-            .position(c.width / 16, 2.5 * c.height / 9)
-            .size(2 * c.width / 16, .25 * c.height / 9)
-            .class("whitebox")
-            .input(() => { 
-                //tried reset, nvm couldn't backspace all the way
-                //limiting length
-                if (godInput.value().length > 30){ // is this racist? how long can usernames be?
-                    let newVal = godInput.value().substr(0,30);
-                    godInput.value(newVal);
-                }
-            })
+        // godInput = c.createInput(communityCritter.ancestry.parents[0].name)
+        //     .parent("communityCreationSpan")
+        //     .position(c.width / 16, 2.5 * c.height / 9)
+        //     .size(2 * c.width / 16, .25 * c.height / 9)
+        //     .class("whitebox")
+        //     .input(() => { 
+        //         //tried reset, nvm couldn't backspace all the way
+        //         //limiting length
+        //         if (godInput.value().length > 30){ // is this racist? how long can usernames be?
+        //             let newVal = godInput.value().substr(0,30);
+        //             godInput.value(newVal);
+        //         }
+        //     })
         // primarySelectHolder = c.createSpan()
         //     .class("select-holder")
-        //     .parent("creationSpan")
+        //     .parent("communityCreationSpan")
         //     .id("p-holder")
         primarySelect = c.createSelect()
             .id("primarySelect")
             .position(c.width / 16, 4 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
-            .parent("creationSpan")
+            .parent("communityCreationSpan")
             // .parent("p-holder")
             .class("whitebox")
             // .style("size", "6")
@@ -219,7 +220,7 @@ let creationInstance = function(c) { //should change to c?
             .id("secondarySelect")
             .position(c.width / 16, 6 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
-            .parent("creationSpan")
+            .parent("communityCreationSpan")
             .class("whitebox")
             .changed(secondaryUpdate);
         // console.log(conduitData);
@@ -229,12 +230,12 @@ let creationInstance = function(c) { //should change to c?
             let target = org.target;
             primarySelect.option(target);
             secondarySelect.option(target);
-            if (target == newCritter.donations[0].target) {
+            if (target == communityCritter.donations[0].target) {
                 primarySelect.selected(target);
                 lastPrimary = target;
                 secondarySelect.disable(target);
             }
-            if (target == newCritter.donations[1].target) {
+            if (target == communityCritter.donations[1].target) {
                 secondarySelect.selected(target);
                 lastSecondary = target;
                 primarySelect.disable(target);
@@ -254,32 +255,32 @@ let creationInstance = function(c) { //should change to c?
         secondarySelect.option("other");
         otherPrimary = c.createInput("Enter new non-profit")
             .id("otherPrimary")
-            .parent("creationSpan")
+            .parent("communityCreationSpan")
             .position(c.width / 16, 4.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
         otherSecondary = c.createInput("Enter new non-profit")
             .id("otherSecondary")
-            .parent("creationSpan")
+            .parent("communityCreationSpan")
             .position(c.width / 16, 6.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
-        startingLifeSlider = c.createSlider(.05, userData.funds, newCritter.life, .05)
+        startingLifeSlider = c.createSlider(.05, ecosystemSketch.stats.communityFunds, communityCritter.life, .05)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
-            .parent("creationSpan");
+            .parent("communityCreationSpan");
 
         //top middle
         critterDisplay.x = 8 * c.width / 16;
         critterDisplay.y = 3 * c.height / 9;
-        // let defaultColor = c.color(newCritter.color[0], newCritter.color[1], newCritter.color[2])
+        // let defaultColor = c.color(communityCritter.color[0], communityCritter.color[1], communityCritter.color[2])
         //need to get color now that it's being set as a string ohh wait can use string in color constructor! but not the way toString formats it?? that's so fucking dumb, or wait, just need to specify
         c.push();
         c.colorMode(c.HSL);
         // let hslColor = [];
-        // let colorString = newCritter.color.substr(4, newCritter.color.length); //cut the hsl( from beginning
+        // let colorString = communityCritter.color.substr(4, communityCritter.color.length); //cut the hsl( from beginning
         // let commaIndex = colorString.indexOf(",");
         // hslColor[0] = parseFloat(colorString.substr(0, commaIndex));
         // colorString = colorString.substr(commaIndex + 1, colorString.length);
@@ -289,49 +290,49 @@ let creationInstance = function(c) { //should change to c?
         // hslColor[2] = parseFloat(colorString.substr(0, colorString.length - 1)); //just cutting off last )
         // let normalizedColor = [D.map(hslColor[0], 0, 360, 0, 1), D.map(hslColor[1], 0, 100, 0, 1), D.map(hslColor[2], 0, 100, 0, 1)];
         // this.DNA.color = normalizedColor;
-        let hslColor = c.color(newCritter.colorPicker);
+        let hslColor = c.color(communityCritter.colorPicker);
         // console.log(hslColor);
         colorPicker = c.createColorPicker(hslColor) //issue now that this is a string....
             .position(7 * c.width / 16, .5 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
-            .parent("creationSpan");
+            .parent("communityCreationSpan");
         c.pop();
         //bottom middle
         //not sure if millis is the right rate for cooldown, seems to be 100 per second
         //for virus prevention, using new tick system like point buy. 20 per slider, starting at 75%, and only like 3.3 mins for max cooldown for playtest
-        // donationCooldownSlider = c.createSlider(1000, 360000, newCritter.donationRate, 1000)
-        donationCooldownSlider = c.createSlider(1000, 20000, newCritter.donationRate, 1000)
-            .parent("creationSpan")
+        // donationCooldownSlider = c.createSlider(1000, 360000, communityCritter.donationRate, 1000)
+        donationCooldownSlider = c.createSlider(1000, 20000, communityCritter.donationRate, 1000)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 5.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
-        // donationPercentageSlider = c.createSlider(.01, 1, newCritter.donationPercentage, .01)
-        donationPercentageSlider = c.createSlider(.05, 1, newCritter.donationPercentage, .05)
-            .parent("creationSpan")
+        // donationPercentageSlider = c.createSlider(.01, 1, communityCritter.donationPercentage, .01)
+        donationPercentageSlider = c.createSlider(.05, 1, communityCritter.donationPercentage, .05)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 5.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
-        // donationMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToDonate, .01)
-        donationMinLifeSlider = c.createSlider(.05, 1, newCritter.minLifeToDonate, .05)
-            .parent("creationSpan")
+        // donationMinLifeSlider = c.createSlider(.01, 5, communityCritter.minLifeToDonate, .01)
+        donationMinLifeSlider = c.createSlider(.05, 1, communityCritter.minLifeToDonate, .05)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 6.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
-        // matingCooldownSlider = c.createSlider(1000, 360000, newCritter.refractoryPeriod, 1000)
-        matingCooldownSlider = c.createSlider(1000, 20000, newCritter.refractoryPeriod, 1000)
-            .parent("creationSpan")
+        // matingCooldownSlider = c.createSlider(1000, 360000, communityCritter.refractoryPeriod, 1000)
+        matingCooldownSlider = c.createSlider(1000, 20000, communityCritter.refractoryPeriod, 1000)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 7.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
-        // matingPercentageSlider = c.createSlider(.01, 1, newCritter.parentalSacrifice, .01)
-        matingPercentageSlider = c.createSlider(.05, 1, newCritter.parentalSacrifice, .05)
-            .parent("creationSpan")
+        // matingPercentageSlider = c.createSlider(.01, 1, communityCritter.parentalSacrifice, .01)
+        matingPercentageSlider = c.createSlider(.05, 1, communityCritter.parentalSacrifice, .05)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 7.6 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
-        // matingMinLifeSlider = c.createSlider(.01, 5, newCritter.minLifeToReproduce, .01)
-        matingMinLifeSlider = c.createSlider(.05, 1, newCritter.minLifeToReproduce, .05)
-            .parent("creationSpan")
+        // matingMinLifeSlider = c.createSlider(.01, 5, communityCritter.minLifeToReproduce, .01)
+        matingMinLifeSlider = c.createSlider(.05, 1, communityCritter.minLifeToReproduce, .05)
+            .parent("communityCreationSpan")
             .position(7.75 * c.width / 16, 8.1 * c.height / 9)
             .size(2.5 * c.width / 16, .25 * c.height / 9)
             .input(checkEdits);
@@ -341,20 +342,34 @@ let creationInstance = function(c) { //should change to c?
         bodySlider.yCenter = 2 * c.height / 9;
         bodySlider.w = 3 * c.width / 16;
         bodySlider.h = 3 * c.width / 16; //square for now
-        bodySlider.xVal = newCritter.maxSpeed;
-        bodySlider.yVal = newCritter.r;
-        bodySlider.xPos = c.map(newCritter.maxSpeed, 0, 1, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2);
-        bodySlider.yPos = c.map(newCritter.r, 1, 0, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2);
+        bodySlider.xVal = communityCritter.maxSpeed;
+        bodySlider.yVal = communityCritter.r;
+        bodySlider.xPos = c.map(communityCritter.maxSpeed, 0, 1, bodySlider.xCenter - bodySlider.w / 2, bodySlider.xCenter + bodySlider.w / 2);
+        bodySlider.yPos = c.map(communityCritter.r, 1, 0, bodySlider.yCenter - bodySlider.h / 2, bodySlider.yCenter + bodySlider.h / 2);
         // bodySlider.xPos = bodySlider.xCenter;
         // bodySlider.yPos = bodySlider.yCenter;
 
         //bottom right
-        creationButton = c.createButton("CREATE CRITTER")
+        creationButton = c.createButton("CREATE SEED CRITTER")
             .class("button")
-            .parent("creationSpan")
+            .parent("communityCreationSpan")
             .position(13.25 * c.width / 16, 7.25 * c.height / 9)
             .size(2 * c.width / 16, c.height / 9)
             .mousePressed(c.createCritter);
+        cancelButton = c.createButton("cancel")
+            .class("button")
+            .parent("communityCreationSpan")
+            .position(11.50 * c.width / 16, 7.75 * c.height / 9)
+            .size( c.width / 16, .5 * c.height / 9)
+            .mousePressed(() => {
+                //close menu and bring back all stuff since not placing
+                mainSketch.modeButton.show();
+                ecosystemSketch.godPanelDiv.show();
+                ecosystemSketch.monitorFunds();
+                // c.select("#communityCreationSpan").hide();
+                c.select("#communityCreationCanvas").hide();
+                ecosystemSketch.hasCreatedSeed = false;
+            });
 
         //confirmation menu
         // confirmationMenu = c.createGraphics(page.width, page.height)
@@ -371,8 +386,8 @@ let creationInstance = function(c) { //should change to c?
     c.draw = () => {
         c.clear();
         // c.background(200, 255, 200, 225); //light green
-        c.background(102, 113, 18); //changing to solid for now for better pop and no clutter from underneath text
-
+        // c.background(102, 113, 18); //changing to solid for now for better pop and no clutter from underneath text
+        c.background(247, 193, 187); //baby pink to distinguish but still match
         //text stuff
         c.textAlign(c.LEFT, c.CENTER);
         c.noStroke();
@@ -382,7 +397,7 @@ let creationInstance = function(c) { //should change to c?
         c.textSize(fontLarge);
         c.textAlign(c.LEFT, c.CENTER);
         c.text(`${nameInput.value()}`, .5 * c.width / 16, .75 * c.height / 9);
-        c.text(`${godInput.value()}`, .5 * c.width / 16, 2 * c.height / 9);
+        // c.text(`${godInput.value()}`, .5 * c.width / 16, 2 * c.height / 9);
         c.text("Donation Target A", .5 * c.width / 16, 3.5 * c.height / 9);
         c.text("Donation Target B", .5 * c.width / 16, 5.5 * c.height / 9);
         c.text(`Starting Life: $${startingLifeSlider.value()}`, .5 * c.width / 16, 7.5 * c.height / 9);
@@ -403,7 +418,7 @@ let creationInstance = function(c) { //should change to c?
         drawCritter(6.5 * c.width / 16, 7.75 * c.height / 9, true, false);
 
         c.textSize(fontSmall);
-        c.text(`CRISPR Gene Edits: ${c.floor(edits)} @ $${editsCost.toFixed(2)}`, 7.75 * c.width / 16, 4.25 * c.height / 9);
+        // c.text(`CRISPR Gene Edits: ${c.floor(edits)} @ $${editsCost.toFixed(2)}`, 7.75 * c.width / 16, 4.25 * c.height / 9);
         c.text(`Donation Cooldown: ${donationCooldownSlider.value() / 100} seconds`, 7.75 * c.width / 16, 5 * c.height / 9);
         c.text(`Donation Percentage: ${donationPercentageSlider.value() * 100}%`, 7.75 * c.width / 16, 5.5 * c.height / 9);
         c.text(`Minimum Life Needed: $${donationMinLifeSlider.value()}`, 7.75 * c.width / 16, 6 * c.height / 9);
@@ -419,20 +434,20 @@ let creationInstance = function(c) { //should change to c?
         c.noStroke();
         c.textSize(fontSmall);
         c.textAlign(c.RIGHT, c.BOTTOM); //kind of doing this backwards...
-        c.text(`Critter Starting Life:\nCRISPR Cost:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 13.25 * c.width / 16, 7 * c.height / 9);
+        c.text(`Critter Starting Life:\nGenesis Tax:\nTotal Cost:\n\nAvailable Community Funds:\nFunds after Creation:`, 13.25 * c.width / 16, 7 * c.height / 9);
         // c.text(`Critter Starting Life:\nEquilibrium Tax:\nGenesis Tax:\nTotal Cost:\n\nAvailable Funds:\nFunds after Creation:`, 11 * c.width / 16, 5.5 * c.height / 9, 12.75 * c.width / 16, 7 * c.height / 9);
         c.textAlign(c.LEFT, c.BOTTOM);
         // let startLife = startingLifeSlider.value().toFixed(2);
         startLife = startingLifeSlider.value();
-        editsTotal = edits * editsCost;
-        equTax = startLife * .1;
-        if(equTax < .1){equTax = .1};
+        // editsTotal = edits * editsCost;
+        // equTax = startLife * .1;
+        // if(equTax < .1){equTax = .1};
         // equTax = equTax.toFixed(2);
         // genTax = 0.05;
-        totalCost = (startLife + editsTotal + equTax + genTax).toFixed(2);
-        fundsAfter = userData.funds.toFixed(2) - parseFloat(totalCost).toFixed(2); //no idea why toFixed isn't working as expected
+        totalCost = (startLife + genTax).toFixed(2);
+        fundsAfter = ecosystemSketch.stats.communityFunds.toFixed(2) - parseFloat(totalCost).toFixed(2); //no idea why toFixed isn't working as expected
         fundsAfter = fundsAfter.toFixed(2);
-        c.text(`$${startLife.toFixed(2)}\n$${(editsTotal).toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${totalCost}\n\n$${userData.funds.toFixed(2)}\n$${fundsAfter}`, 13.75 * c.width / 16, 7 * c.height / 9);
+        c.text(`$${startLife.toFixed(2)}\n$${genTax}\n$${totalCost}\n\n$${ecosystemSketch.stats.communityFunds.toFixed(2)}\n$${fundsAfter}`, 13.75 * c.width / 16, 7 * c.height / 9);
         // c.text(`$${startLife.toFixed(2)}\n$${equTax.toFixed(2)}\n$${genTax}\n$${(startLife + equTax + genTax).toFixed(2)}\n\n$${userData.funds.toFixed(2)}\n$${(userData.funds - startLife - equTax - genTax).toFixed(2)}`, 13.75 * c.width / 16, 7 * c.height / 9);
         if(fundsAfter < 0) {
             creationButton.style("background-color", "red");
@@ -541,49 +556,47 @@ let creationInstance = function(c) { //should change to c?
         // console.log('creating critter');
         //not doing confirmation pop up for now
         if (fundsAfter >= 0) {
-            newCritter.name = nameInput.value();
+            communityCritter.name = nameInput.value();
             let targetA = primarySelect.value();
             let targetB = secondarySelect.value();
             if (targetA == "other"){targetA = otherPrimary.value()}
             if (targetB == "other"){targetB = otherSecondary.value()}
-            newCritter.donations = [{target: targetA, total: 0},{target: targetB, total: 0}];
+            communityCritter.donations = [{target: targetA, total: 0},{target: targetB, total: 0}];
             // positionArray = [0,0]; //done in ecosystem
-            newCritter.life = startingLifeSlider.value();
-            newCritter.ancestry = {child: nameInput.value(), parents: [{name: godInput.value()}]};
+            communityCritter.life = startingLifeSlider.value();
+            communityCritter.ancestry = {child: nameInput.value(), parents: [{name: "The Universe"}]};
             // color = colorPicker.color();
-            // newCritter.color = colorPicker.value(); //hex now
+            // communityCritter.color = colorPicker.value(); //hex now
             //HSL switch
-            newCritter.color = colorPicker.color().toString("hsl");
-            newCritter.colorPicker = colorPicker.color().toString("#rrggbb");
-            // console.log(typeof newCritter.color);
-            // console.log(newCritter.color);
-            // console.log(newCritter.colorPicker);
+            communityCritter.color = colorPicker.color().toString("hsl");
+            communityCritter.colorPicker = colorPicker.color().toString("#rrggbb");
+            // console.log(typeof communityCritter.color);
+            // console.log(communityCritter.color);
+            // console.log(communityCritter.colorPicker);
 
-            newCritter.maxSpeed = bodySlider.xVal;
-            newCritter.r = bodySlider.yVal;
-            newCritter.donationRate = donationCooldownSlider.value();
-            newCritter.donationPercentage = donationPercentageSlider.value();
-            newCritter.minLifeToDonate = donationMinLifeSlider.value();
-            newCritter.refractoryPeriod = matingCooldownSlider.value();
-            newCritter.parentalSacrifice = matingPercentageSlider.value();
-            newCritter.minLifeToReproduce = matingMinLifeSlider.value();
-
-            //update funds in mainSketch
-            // userData.funds -= newCritter.life; //nvm only if placed
+            communityCritter.maxSpeed = bodySlider.xVal;
+            communityCritter.r = bodySlider.yVal;
+            communityCritter.donationRate = donationCooldownSlider.value();
+            communityCritter.donationPercentage = donationPercentageSlider.value();
+            communityCritter.minLifeToDonate = donationMinLifeSlider.value();
+            communityCritter.refractoryPeriod = matingCooldownSlider.value();
+            communityCritter.parentalSacrifice = matingPercentageSlider.value();
+            communityCritter.minLifeToReproduce = matingMinLifeSlider.value();
 
             //update the object that will be sent to server to update funds
-            updates.username = userData.username;
-            updates.totalCost = totalCost;
-            updates.communityFunds = editsTotal + equTax;
-            updates.genesisFunds = genTax;
+            // updates.username = userData.username;
+            // updates.totalCost = totalCost;
+            // ecosystemSketch.stats.communityFunds = editsTotal + equTax;
+            // updates.genesisFunds = genTax;
 
-            //close menu and go back to ecosystem to plop down
-            mainSketch.modeButton.html('Abort Critter');
-            // c.select("#creationSpan").hide();
-            c.select("#creationCanvas").hide();
-            ecosystemSketch.isReadyToSpawn = true;
-            // document.getElementById("creationSpan").remove();
-            // document.getElementById("defaultCanvas2").remove();
+            //close menu and bring back all stuff since not placing
+            mainSketch.modeButton.show();
+            ecosystemSketch.godPanelDiv.show();
+            ecosystemSketch.monitorFunds();
+            // c.select("#communityCreationSpan").hide();
+            // c.select("#defaultCanvas2").hide();
+            c.select("#communityCreationCanvas").hide();
+            ecosystemSketch.hasCreatedSeed = true;
         } 
     }
 

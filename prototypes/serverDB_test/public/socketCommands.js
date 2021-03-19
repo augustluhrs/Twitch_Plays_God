@@ -1,4 +1,5 @@
 //worried about hacking, but fine because eventually will be checked against server info
+
 //open and connect the input socket
 let socket = io('/');
 
@@ -66,6 +67,13 @@ socket.on('currentAct', (data) => { //this is real messy but gotta run with it f
         } else {
             ecosystemSketch.isFeast = false;
         }
+        if (data.actState == "creation") {
+            ecosystemSketch.hasCreatedSeed = false;
+            ecosystemSketch.communityCreationButton.show();
+        } else {
+            // ecosystemSketch.isFeast = false;
+            ecosystemSketch.communityCreationButton.hide();
+        }
     }
 });
 
@@ -79,7 +87,15 @@ socket.on('getVotes', (data) => {
 
 socket.on("feastMovement", (data) => {
     ecosystemSketch.allIcons.feastIcons = data;
-})
+});
+
+socket.on("getSeedCritters", (data) => {
+    console.log("checking for seed");
+    if (ecosystemSketch.hasCreatedSeed) {
+        console.log(`sending seed critter: ${communityCritter}`);
+        socket.emit("plantSeedCritter", {critter: communityCritter});
+    }
+});
 
 // socket.on('refresh', () => {
 //     location.reload();

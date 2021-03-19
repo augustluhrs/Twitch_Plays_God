@@ -48,24 +48,24 @@ class Critter {
                 let randStartA, randEndA, randStartB, randEndB;
                 let nameA = "";
                 let nameB = "";
-                while(nameA.length < 2){
-                    randStartA = Math.floor(Math.random() * parentA.name.length);
-                    randEndA = Math.floor(Math.random() * parentA.name.length + 1);
-                    nameA = parentA.name.substring(randStartA, randEndA);
+                if (parentA.name.length < 2){
+                    nameA = parentA.name;
+                } else {
+                    while(nameA.length < 2){
+                        randStartA = Math.floor(Math.random() * parentA.name.length);
+                        randEndA = Math.floor(Math.random() * parentA.name.length + 1);
+                        nameA = parentA.name.substring(randStartA, randEndA);
+                    }
                 }
-                while(nameB.length < 2) {
-                    randStartB = Math.floor(Math.random() * parentB.name.length);
-                    randEndB = Math.floor(Math.random() * parentB.name.length + 1);
-                    nameB = parentB.name.substring(randStartB, randEndB);
+                if (parentB.name.length < 2){
+                    nameB = parentB.name;
+                } else {
+                    while(nameB.length < 2) {
+                        randStartB = Math.floor(Math.random() * parentB.name.length);
+                        randEndB = Math.floor(Math.random() * parentB.name.length + 1);
+                        nameB = parentB.name.substring(randStartB, randEndB);
+                    }
                 }
-                // let randStartA = Math.floor(Math.random() * parentA.name.length);
-                // let randEndA = Math.floor(Math.random() * parentA.name.length + 1);
-                // let nameA = parentA.name.substring(randStartA, randEndA);
-                // console.log(`${parentA.name}, ${randStartA}, ${randEndA}, ${nameA}`);
-                // let randStartB = Math.floor(Math.random() * parentB.name.length);
-                // let randEndB = Math.floor(Math.random() * parentB.name.length + 1);
-                // let nameB = parentB.name.substring(randStartB, randEndB);
-                // console.log(`${parentB.name}, ${randStartB}, ${randEndB}, ${nameB}`);
 
                 let bebName;
                 if (Math.random() > .5) {

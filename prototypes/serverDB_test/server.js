@@ -66,6 +66,7 @@ let timerStart = Date.now();
 let actState = "voting";
 let lastState = "";
 let hasAskedForVotes = false;
+let seedCritters = [];
 
 /*
     ~ * ~ * ~ * MAIN FUNCTION
@@ -308,6 +309,10 @@ world.on('connection', function(socket){
         // }
     });
 
+    socket.on("plantSeedCritter", (data) => {
+        seedCritters.push(data.critter);
+    });
+
 
     // socket.on("checkFunds", (data) => {
     //     // console.log(`Adding Funds: ${data.username} -- ${data.amount}`);
@@ -385,8 +390,9 @@ setInterval( () => {
     }
     //trigger next event
     if (timeLeft <= 0 && !hasAskedForVotes){ //prob a better way of doing this -- could do it clientside off timer, but want to make sure only happens once from server
-        io.emit("getVotes");
-        hasAskedForVotes = true;
+        //might be weird to do this here... we have actOfGod() which is at the start of the round, we need one at end
+        console.log(actState);
+        endRound();
     }
     if (timeLeft <= -3 && lastState != actState){ //now waiting 3 seconds for all "voting" event messages
         setupNextRound();
@@ -394,7 +400,25 @@ setInterval( () => {
 }, 500);
 
 //acts of god event per round
+function endRound(){
+    hasAskedForVotes = true; //just to prevent it running a bunch
+    if (actState == "voting") {
+        io.emit("getVotes");
+        // hasAskedForVotes = true;
+    }
+    if(actState == "creation"){
+        seedCritters = [];
+        io.emit("getSeedCritters");
+    }
+}
 function setupNextRound(){
+    if (actState == "creation") {
+        if (seedCritters.length != 0){
+            console.log('spawning critter from community seeds')
+            ecosystem.spawnCritterFromSeeds(seedCritters);
+        }
+    }
+
     lastState = actState; //to only call event once per round
     if (actState == "voting") {
         //figure out what the state is, send to clients, then reset timer
@@ -404,6 +428,7 @@ function setupNextRound(){
             lastState = "repeatVoting"; //just so will trigger again
             hasAskedForVotes = false;
         } else {
+            hasAskedForVotes = false; //this is so dumb
             actOfGod(actState);
         }
     } else {

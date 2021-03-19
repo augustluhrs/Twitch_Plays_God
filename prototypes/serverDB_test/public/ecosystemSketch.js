@@ -58,7 +58,9 @@ let ecosystemInstance = function(e) {
         edgeMax: (5 *  page.width / 16) + (.25 * page.width / 16),
         fadeSpeed: 40
     }
-    // let godPanel;
+    e.allIcons = {
+        feastIcons: [],
+    }
     //voting
     e.helpIcon;
     e.isShowingVotingHelp = false;
@@ -69,9 +71,13 @@ let ecosystemInstance = function(e) {
     e.isFeast = false;
     e.feastIcons = ["🍉", "🍑", "🥥", "🥑", "🌽", "🥔", "🧀", "🍗", "🥩", "🍕", "🌭", "🍙", "🧁", "🍩", "🌶️", "🥦", "🍄"];
     e.feastIcon;
-    e.allIcons = {
-        feastIcons: [],
-    }
+    //famine
+    //creation
+    // e.isCommunityCreation = false;
+    e.communityCreationButton;
+    e.hasCreatedSeed = false;
+
+    
 
     //assets
     let godIcon;
@@ -111,24 +117,25 @@ let ecosystemInstance = function(e) {
                     // e.panelFade("in", e.godPanel.x);
                     e.godPanel.dir = "in";
                     e.eventButton.html("HIDE PANEL");
-                    for (let d of e.ranks) {
-                        d.hide();
-                    }
+                    // for (let d of e.ranks) { //why the fuck am i hiding here
+                    //     d.hide();
+                    // }
                 } else { //hide panel
                     e.eventButton.html("BE GOD");
                     e.godPanel.dir = "out";
                     // e.panelFade("out", e.godPanel.x);
-                    if (e.actState == "voting") {
-                        for (let d of e.ranks) {
-                            d.show();
-                        }
-                    }
+                    // if (e.actState == "voting") {
+                    //     for (let d of e.ranks) {
+                    //         d.show();
+                    //     }
+                    // }
                 }
             });
 
         //voting event
         e.participationCheckbox = e.createCheckbox('Participating in Next Act of God', false)
             .id("participationCheckbox")
+            .parent("godPanelDiv")
             .position(e.godPanel.x + 4 * e.godPanel.width / 4 , page.height / 8 + (e.godPanel.y - e.godPanel.height / 2) + 3 * e.godPanel.height / 30);
         e.participationCheckbox.hide();
         for(let i = 0; i < 7; i++){
@@ -172,11 +179,32 @@ let ecosystemInstance = function(e) {
                 e.isShowingVotingHelp = false;
                 // console.log('off')
             });
-        e.helpIcon.hide();
+            e.helpIcon.hide();
 
         //feast
         e.feastIcon = e.feastIcons[Math.floor(Math.random() * e.feastIcons.length)];
         console.log(`my feast icon: ${e.feastIcon}`);
+
+        //creation
+        e.communityCreationButton = e.createButton("CREATE SEED CRITTER")
+            .parent('godPanelDiv')
+            .class("button")
+            .id("communityCreationButton")
+            .position(1.75 * e.width / 16, 4.25 * e.height / 9)
+            .mousePressed(() => {
+                if (communityCreationSketch == undefined) {
+                    communityCreationSketch = new p5(communityCreationInstance, 'communityCreationCanvas');
+                } else {
+                    e.select(`#communityCreationCanvas`).show();
+                }
+                // m.modeButton.html("Back To The World") //gonna be fucky with this
+                mainSketch.modeButton.hide(); //need to show this and orgList and godPanel (monitorFunds)
+                document.getElementById("orgList").style.display = "none";
+                ecosystemSketch.godPanelDiv.hide();
+            });
+        if (e.actState != "creation") {
+            e.communityCreationButton.hide();
+        }
 
         //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
         let listWidth = e.width / 6 + "px";
@@ -268,8 +296,9 @@ let ecosystemInstance = function(e) {
                     //reset
                     e.isReadyToSpawn = false;
                     e.isCreating = false;
-                    document.getElementById("defaultCanvas2").remove();
-                    document.getElementById("creationSpan").remove();
+                    // document.getElementById("defaultCanvas2").remove();
+                    // document.getElementById("creationSpan").remove();
+                    // e.select(`#creationCanvas`).hide();
                     e.godPanelDiv.show();
                     document.getElementById("orgList").style.display = "inherit"; //brings back org list, no idea what the style it's inheriting is
                     mainSketch.modeButton.html("Create New Critter");
@@ -344,26 +373,6 @@ let ecosystemInstance = function(e) {
         e.pop();
     }
 
-    // let drawBaby = (critter) => {
-    //     //for lifeForce aura
-    //     // let fadedColor = e.color(critter.color[0] * 255, critter.color[1]  * 255, critter.color[2]  * 255, 100);
-    //     // e.fill(fadedColor);
-    //     // e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 100, 0, critter.r / 2));
-        
-    //     //show ring if ready to mate
-    //     // e.noFill();
-    //     // if(critter.isReadyToMate){
-    //     //     e.stroke(255);
-    //     // }
-    //     // e.ellipse(critter.position.x, critter.position.y, critter.r + e.map(critter.life, 0, 200, 0, critter.r / 2));
-    
-    //     //base critter
-    //     // let critCol = e.color(critter.color[0] * 255, critter.color[1] * 255, critter.color[2] * 255);
-    //     e.fill(newCritter.color);
-    //     e.noStroke();
-    //     e.ellipse(mouseX, mouseY, newCritter.r); 
-    // }
-
     e.monitorFunds = () => { 
         // console.log("monitor Funds")
         // for (let child of document.getElementById("orgList").children) {
@@ -396,28 +405,6 @@ let ecosystemInstance = function(e) {
                     .class("orgDivs")
             }
         }
-        // }
-        /* OLD WAY
-        //draw the shape background -- need to make this transparent somehow
-        e.fill(0);
-        e.textAlign(e.LEFT, e.CENTER);
-    
-        e.image(monitor.shape, monitor.position.x, monitor.position.y, monitor.size.w * 2, monitor.size.h * 2);
-        let monitorOffset = {x: monitor.position.x - monitor.size.w + 20, y: monitor.position.y - monitor.size.h /2}
-        let sectionSize = monitor.size.h / (e.donations.sorted.length + 1); //fence postttt
-        e.textSize(sectionSize * 0.5);
-        e.donations.sorted.forEach( (org) => {
-            // e.text(org["target"] + ": $" + org["funds"], monitorOffset.x, monitorOffset.y);
-            e.text(`${org["target"]}: $${parseFloat(org["funds"].toFixed(2))}`, monitorOffset.x, monitorOffset.y);
-            
-            monitorOffset.y += sectionSize; //better to use index?
-        });
-        // e.donations.sorted.forEach( (fund) => {
-        //     e.text(fund[0] + ": $" + fund[1], monitorOffset.x, monitorOffset.y);
-        //     monitorOffset.y += sectionSize; //better to use index?
-        // });
-        e.text("Total Donated: $" + parseFloat(e.donations.total).toFixed(2), monitorOffset.x, monitorOffset.y);
-        */
     }
 
     e.displayStats = () => {
@@ -476,6 +463,16 @@ let ecosystemInstance = function(e) {
             case "famine":
                 break;
             case "creation":
+                e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);
+                e.push();
+                e.fill(21, 96, 100);
+                e.textAlign(e.CENTER, e.CENTER);
+                if(e.hasCreatedSeed){
+                    e.text('Seed Critter Ready', e.godPanel.x, 2 * e.godPanel.y / 3);
+                } else {
+                    e.text('Click to Create Possible Seed', e.godPanel.x, 2 * e.godPanel.y / 3);
+                }
+                e.pop();
                 break;
             case "meltdown":
                 break;
@@ -500,7 +497,7 @@ let ecosystemInstance = function(e) {
                 e.godPanel.x += e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge += e.godPanel.fadeSpeed;
             } else {
-                //at end of fade
+                //at end of fade -- TODO relocate all the stupid show shit here
                 if(e.actState == "voting"){
                     e.participationCheckbox.show();
                     for (let dropdown of e.ranks){
@@ -508,14 +505,20 @@ let ecosystemInstance = function(e) {
                     }
                     e.helpIcon.show();
                 }
+                if (e.actState == "creation") {
+                    e.communityCreationButton.show();
+                }
                 return;
             }
         } else {
+            //hide all?? gotta be a better way
             e.participationCheckbox.hide();
             for (let dropdown of e.ranks){
                 dropdown.hide();
             }
             e.helpIcon.hide();
+            e.communityCreationButton.hide();
+            //continue fade out
             if (e.godPanel.rightEdge > 0){
                 e.godPanel.x -= e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge -= e.godPanel.fadeSpeed;

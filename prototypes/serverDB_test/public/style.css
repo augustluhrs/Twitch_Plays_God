@@ -57,4 +57,11 @@ canvas {
     top: 135px;
     left: 0px;
 }
+
+#communityCreationCanvas {
+    position: absolute;
+    margin: 0px;
+    top: 135px;
+    left: 0px;
+}
   
