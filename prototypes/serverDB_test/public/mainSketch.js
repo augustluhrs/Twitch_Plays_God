@@ -116,8 +116,10 @@ let mainInstance = (m) => {
                     }
 
                     m.modeButton.html("Back To The World")
-                    document.getElementById("orgList").style.display = "none";
+                    // document.getElementById("orgList").style.display = "none";
                     ecosystemSketch.godPanelDiv.hide();
+                    ecosystemSketch.donationsPanelDiv.hide();
+
 
                     // creationSketch.elt.position(0, page.height / 8);
                     // document.getElementById("creationCanvas").style(position(0, page.height / 8);
@@ -132,21 +134,6 @@ let mainInstance = (m) => {
 
                     ecosystemSketch.isReadyToSpawn = false;
                     ecosystemSketch.monitorFunds(); //to make list pop back up
-
-                    //ugh wrong place for these
-                    // document.getElementById("orgList").style.display = "block";
-                    // document.getElementById("orgList").hidden = false; // not sure why this doesn't work
-                    // document.getElementById("orgList").removeAttribute("hidden");
-                    // document.getElementById("orgList").removeAttribute("display");
-                    // console.log('asdfads');
-
-
-                    // document.getElementById("confirmationSpan").remove();
-
-
-                    // for (let child of document.getElementById('creationCanvas').children) {
-                    //     child.remove();
-                    // }
                 }
             });
         m.modeButton.hide();

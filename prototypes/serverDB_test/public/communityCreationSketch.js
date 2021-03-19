@@ -365,6 +365,8 @@ let communityCreationInstance = function(c) { //should change to c?
                 //close menu and bring back all stuff since not placing
                 mainSketch.modeButton.show();
                 ecosystemSketch.godPanelDiv.show();
+                ecosystemSketch.donationsPanelDiv.show();
+
                 ecosystemSketch.monitorFunds();
                 // c.select("#communityCreationSpan").hide();
                 c.select("#communityCreationCanvas").hide();
@@ -592,6 +594,8 @@ let communityCreationInstance = function(c) { //should change to c?
             //close menu and bring back all stuff since not placing
             mainSketch.modeButton.show();
             ecosystemSketch.godPanelDiv.show();
+            ecosystemSketch.donationsPanelDiv.show();
+
             ecosystemSketch.monitorFunds();
             // c.select("#communityCreationSpan").hide();
             // c.select("#defaultCanvas2").hide();

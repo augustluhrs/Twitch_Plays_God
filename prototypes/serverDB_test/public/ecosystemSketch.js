@@ -203,8 +203,10 @@ let ecosystemInstance = function(e) {
                 }
                 // m.modeButton.html("Back To The World") //gonna be fucky with this
                 mainSketch.modeButton.hide(); //need to show this and orgList and godPanel (monitorFunds)
-                document.getElementById("orgList").style.display = "none";
+                // document.getElementById("orgList").style.display = "none";
                 ecosystemSketch.godPanelDiv.hide();
+                ecosystemSketch.donationsPanelDiv.hide();
+
             });
         if (e.actState != "creation") {
             e.communityCreationButton.hide();
@@ -214,8 +216,13 @@ let ecosystemInstance = function(e) {
         // let listWidth = e.width / 6 + "px";
         // let listHeight = e.height / 3 + "px";
 
-        e.donationsPanelButton = e.createButton('DONATIONS')
+        //parent div for the panel, will move in and out on fade
+        e.donationsPanelDiv = e.createDiv()
             .parent("ecosystemCanvas")
+            .id("donationsPanelDiv");
+
+        e.donationsPanelButton = e.createButton('DONATIONS')
+            .parent("donationsPanelDiv")
             .class("button")
             .id("donationsPanelButton")
             .position(14.25 * e.width / 16, 8.5 * e.height / 9)
@@ -411,15 +418,15 @@ let ecosystemInstance = function(e) {
             // let listHeight = e.height / 3 + "px";
             let listWidth = 5 * e.donationsPanel.width / 7 + "px";
             let listHeight = 8 * e.donationsPanel.height / 9 + "px";
-            //parent div for the panel, will move in and out on fade
-            e.donationsPanelDiv = e.createDiv()
-                .parent("ecosystemCanvas")
-                .id("donationsPanel")
+            // //parent div for the panel, will move in and out on fade
+            // e.donationsPanelDiv = e.createDiv()
+            //     .parent("ecosystemCanvas")
+            //     .id("donationsPanel")
                 // .position(5 * e.width / 6, 2 * e.height/3)
             //div for the donation targets
             e.orgListDiv = e.createDiv()
                 // .parent("ecosystemCanvas")
-                .parent("donationsPanel")
+                .parent("donationsPanelDiv")
                 .id("orgList")
                 .class("scroll-hide")
                 // .position(5 * e.width / 6, 2 * e.height/3)
@@ -650,7 +657,7 @@ let ecosystemInstance = function(e) {
     e.drawDonationsPanel = () => {
         e.push();
         e.donationsPanelFade();
-        e.fill(238, 232, 44); //yellow
+        e.fill(238, 232, 44, 200); //yellow
         e.rect(e.donationsPanel.x, e.donationsPanel.y, e.donationsPanel.width, e.donationsPanel.height);
         e.pop();
     }

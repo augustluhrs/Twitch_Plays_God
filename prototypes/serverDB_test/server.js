@@ -225,10 +225,11 @@ world.on('connection', function(socket){
     //removing these so only updates when server is ready... wait no, can't b/c then sketch doesn't have certain variables...
     if(ecosystem != undefined){ //give it current status of everything
         console.log("world has ecosystem")
-        world.emit('fundsUpdate', ecosystem.conduit);
-        world.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
+        //WHY WAS THIS UPDATING EVERYONE
+        socket.emit('fundsUpdate', ecosystem.conduit);
+        socket.emit("statsUpdate", {critterCount: ecosystem.critterCount, worldLife: ecosystem.worldLife, communityFunds: ecosystem.communityFunds}); //toFixed...
         // world.emit("refresh"); //just so reloads if server resets -- nvm it loops, only really need this on my end so w/e
-        world.emit("currentAct", {actState: actState});
+        socket.emit("currentAct", {actState: actState});
     }
     
     //new event listeners
