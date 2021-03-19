@@ -16,6 +16,12 @@ let boundary = new Rectangle(D.worldSize.width / 2, D.worldSize.height / 2, D.wo
 class Ecosystem {
     //do I need a if (!(this instanceof Ecosystem))??
     constructor(ecoSetup) {
+        //for acts of god
+        this.isFamine = false;
+        this.isFlood = false;
+        this.isFire = false;
+        this.isMeltdown = false;
+        //setup based on whether existing or new
         if(typeof ecoSetup === "number"){
             console.log("new ecosystem");
             this.width = D.worldSize.width;
@@ -199,9 +205,14 @@ class Ecosystem {
                     needsBackup = true;
                 }
                 if (excretion.makeFood != null) {
-                    // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
-                    this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
-                    needsBackup = true;  
+                    if(!this.isFamine){
+                        // console.log("food at: " + JSON.stringify(excretion.makeFood.foodPos));
+                        this.makeFood(excretion.makeFood.amount, excretion.makeFood.foodPos);
+                        needsBackup = true;
+                    } else { //during famine poop goes straight to community funds
+                        this.communityFunds += excretion.makeFood.amount;
+                        this.worldLife -= excretion.makeFood.amount;
+                    }  
                 }
             }
             //update socket display positions

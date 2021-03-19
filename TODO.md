@@ -4,7 +4,7 @@
 
 **Feb 2021 Update** -- Cont. into March
 
-Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas.
+Hitting a fake roadblock with the critter creation for the first playtest. Need to excrete this so I can move on. Main issue was difference in absolute positioning for DOM elements in instance sketch -- need to reference page not canvas?
 
 - [X] Critter Creation
     - [X] Instance Mode with Page DOM Positioning
@@ -87,18 +87,19 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
 - [ ] basics page / tutorial / help
 - [ ] community effects / ACTS OF GOD
     - [X] brainstorm playtestable community effect prototypes
-    - [ ] food sprinkle (feast)
-        - [ ] foodSprinkle clientside toggle
-        - [ ] see where other clients are
-        - [ ] change to 0.01
-        - [ ] message + change panel
+    - [X] food sprinkle (feast)
+        - [X] foodSprinkle clientside toggle
+        - [X] see where other clients are
+        - [X] change to 0.01
+        - [X] message + change panel
     - [ ] famine (all poop goes to community funds)
         - [ ] visual effect
         - [ ] panel and message
         - [ ] all poop goes straight to community funds
-    - [ ] community critter generation
-        - [ ] same critter menu
-        - [ ] panel and message
+    - [X] community critter generation
+        - [X] same critter menu
+        - [X] panel and message
+        - [X] frankencritter
     - [ ] radioactive waste (area that increases mutation rate)
     - [ ] fire (area that reduces life -- goes to funds or else will draw in)
     - [ ] flood (all critters lose health)
@@ -133,7 +134,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] leaderboard filter by org
     - [ ] user donation as percentage of each critter donation
 - [ ] Playtest (start day and week later followup)
-    - [ ] host on glitch
+    - [X] host on glitch
     - [X] get group
     - [ ] intitial feedback survey
     - [ ] week later feedback survey
@@ -143,13 +144,12 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] reduce timers
 - [ ] Documentation
     - [ ] get media
-    - [ ] update github with current project status and media
+    - [X] update github with current project status and media
     - [ ] add to website
-    - [ ] create separate todo/changelog and update readme
+    - [X] create separate todo/changelog and update readme
     - [ ] design document with standards
     - [ ] prettier / ESLint?
     - [ ] versions and log
-    - [ ] readme update and todo separation
 - [ ] "use strict" for debugging? https://eloquentjavascript.net/08_error.html
 - [ ] standard toFixed/parseFloat across board https://modernweb.com/what-every-javascript-developer-should-know-about-floating-points/
 - [ ] needs some sort of new theming...

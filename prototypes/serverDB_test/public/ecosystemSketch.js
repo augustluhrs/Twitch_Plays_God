@@ -245,6 +245,7 @@ let ecosystemInstance = function(e) {
             e.displayTimerAndState();
             // if(e.showGodPanel){ //need this for fade to work right
             e.drawGodPanel();
+            // e.drawGodEffects();
             // }
             if (e.isReadyToSpawn) {
                 // only shows after create Critter button pressed
@@ -416,7 +417,7 @@ let ecosystemInstance = function(e) {
         e.text("Life in World: $" + parseFloat(e.stats.worldLife).toFixed(2), 4 * e.width / 5, e.height - 50); //need to make sure it's a float everytime I want to round?
     }
 
-    //god panel
+    //god panel -- turned into also being god effects draw
     e.drawGodPanel = () => {
         e.push();
         e.panelFade();
@@ -461,6 +462,30 @@ let ecosystemInstance = function(e) {
                 }
                 break;
             case "famine":
+                
+                e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);
+                e.push();
+                e.fill(21, 96, 100);
+                e.textAlign(e.CENTER, e.CENTER);
+                e.text("all poop goes straight to\ncommunity funds", e.godPanel.x, 2 * e.godPanel.y / 3);
+                e.pop();
+                //display visual
+                e.push();
+                e.translate(e.width/2, e.height/2)
+                e.rotate(e.frameCount * 0.01);
+                for (let j = 0; j < 8; j++) {
+                    e.push();
+                    for (let i = 0; i < 50; i++) {
+                        e.rotate(e.sin(e.frameCount * 0.001 + j) * 100);
+                        e.translate(
+                            // e.sin(e.frameCount * 0.001 + j) * 100,
+                            e.cos(e.frameCount * 0.001 + j) * 100,
+                            i * 0.1
+                        );
+                        e.text("💀", 0, 0);
+                    }
+                    e.pop();
+                }
                 break;
             case "creation":
                 e.rect(e.godPanel.x, 2 * e.godPanel.y / 3, e.godPanel.width, e.godPanel.height / 3);

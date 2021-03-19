@@ -387,6 +387,10 @@ setInterval( () => {
     // console.log(timeLeft)
     if (timeLeft >= 0) {
         io.emit("timer", {timeLeft: timeLeft});
+        //for acts that need something to happen at intervals
+        if (actState == "flood") {
+
+        }
     }
     //trigger next event
     if (timeLeft <= 0 && !hasAskedForVotes){ //prob a better way of doing this -- could do it clientside off timer, but want to make sure only happens once from server
@@ -400,18 +404,22 @@ setInterval( () => {
 }, 500);
 
 //acts of god event per round
-function endRound(){
+function endRound(){ //things that happen at the end of round
     hasAskedForVotes = true; //just to prevent it running a bunch
     if (actState == "voting") {
         io.emit("getVotes");
         // hasAskedForVotes = true;
+    }
+    if (actState == "famine") {
+        ecosystem.isFamine = false;
     }
     if(actState == "creation"){
         seedCritters = [];
         io.emit("getSeedCritters");
     }
 }
-function setupNextRound(){
+function setupNextRound(){ //things that happen at the beginning of a round
+    //this is maybe not the right place for this but its gotta happen at very end
     if (actState == "creation") {
         if (seedCritters.length != 0){
             console.log('spawning critter from community seeds')
@@ -440,7 +448,7 @@ function setupNextRound(){
     io.emit("currentAct", {actState: actState});
 }
 
-function actOfGod(act){
+function actOfGod(act){ //things that happen... when? at the very beginning of a round? this is redundant i think
     console.log(`act of god: ${act}`);
 
     switch(act) {
@@ -449,6 +457,7 @@ function actOfGod(act){
             userIcons.feastIcons = [];
             break;
         case "famine":
+            ecosystem.isFamine = true;
             break;
         case "creation":
             break;
