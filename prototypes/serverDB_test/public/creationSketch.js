@@ -11,6 +11,7 @@ let creationInstance = function(c) { //should change to c?
     let primarySelect, secondarySelect, primaryInput, secondaryInput, lastPrimary, lastSecondary;
     let otherPrimary, otherSecondary;
     let startingLifeSlider, startingLife;
+    c.numTargets = 0;
 
     //top middle
     let critterDisplay = {
@@ -225,8 +226,10 @@ let creationInstance = function(c) { //should change to c?
         // console.log(conduitData);
         // let targets = Object.keys(conduitData);
         // for (let [i, target] of targets.entries()) {
-        for (let org of ecosystemSketch.donations.sorted) {
-            let target = org.target;
+        // for (let org of ecosystemSketch.donations.sorted) {
+        for (let org of ecosystemSketch.donations.sortedTargets) {
+            // let target = org.target;
+            let target = org; //now just strings in the array
             primarySelect.option(target);
             secondarySelect.option(target);
             if (target == newCritter.donations[0].target) {
@@ -629,5 +632,54 @@ let creationInstance = function(c) { //should change to c?
         // } else {
         //     editsCost = 0.2;
         // }
+    }
+
+    c.newTargets = () => {
+        c.numTargets = ecosystemSketch.donations.sortedTargets.length;
+        document.getElementById('primarySelect').remove();
+        document.getElementById('secondarySelect').remove();
+
+        primarySelect = c.createSelect()
+            .id("primarySelect")
+            .position(c.width / 16, 4 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .parent("creationSpan")
+            .class("whitebox")
+            .changed(primaryUpdate);
+        secondarySelect = c.createSelect()
+            .id("secondarySelect")
+            .position(c.width / 16, 6 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .parent("creationSpan")
+            .class("whitebox")
+            .changed(secondaryUpdate);
+        for (let org of ecosystemSketch.donations.sortedTargets) {
+            // let target = org.target;
+            let target = org; //now just strings in the array
+            primarySelect.option(target);
+            secondarySelect.option(target);
+            if (target == newCritter.donations[0].target) {
+                primarySelect.selected(target);
+                lastPrimary = target;
+                secondarySelect.disable(target);
+            }
+            if (target == newCritter.donations[1].target) {
+                secondarySelect.selected(target);
+                lastSecondary = target;
+                primarySelect.disable(target);
+            }
+            // if (i == 0) {
+            //     primarySelect.selected(target);
+            //     lastPrimary = target;
+            //     secondarySelect.disable(target);
+            // }
+            // if (i == 1) {
+            //     secondarySelect.selected(target);
+            //     lastSecondary = target;
+            //     primarySelect.disable(target);
+            // }
+        }
+        primarySelect.option("other");
+        secondarySelect.option("other");
     }
 };

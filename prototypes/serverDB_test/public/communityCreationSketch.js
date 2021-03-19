@@ -11,6 +11,7 @@ let communityCreationInstance = function(c) { //should change to c?
     let primarySelect, secondarySelect, primaryInput, secondaryInput, lastPrimary, lastSecondary;
     let otherPrimary, otherSecondary;
     let startingLifeSlider, startingLife;
+    c.numTargets = 0;
 
     //top middle
     let critterDisplay = {
@@ -198,7 +199,7 @@ let communityCreationInstance = function(c) { //should change to c?
         //     .parent("communityCreationSpan")
         //     .id("p-holder")
         primarySelect = c.createSelect()
-            .id("primarySelect")
+            .id("communityPrimarySelect")
             .position(c.width / 16, 4 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("communityCreationSpan")
@@ -217,7 +218,7 @@ let communityCreationInstance = function(c) { //should change to c?
         //     }
         // })
         secondarySelect = c.createSelect()
-            .id("secondarySelect")
+            .id("communitySecondarySelect")
             .position(c.width / 16, 6 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .parent("communityCreationSpan")
@@ -226,8 +227,10 @@ let communityCreationInstance = function(c) { //should change to c?
         // console.log(conduitData);
         // let targets = Object.keys(conduitData);
         // for (let [i, target] of targets.entries()) {
-        for (let org of ecosystemSketch.donations.sorted) {
-            let target = org.target;
+        // for (let org of ecosystemSketch.donations.sorted) {
+        for (let org of ecosystemSketch.donations.sortedTargets) {
+            // let target = org.target;
+            let target = org; //now just strings in the array
             primarySelect.option(target);
             secondarySelect.option(target);
             if (target == communityCritter.donations[0].target) {
@@ -254,14 +257,14 @@ let communityCreationInstance = function(c) { //should change to c?
         primarySelect.option("other");
         secondarySelect.option("other");
         otherPrimary = c.createInput("Enter new non-profit")
-            .id("otherPrimary")
+            .id("communityOtherPrimary")
             .parent("communityCreationSpan")
             .position(c.width / 16, 4.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
             .class("whitebox")
             .hide();
         otherSecondary = c.createInput("Enter new non-profit")
-            .id("otherSecondary")
+            .id("communityOtherSecondary")
             .parent("communityCreationSpan")
             .position(c.width / 16, 6.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
@@ -482,8 +485,8 @@ let communityCreationInstance = function(c) { //should change to c?
 
     //fucking select bullshit, should make PR for p5 or something, ridiculous that you can't enable if you can disable
     function primaryUpdate(){
-        let primaryOptions = c.select("#primarySelect");
-        let secondaryOptions = c.select("#secondarySelect");
+        let primaryOptions = c.select("#communityPrimarySelect");
+        let secondaryOptions = c.select("#communitySecondarySelect");
         for (let i = 0; i < primaryOptions.elt.length; i++) {
             if(primaryOptions.elt[i].value == lastPrimary){
                 primaryOptions.elt[i].disabled = false;
@@ -495,17 +498,17 @@ let communityCreationInstance = function(c) { //should change to c?
             }
         }
         if(primarySelect.value() == "other"){
-            c.select("#otherPrimary").show();
+            c.select("#communityOtherPrimary").show();
         } else {
-            c.select("#otherPrimary").hide();
+            c.select("#communityOtherPrimary").hide();
             secondarySelect.disable(primarySelect.value());
             lastPrimary = primarySelect.value();
         }
     }
 
     function secondaryUpdate(){
-        let primaryOptions = c.select("#primarySelect");
-        let secondaryOptions = c.select("#secondarySelect");
+        let primaryOptions = c.select("#communityPrimarySelect");
+        let secondaryOptions = c.select("#communitySecondarySelect");
         for (let i = 0; i < primaryOptions.elt.length; i++) {
             if(primaryOptions.elt[i].value == lastSecondary){
                 primaryOptions.elt[i].disabled = false;
@@ -517,9 +520,9 @@ let communityCreationInstance = function(c) { //should change to c?
             }
         }
         if(secondarySelect.value() == "other"){
-            c.select("#otherSecondary").show();
+            c.select("#communityOtherSecondary").show();
         } else {
-            c.select("#otherSecondary").hide();
+            c.select("#communityOtherSecondary").hide();
             primarySelect.disable(secondarySelect.value());
             lastSecondary = secondarySelect.value();
         }
@@ -646,5 +649,57 @@ let communityCreationInstance = function(c) { //should change to c?
         // } else {
         //     editsCost = 0.2;
         // }
+    }
+
+    c.newTargets = () => {
+        // console.log(primarySelect);
+        c.numTargets = ecosystemSketch.donations.sortedTargets.length;
+
+
+        document.getElementById('communityPrimarySelect').remove();
+        document.getElementById('communitySecondarySelect').remove();
+        // console.log(primarySelect);
+        primarySelect = c.createSelect()
+            .id("communityPrimarySelect")
+            .position(c.width / 16, 4 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .parent("communityCreationSpan")
+            .class("whitebox")
+            .changed(primaryUpdate);
+        secondarySelect = c.createSelect()
+            .id("communitySecondarySelect")
+            .position(c.width / 16, 6 * c.height / 9)
+            .size(3 * c.width / 16, .25 * c.height / 9)
+            .parent("communityCreationSpan")
+            .class("whitebox")
+            .changed(secondaryUpdate);
+        for (let org of ecosystemSketch.donations.sortedTargets) {
+            // let target = org.target;
+            let target = org; //now just strings in the array
+            primarySelect.option(target);
+            secondarySelect.option(target);
+            if (target == newCritter.donations[0].target) {
+                primarySelect.selected(target);
+                lastPrimary = target;
+                secondarySelect.disable(target);
+            }
+            if (target == newCritter.donations[1].target) {
+                secondarySelect.selected(target);
+                lastSecondary = target;
+                primarySelect.disable(target);
+            }
+            // if (i == 0) {
+            //     primarySelect.selected(target);
+            //     lastPrimary = target;
+            //     secondarySelect.disable(target);
+            // }
+            // if (i == 1) {
+            //     secondarySelect.selected(target);
+            //     lastSecondary = target;
+            //     primarySelect.disable(target);
+            // }
+        }
+        primarySelect.option("other");
+        secondarySelect.option("other");
     }
 };

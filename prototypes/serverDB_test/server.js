@@ -343,6 +343,11 @@ world.on('connection', function(socket){
         backupGods();
     });
 
+    socket.on("addCommunityFunds", (data) => {
+        console.log(`Adding Community Funds: ${data.amount}`);
+        ecosystem.communityFunds += data.amount;
+    });
+
     //listen for this client to disconnect
     socket.on('disconnect', function(){
         console.log('input client disconnected: ' + socket.id);

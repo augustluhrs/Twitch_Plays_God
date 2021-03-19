@@ -111,6 +111,11 @@ let mainInstance = (m) => {
                 if(ecosystemSketch.isCreating){
                     if (creationSketch == undefined) {
                         creationSketch = new p5(creationInstance, 'creationCanvas');
+                    } else if (creationSketch.numTargets != ecosystemSketch.donations.sortedTargets.length) {
+                        //need to create new sketch if new donation targets
+                        console.log("refreshing creation menu for new targets");
+                        creationSketch.newTargets();
+                        m.select(`#creationCanvas`).show();
                     } else {
                         m.select(`#creationCanvas`).show();
                     }

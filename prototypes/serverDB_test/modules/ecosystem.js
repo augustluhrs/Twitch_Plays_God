@@ -240,6 +240,7 @@ class Ecosystem {
         //create critter and check Conduit
         this.critters.push(new Critter("user", critter));
         if (this.conduit.checkNewCritterTargets(critter.donations)){ //other donation stuff happens in .deposit()
+            // this.conduit.sortTargets();
             world.emit("fundsUpdate", this.conduit); //just if new orgs to add to creation menu
         }
         //update stats

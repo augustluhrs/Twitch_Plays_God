@@ -15,6 +15,7 @@ socket.on('update', (updates) => {
 socket.on('fundsUpdate', (conduit) => {
     console.log("fundsUpdate")
     ecosystemSketch.donations.sorted = conduit.donations;
+    ecosystemSketch.donations.sortedTargets = conduit.sortedTargets;
     ecosystemSketch.donations.total = conduit.totalRaised;
     ecosystemSketch.monitorFunds();
 });

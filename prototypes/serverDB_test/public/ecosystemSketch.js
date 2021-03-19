@@ -77,6 +77,7 @@ let ecosystemInstance = function(e) {
     //for the donations panel stuff
     e.donations = {
         sorted: [],
+        sortedTargets: [], //just the names for the dropdowns
         total: 0
     };
 
@@ -169,6 +170,9 @@ let ecosystemInstance = function(e) {
                 dropdown.option(act);
             }
             dropdown.selected("none");
+            dropdown.disable("fire");
+            dropdown.disable("lightning");
+            dropdown.disable("meltdown");
             dropdown.hide();
         }
         
@@ -198,8 +202,13 @@ let ecosystemInstance = function(e) {
             .mousePressed(() => {
                 if (communityCreationSketch == undefined) {
                     communityCreationSketch = new p5(communityCreationInstance, 'communityCreationCanvas');
+                } else if (communityCreationSketch.numTargets != ecosystemSketch.donations.sortedTargets.length){
+                    console.log("refreshing comcre menu for new targets");
+                    communityCreationSketch.newTargets();
+                    e.select(`#communityCreationCanvas`).show();
                 } else {
                     e.select(`#communityCreationCanvas`).show();
+
                 }
                 // m.modeButton.html("Back To The World") //gonna be fucky with this
                 mainSketch.modeButton.hide(); //need to show this and orgList and godPanel (monitorFunds)
@@ -512,7 +521,33 @@ let ecosystemInstance = function(e) {
                 if(e.isShowingVotingHelp){
                     e.push();
                     e.fill(238, 232, 44); //yellow
-                    e.rect(e.godPanel.rightEdge + e.godPanel.width / 9, e.godPanel.y, 3 * page.width / 16, 4 * page.height / 9);
+                    let helpPanel = {
+                        x: e.godPanel.rightEdge + e.godPanel.width / 9,
+                        y: e.godPanel.y,
+                        width: 3 * page.width / 16,
+                        height: 4 * page.height / 9
+                    }
+                    e.rect(helpPanel.x, helpPanel.y, helpPanel.width, helpPanel.height);
+                    //text
+                    e.textSize(18);
+                    e.textAlign(e.LEFT, e.TOP);
+                    e.fill(21, 96, 100); //dark blue
+                    //template literals include indentations...
+                    e.text("Rank any number of preferences\n" +
+                        "for which Act of God to happen next.\n\n" +
+                        "Your votes will only send if the\n" +
+                        "participation checkbox is checked.\n\n\n" +
+                        "FEAST: Click to Feed the Critters\n\n"+
+                        "FAMINE: Food created (poop) instead \n" +
+                        "   goes to the Community Funds\n\n"+
+                        "CREATION: Create a Critter that will be\n"+
+                        "   Frankensteined together with others\n\n" +
+                        // "Meltdown: Spill radioactive waste that\n"+
+                        // "   will increase critter mutation rate"+
+                        // "Fire:\n"+
+                        "FLOOD: All Critters lose $0.01 a second,\n"+
+                        "   which goes to the Community Fund\n\n"+
+                        "The other events are not available yet.", helpPanel.x - 4 * helpPanel.width / 9, helpPanel.y - 4 * helpPanel.height / 9);
                     e.pop();
                 }
                 break;
@@ -787,8 +822,8 @@ let ecosystemInstance = function(e) {
         infoGraphics.text("LIFE: " + critter.life.toFixed(2), e.overlay.w / 24, e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Poop Rate: " + critter.excretionRate.toFixed(2), e.overlay.w / 24, 2 * e.overlay.h / 24 + e.overlay.h / 4);
         //space then donation stats
-        infoGraphics.text("1: " + critter.donations[0].target + " -- donated: " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
-        infoGraphics.text("2: " + critter.donations[1].target + " -- donated: " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
+        infoGraphics.text(critter.donations[0].target + ": " + critter.donations[0].total.toFixed(2), e.overlay.w / 24, 4 * e.overlay.h / 24 + e.overlay.h / 4);
+        infoGraphics.text(critter.donations[1].target + ": " + critter.donations[1].total.toFixed(2), e.overlay.w / 24, 5 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Min Life b4 Donation: " + critter.minLifeToDonate.toFixed(2), e.overlay.w / 24, 6 * e.overlay.h / 24 + e.overlay.h / 4);
         // infoGraphics.text("Donation Timer: " + (floor(critter.donationRate) - critter.donationTimer), e.overlay.w / 24, 8 * e.overlay.h / 24 + e.overlay.h / 4);
         infoGraphics.text("Donation Percentage: " + critter.donationPercentage.toFixed(2) * 100 + "%", e.overlay.w / 24, 7 * e.overlay.h / 24 + e.overlay.h / 4);
