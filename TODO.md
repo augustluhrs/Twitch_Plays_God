@@ -84,6 +84,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] click username button to get your stats
     - [ ] change all relative positions to 16:9
     - [ ] turn donations list into fade panel too
+    - [ ] fix ecosystemCanvas css not having top offset
 - [ ] basics page / tutorial / help
 - [ ] community effects / ACTS OF GOD
     - [X] brainstorm playtestable community effect prototypes

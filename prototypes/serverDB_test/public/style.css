@@ -35,6 +35,12 @@ canvas {
     display: none; 
 }
 
+.scroll-text {
+    /* color: #667112; */
+    color: #156064;
+    font-size: x-large;
+}
+
 
 /* couldn't get it to work without doing it in html-- https://codepen.io/paulobrien/pen/yEjOwG */
 /* .select {
@@ -49,6 +55,13 @@ canvas {
 	width:200px;
 	height:1.5em;
 	background:#f9f9f9;
+} */
+
+/* #ecosystemCanvas { //ughhhhh
+    position: absolute;
+    margin: 0px;
+    top: 135px;
+    left: 0px;
 } */
 
 #creationCanvas {

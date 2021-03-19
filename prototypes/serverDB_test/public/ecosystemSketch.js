@@ -16,11 +16,7 @@ let ecosystemInstance = function(e) {
     //     sorted: []
     // };
 
-    e.donations = {
-        sorted: [],
-        total: 0
-    };
-    
+    //bottom row stats
     e.stats = {
         critterCount: 0,
         worldLife: 0,
@@ -50,13 +46,14 @@ let ecosystemInstance = function(e) {
     e.godPanelDiv;
     e.showGodPanel = false;
     e.godPanel = {
-        x: -(2.5 * page.width / 16),
+        x: -(2 * page.width / 16),
         y: (page.height / 2) - .25 * page.height / 9,
-        width: 5 *  page.width / 16, 
+        width: 4 *  page.width / 16, 
         height: 6 * page.height / 9,
         rightEdge: 0, 
-        edgeMax: (5 *  page.width / 16) + (.25 * page.width / 16),
-        fadeSpeed: 40
+        edgeMax: (4 *  page.width / 16) + (.25 * page.width / 16),
+        fadeSpeed: 40,
+        dir: "out"
     }
     e.allIcons = {
         feastIcons: [],
@@ -76,6 +73,32 @@ let ecosystemInstance = function(e) {
     // e.isCommunityCreation = false;
     e.communityCreationButton;
     e.hasCreatedSeed = false;
+
+    //for the donations panel stuff
+    e.donations = {
+        sorted: [],
+        total: 0
+    };
+
+    e.donationsPanel = { //just opposite of god panel
+        x: page.width + (2 * page.width / 16),
+        y: (page.height / 2) - .25 * page.height / 9,
+        width: 4 *  page.width / 16, 
+        height: 6 * page.height / 9,
+        leftEdge: page.width, 
+        edgeMax: page.width - ((4 *  page.width / 16) + (.25 * page.width / 16)),
+        fadeSpeed: 40,
+        dir: "out"
+    }
+    e.donationsPanelDiv;
+    e.orgListDiv;
+    // e.godsDonationListDiv;
+    // e.godsInvolementListDiv;
+    e.donationsPanelState = 'orgList';
+    e.donationsPanelButton;
+    e.donationsPanelModeButton;
+    e.showDonationsPanel = false;
+    
 
     
 
@@ -114,21 +137,11 @@ let ecosystemInstance = function(e) {
             .mousePressed(() => {
                 e.showGodPanel = !e.showGodPanel;
                 if (e.showGodPanel) { //bring out panel
-                    // e.panelFade("in", e.godPanel.x);
                     e.godPanel.dir = "in";
                     e.eventButton.html("HIDE PANEL");
-                    // for (let d of e.ranks) { //why the fuck am i hiding here
-                    //     d.hide();
-                    // }
                 } else { //hide panel
                     e.eventButton.html("BE GOD");
                     e.godPanel.dir = "out";
-                    // e.panelFade("out", e.godPanel.x);
-                    // if (e.actState == "voting") {
-                    //     for (let d of e.ranks) {
-                    //         d.show();
-                    //     }
-                    // }
                 }
             });
 
@@ -140,15 +153,6 @@ let ecosystemInstance = function(e) {
         e.participationCheckbox.hide();
         for(let i = 0; i < 7; i++){
             let newRankDropdown = e.createSelect();
-            //will be undefined for some reason if we do this here
-                // .id(`rank${i}`)
-                // .parent('godPanelDiv')
-                // .class('whitebox')
-                // .size(2 * e.godPanel.width / 4, e.godPanel.height / 14)
-                // .position(e.godPanel.x + e.godPanel.width, (e.godPanel.y - e.godPanel.height / 2) + (8 + (2*i)) * e.godPanel.height / 30)
-                // .changed(e.rankingChange)
-                // .option("none")
-            // console.log(newRankDropdown)
             e.ranks.push(newRankDropdown);
         }
         for (let [i, dropdown] of e.ranks.entries()) {
@@ -190,7 +194,7 @@ let ecosystemInstance = function(e) {
             .parent('godPanelDiv')
             .class("button")
             .id("communityCreationButton")
-            .position(1.75 * e.width / 16, 4.25 * e.height / 9)
+            .position(1.25 * e.width / 16, 4.25 * e.height / 9)
             .mousePressed(() => {
                 if (communityCreationSketch == undefined) {
                     communityCreationSketch = new p5(communityCreationInstance, 'communityCreationCanvas');
@@ -206,25 +210,35 @@ let ecosystemInstance = function(e) {
             e.communityCreationButton.hide();
         }
 
-        //scrollable donations list -- hmmm but this will cover the critters... should make collapsable
-        let listWidth = e.width / 6 + "px";
-        let listHeight = e.height / 3 + "px";
+        //scrollable donations list
+        // let listWidth = e.width / 6 + "px";
+        // let listHeight = e.height / 3 + "px";
 
-        //having issues with this not being declared in time
-        // e.createDiv()
-        //     .parent("ecosystemCanvas")
-        //     .id("orgList")
-        //     .position(7 * e.width / 8, 2 * e.height/3)
+        e.donationsPanelButton = e.createButton('DONATIONS')
+            .parent("ecosystemCanvas")
+            .class("button")
+            .id("donationsPanelButton")
+            .position(14.25 * e.width / 16, 8.5 * e.height / 9)
+            .mousePressed(() => {
+                e.showDonationsPanel = !e.showDonationsPanel;
+                if (e.showDonationsPanel) { //bring out panel
+                    e.donationsPanel.dir = "in";
+                    e.donationsPanelButton.html("HIDE PANEL");
+
+                } else { //hide panel
+                    e.donationsPanelButton.html("DONATIONS");
+                    e.donationsPanel.dir = "out";
+                }
+            });
+
+        e.monitorFunds();
+
+        //nvm don't need this because gets fundsUpdate on load?
+        // e.select("#orgList")
+        //     .position(5 * e.width / 6, 2 * e.height/3)
         //     .style("height", listHeight)
         //     .style("width", listWidth)
         //     .style("overflow", "scroll");
-
-        //nvm don't need this because gets fundsUpdate on load?
-        e.select("#orgList")
-            .position(5 * e.width / 6, 2 * e.height/3)
-            .style("height", listHeight)
-            .style("width", listWidth)
-            .style("overflow", "scroll");
         // e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
         //     .parent("orgList")
         //     .class("orgDivs")
@@ -245,6 +259,7 @@ let ecosystemInstance = function(e) {
             e.displayTimerAndState();
             // if(e.showGodPanel){ //need this for fade to work right
             e.drawGodPanel();
+            e.drawDonationsPanel();
             // e.drawGodEffects();
             // }
             if (e.isReadyToSpawn) {
@@ -382,29 +397,77 @@ let ecosystemInstance = function(e) {
         // }
         //not sure why i can't just remove the children, weird dupe bugs, just removing whole thing and remaking
         if(!e.isCreating){ //had to put this here because fundsUpdate during creation would make it appear
-            e.select("#orgList").remove();
-            let listWidth = e.width / 6 + "px";
-            let listHeight = e.height / 3 + "px";
-            e.createDiv()
+            //remove the three lists so we can remake them?
+            if (document.getElementById('orgList')){
+                document.getElementById('orgList').remove();
+                // document.getElementById('godsDonationList').remove();
+                // document.getElementById('godsInvolvementList').remove();
+
+                // e.select('#orgList').hide();
+                // e.select('#godsDonationList').hide();
+                // e.select('#godsInvolvementList').hide();
+            }
+            // let listWidth = e.width / 6 + "px";
+            // let listHeight = e.height / 3 + "px";
+            let listWidth = 5 * e.donationsPanel.width / 7 + "px";
+            let listHeight = 8 * e.donationsPanel.height / 9 + "px";
+            //parent div for the panel, will move in and out on fade
+            e.donationsPanelDiv = e.createDiv()
                 .parent("ecosystemCanvas")
+                .id("donationsPanel")
+                // .position(5 * e.width / 6, 2 * e.height/3)
+            //div for the donation targets
+            e.orgListDiv = e.createDiv()
+                // .parent("ecosystemCanvas")
+                .parent("donationsPanel")
                 .id("orgList")
                 .class("scroll-hide")
-                .position(5 * e.width / 6, 2 * e.height/3)
+                // .position(5 * e.width / 6, 2 * e.height/3)
+                .position(e.donationsPanel.x - 3 * e.donationsPanel.width / 8, e.donationsPanel.y - e.donationsPanel.height / 4)
                 .style("height", listHeight)
                 .style("width", listWidth)
                 .style("overflow", "scroll");
             e.createDiv(`TOTAL RAISED: $${parseFloat(e.donations.total.toFixed(2))}`)
                 .parent("orgList")
-                .class("orgDivs")
+                // .class("orgDivs")
+                .class("scroll-text")
+
             e.createDiv(`&nbsp;`) //space after TOTAL -- should proabably use something else eventually (https://stackoverflow.com/questions/3416454/how-to-make-an-empty-div-take-space)
                 .parent("orgList")
-                .class("orgDivs")
+                // .class("orgDivs")
+                .class("scroll-text")
             // for(let i = 0; i<10; i++) { //just for testing scroll -- eventually might need to show some other way that the list continues
             for (let org of e.donations.sorted) {
                 e.createDiv(`${org.target}: $${parseFloat(org.funds.toFixed(2))}`)
                     .parent("orgList")
-                    .class("orgDivs")
+                    // .class("orgDivs")
+                    .class("scroll-text")
             }
+            // e.select('#orgList').hide();
+
+            //gods by donation
+            // e.godsDonationListDiv = e.createDiv()
+            //     .parent("donationsPanel")
+            //     .id("godsDonationList")
+            //     .class("scroll-hide")
+            //     // .position(5 * e.width / 6, 2 * e.height/3)
+            //     .style("height", listHeight)
+            //     .style("width", listWidth)
+            //     .style("overflow", "scroll");
+            // e.select('#godsDonationList').hide();
+            
+
+            // //gods by involvement
+            // e.godsInvolementListDiv = e.createDiv()
+            //     .parent("donationsPanel")
+            //     .id("godsInvolvementList")
+            //     .class("scroll-hide")
+            //     // .position(5 * e.width / 6, 2 * e.height/3)
+            //     .style("height", listHeight)
+            //     .style("width", listWidth)
+            //     .style("overflow", "scroll");
+            // e.select('#godsInvolvementList').hide();
+            
         }
     }
 
@@ -441,7 +504,7 @@ let ecosystemInstance = function(e) {
                 
                 if(e.isShowingVotingHelp){
                     e.push();
-                    e.fill(238, 232, 44);
+                    e.fill(238, 232, 44); //yellow
                     e.rect(e.godPanel.rightEdge + e.godPanel.width / 9, e.godPanel.y, 3 * page.width / 16, 4 * page.height / 9);
                     e.pop();
                 }
@@ -577,6 +640,48 @@ let ecosystemInstance = function(e) {
             if (e.godPanel.rightEdge > 0){
                 e.godPanel.x -= e.godPanel.fadeSpeed;
                 e.godPanel.rightEdge -= e.godPanel.fadeSpeed;
+            } else {
+                return;
+            }
+        }
+    }
+
+    //donations panel on right
+    e.drawDonationsPanel = () => {
+        e.push();
+        e.donationsPanelFade();
+        e.fill(238, 232, 44); //yellow
+        e.rect(e.donationsPanel.x, e.donationsPanel.y, e.donationsPanel.width, e.donationsPanel.height);
+        e.pop();
+    }
+
+    e.donationsPanelFade = () => {
+        let dir = e.donationsPanel.dir;
+        if (dir == "in") {
+            if (e.donationsPanel.leftEdge > e.donationsPanel.edgeMax) {
+                e.donationsPanel.x -= e.donationsPanel.fadeSpeed;
+                e.donationsPanel.leftEdge -= e.donationsPanel.fadeSpeed;
+            } else {
+                // e.donationsPanelDiv.show();
+                e.select(`#${e.donationsPanelState}`).show();
+                // e.orgListDiv.position(e.donationsPanel.x - e.donationsPanel.width / 4, e.donationsPanel.y - e.donationsPanel.height / 4)
+                e.orgListDiv.position(e.donationsPanel.x - 3 * e.donationsPanel.width / 8, e.donationsPanel.y - e.donationsPanel.height / 4)
+               
+                return;
+            }
+        } else {
+            // paranoid about monitor funds getting rid of these
+            if (document.getElementById('orgList')){
+                e.select('#orgList').hide();
+                // e.select('#godsDonationList').hide();
+                // e.select('#godsInvolvementList').hide();
+            }
+            // e.donationsPanelDiv.hide();
+            
+            //continue fade out
+            if (e.donationsPanel.leftEdge < page.width){
+                e.donationsPanel.x += e.donationsPanel.fadeSpeed;
+                e.donationsPanel.leftEdge += e.donationsPanel.fadeSpeed;
             } else {
                 return;
             }
