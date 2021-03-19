@@ -260,15 +260,15 @@ let creationInstance = function(c) { //should change to c?
             .parent("creationSpan")
             .position(c.width / 16, 4.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
-            .class("whitebox")
-            .hide();
+            .class("whitebox");
+        otherPrimary.hide();
         otherSecondary = c.createInput("Enter new non-profit")
             .id("otherSecondary")
             .parent("creationSpan")
             .position(c.width / 16, 6.5 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)
-            .class("whitebox")
-            .hide();
+            .class("whitebox");
+        otherSecondary.hide();
         startingLifeSlider = c.createSlider(.05, userData.funds, newCritter.life, .05)
             .position(c.width / 16, 8 * c.height / 9)
             .size(3 * c.width / 16, .25 * c.height / 9)

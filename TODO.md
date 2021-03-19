@@ -52,7 +52,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] saturation threshold so hue doesn't lerp if black/white
 - [ ] UI misc unessential
     - [X] Scrollable Donation List
-    - [ ] Collapsable Donation List
+    - [X] Collapsable Donation List
     - [X] hide scrollbar
     - [X] hide donations list on menu click and if fundsUpdate
     - [ ] no overlap between critter overlay and funds monitor... keep left or hide?
@@ -85,6 +85,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [ ] change all relative positions to 16:9
     - [ ] turn donations list into fade panel too
     - [ ] fix ecosystemCanvas css not having top offset
+    - [ ] fix otherOrg inputs show/hide bugs
 - [ ] basics page / tutorial / help
 - [ ] community effects / ACTS OF GOD
     - [X] brainstorm playtestable community effect prototypes
@@ -93,17 +94,17 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
         - [X] see where other clients are
         - [X] change to 0.01
         - [X] message + change panel
-    - [ ] famine (all poop goes to community funds)
-        - [ ] visual effect
-        - [ ] panel and message
-        - [ ] all poop goes straight to community funds
+    - [X] famine (all poop goes to community funds)
+        - [X] visual effect
+        - [X] panel and message
+        - [X] all poop goes straight to community funds
     - [X] community critter generation
         - [X] same critter menu
         - [X] panel and message
         - [X] frankencritter
     - [ ] radioactive waste (area that increases mutation rate)
     - [ ] fire (area that reduces life -- goes to funds or else will draw in)
-    - [ ] flood (all critters lose health)
+    - [X] flood (all critters lose health)
     - [ ] lightning strike (one critter instantly dies)
     - [X] ~~ranked choice voting system~~ Condorcet-Lite Voting
     - [X] timer for rounds
@@ -139,7 +140,7 @@ Hitting a fake roadblock with the critter creation for the first playtest. Need 
     - [X] get group
     - [ ] intitial feedback survey
     - [ ] week later feedback survey
-    - [ ] user log in
+    - [X] user log in
     - [ ] initial playtest
     - [ ] ethics playtest/check-in
     - [X] reduce timers
